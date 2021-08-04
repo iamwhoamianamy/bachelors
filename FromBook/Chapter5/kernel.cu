@@ -1,121 +1,149 @@
-﻿
+﻿#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <fstream>
+#include "GL/freeglut.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "cudahelper.cuh"
+#include "math_constants.h"
 
-#include <stdio.h>
+const int DIM = 1024;
+const int IMAGE_SIZE = DIM * DIM * 3;
+const int FPS = 30;
 
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
+unsigned char* bitmap_pixels;
 
-__global__ void addKernel(int *c, const int *a, const int *b)
+struct Info
 {
-    int i = threadIdx.x;
-    c[i] = a[i] + b[i];
+   float p = CUDART_PI_F;
+   float t = 0;
+};
+
+Info info;
+
+__device__ void setPixel(unsigned char* ptr, const int offset, const unsigned char r, const unsigned char g, const unsigned char b)
+{
+   ptr[offset * 3 + 0] = r;
+   ptr[offset * 3 + 1] = g;
+   ptr[offset * 3 + 2] = b;
 }
 
-int main()
+__device__ void setPixel(unsigned char* ptr, const int offset, const unsigned char value)
 {
-    const int arraySize = 5;
-    const int a[arraySize] = { 1, 2, 3, 4, 5 };
-    const int b[arraySize] = { 10, 20, 30, 40, 50 };
-    int c[arraySize] = { 0 };
-
-    // Add vectors in parallel.
-    cudaError_t cudaStatus = addWithCuda(c, a, b, arraySize);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "addWithCuda failed!");
-        return 1;
-    }
-
-    printf("{1,2,3,4,5} + {10,20,30,40,50} = {%d,%d,%d,%d,%d}\n",
-        c[0], c[1], c[2], c[3], c[4]);
-
-    // cudaDeviceReset must be called before exiting in order for profiling and
-    // tracing tools such as Nsight and Visual Profiler to show complete traces.
-    cudaStatus = cudaDeviceReset();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceReset failed!");
-        return 1;
-    }
-
-    return 0;
+   ptr[offset * 3 + 0] = value;
+   ptr[offset * 3 + 1] = value;
+   ptr[offset * 3 + 2] = value;
 }
 
-// Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size)
+__global__ void kernel(unsigned char* ptr, const float t)
 {
-    int *dev_a = 0;
-    int *dev_b = 0;
-    int *dev_c = 0;
-    cudaError_t cudaStatus;
+   int x = threadIdx.x + blockIdx.x * blockDim.x;
+   int y = threadIdx.y + blockIdx.y * blockDim.y;
+   int offset = x + y * blockDim.x * gridDim.x;
 
-    // Choose which GPU to run on, change this on a multi-GPU system.
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
+   float fx = x - DIM / 2;
+   float fy = y - DIM / 2;
 
-    // Allocate GPU buffers for three vectors (two input, one output)    .
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+   float d = sqrtf(fx * fx + fy * fy);
 
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+   unsigned char value = (unsigned char)(128.0f + 127.0f * cos(d / 10.0f - t / 7.0f) / (d / 10.0f + 1.0f));
 
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+   setPixel(ptr, offset, value);
+}
 
-    // Copy input vectors from host memory to GPU buffers.
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+void formRings()
+{
+   unsigned char* dev_bitmap;
 
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+   tryCudaMalloc((void**)&dev_bitmap, IMAGE_SIZE);
 
-    // Launch a kernel on the GPU with one thread for each element.
-    addKernel<<<1, size>>>(dev_c, dev_a, dev_b);
+   dim3 blocks(DIM / 16, DIM / 16);
+   dim3 threads(16, 16);
 
-    // Check for any errors launching the kernel
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-        goto Error;
-    }
-    
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
-        goto Error;
-    }
+   kernel<<<blocks, threads>>>(dev_bitmap, info.t);
 
-    // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+   tryKernelLaunch();
+   tryKernelSynchronize();
 
-Error:
-    cudaFree(dev_c);
-    cudaFree(dev_a);
-    cudaFree(dev_b);
-    
-    return cudaStatus;
+   handleError(cudaMemcpy(bitmap_pixels, dev_bitmap, IMAGE_SIZE, cudaMemcpyDeviceToHost));
+   cudaFree(dev_bitmap);
+}
+
+// Функция изменения размеров окна
+void reshape(GLint w, GLint h)
+{
+   glViewport(0, 0, DIM, DIM);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   glOrtho(0, DIM, 0, DIM, -1.0, 1.0);
+   glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
+}
+
+// Функция обработки сообщений от клавиатуры 1
+void keyboardLetters(unsigned char key, int x, int y)
+{
+   switch(key)
+   {
+
+   }
+
+   glutPostRedisplay();
+}
+
+// Функция вывода на экран 
+void display()
+{
+   glClear(GL_COLOR_BUFFER_BIT);
+   glRasterPos2i(0, 0);
+
+   formRings();
+   glDrawPixels(DIM, DIM, GL_RGB, GL_UNSIGNED_BYTE, bitmap_pixels);
+   info.t += 1.0f;
+
+   glFinish();
+}
+
+void onTimer(int millisec)
+{
+   glutPostRedisplay();
+   glutTimerFunc(1000 / FPS, onTimer, 0);
+}
+
+void initializing()
+{
+   bitmap_pixels = new unsigned char[IMAGE_SIZE];
+}
+
+void exitingFunction()
+{
+   tryCudaLastError();
+   delete[] bitmap_pixels;
+
+   tryCudaReset();
+   std::cout << "Done!";
+}
+
+int main(int argc, char** argv)
+{
+   glutInit(&argc, argv);
+   glutInitDisplayMode(GLUT_RGB);
+   glutInitWindowSize(DIM, DIM);
+   glutCreateWindow("Фрактал");
+
+   glShadeModel(GL_FLAT);
+   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+   glutDisplayFunc(display);
+   glutReshapeFunc(reshape);
+   glutKeyboardFunc(keyboardLetters);
+   atexit(exitingFunction);
+   glutTimerFunc(0, onTimer, 0);
+
+   initializing();
+
+   glutMainLoop();
+
+   return 0;
 }
