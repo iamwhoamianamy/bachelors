@@ -14,6 +14,13 @@ void printg(const char *str)
    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
 }
 
+void printr(const char* str)
+{
+   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
+   printf(str);
+   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
+}
+
 cudaError_t handleError(cudaError_t functReturn)
 {
    switch(functReturn)
@@ -24,7 +31,7 @@ cudaError_t handleError(cudaError_t functReturn)
       }
       default:
       {
-         printf("ERROR!\n");
+         printr("ERROR!\n");
          std::exit(0);
       }
    }
@@ -36,7 +43,7 @@ void tryCudaMalloc(void** devPtr, const size_t size)
 
    if(cudaStatus != cudaError::cudaSuccess)
    {
-      printf("Error on allocating memory!\n");
+      printr("Error on allocating memory!\n");
 
       free(*devPtr);
 
@@ -50,7 +57,7 @@ void tryCudaLastError()
 
    if(cudaStatus != cudaError::cudaSuccess)
    {
-      printf("An error occured!\n");
+      printr("An error occured!\n");
 
       std::exit(0);
    }
@@ -66,7 +73,7 @@ void tryCudaReset()
    }
    else
    {
-      printf("Cuda device reset failed!\n");
+      printr("Cuda device reset failed!\n");
 
       std::exit(0);
    }
@@ -78,7 +85,7 @@ void tryKernelLaunch()
 
    if(cudaStatus != cudaError::cudaSuccess)
    {
-      printf("Kernel launch failed!\n");
+      printr("Kernel launch failed!\n");
 
       std::exit(0);
    }
@@ -90,7 +97,7 @@ void tryKernelSynchronize()
 
    if(cudaStatus != cudaError::cudaSuccess)
    {
-      printf("Kernel synchrinisation failed!\n");
+      printr("Kernel synchrinisation failed!\n");
 
       std::exit(0);
    }
