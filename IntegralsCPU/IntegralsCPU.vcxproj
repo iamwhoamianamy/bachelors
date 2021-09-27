@@ -152,6 +152,7 @@
     <ClCompile Include="point.cpp" />
     <ClCompile Include="quad_points.cpp" />
     <ClCompile Include="triangle.cpp" />
+    <ClCompile Include="triangle_quadratures.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

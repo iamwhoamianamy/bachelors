@@ -18,7 +18,9 @@ double f(Point p)
 
 int main()
 {
-   Mesh sphere("icosphere.txt");
+   //Mesh sphere("icosphere.txt");
+   Mesh sphere = std::move(Mesh::FromOBJ("icosphere.obj"));
+
    QuadPoints qp = QuadPoints(6);
 
    double sum = 0;
@@ -30,7 +32,7 @@ int main()
    {
       Triangle tr = sphere.GetTriangle(i);
       double area = tr.Area();
-      double integral = calcIntegral(f, tr, qp);
+      double integral = calcIntegralOverTriangle(f, tr, qp);
       cout << setw(4) << i << setw(14) << area << setw(14) << integral << endl;
       sum += integral;
    }

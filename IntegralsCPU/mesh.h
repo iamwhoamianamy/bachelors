@@ -15,8 +15,14 @@ namespace triangle_quadratures
       vector<vector<int>> _faces_ind;
 
    public:
+      Mesh();
       Mesh(string fileName);
+      Mesh(Mesh&& mesh) noexcept;
+
       Triangle GetTriangle(int index) const;
       int TriangleCount() const;
+
+      Mesh& operator=(Mesh&& mesh) noexcept;
+      static Mesh& FromOBJ(string fileName);
    };
 }
