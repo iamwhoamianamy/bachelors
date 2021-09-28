@@ -19,7 +19,8 @@ double f(Point p)
 int main()
 {
    //Mesh sphere("icosphere.txt");
-   Mesh sphere = std::move(Mesh::FromOBJ("icosphere.obj"));
+   Mesh sphere;
+   sphere.InitFromOBJ("icosphere.obj");
 
    QuadPoints qp = QuadPoints(6);
 

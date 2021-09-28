@@ -9,7 +9,7 @@ namespace triangle_quadratures
 
    }
 
-   Mesh::Mesh(string fileName)
+   void Mesh::InitFromTXT(string fileName)
    {
       ifstream fin;
       fin.open(fileName, ios_base::in);
@@ -44,12 +44,12 @@ namespace triangle_quadratures
       fin.close();
    }
 
-   Mesh::Mesh(Mesh&& mesh) noexcept
-   {
-      _triangles_count = mesh._triangles_count;
-      _vertices = std::move(mesh._vertices);
-      _faces_ind = std::move(mesh._faces_ind);
-   }
+   //Mesh::Mesh(Mesh&& mesh) noexcept
+   //{
+   //   _triangles_count = mesh._triangles_count;
+   //   _vertices = std::move(mesh._vertices);
+   //   _faces_ind = std::move(mesh._faces_ind);
+   //}
 
    Triangle Mesh::GetTriangle(int index) const
    {
@@ -65,17 +65,16 @@ namespace triangle_quadratures
       return _triangles_count;
    }
 
-   Mesh& Mesh::operator=(Mesh&& mesh) noexcept
-   {
-      _triangles_count = mesh._triangles_count;
-      _vertices = std::move(mesh._vertices);
-      _faces_ind = std::move(mesh._faces_ind);
-      return *this;
-   }
+   //Mesh& Mesh::operator=(Mesh&& mesh) noexcept
+   //{
+   //   _triangles_count = mesh._triangles_count;
+   //   _vertices = std::move(mesh._vertices);
+   //   _faces_ind = std::move(mesh._faces_ind);
+   //   return *this;
+   //}
 
-   Mesh& Mesh::FromOBJ(string fileName)
+   void Mesh::InitFromOBJ(string fileName)
    {
-      Mesh result_mesh;
       ifstream fin;
       fin.open(fileName, ios_base::in);
 
@@ -92,7 +91,7 @@ namespace triangle_quadratures
          {
             double x, y, z;
             fin >> x >> y >> z;
-            result_mesh._vertices.push_back(Point(x, y, z));
+            _vertices.push_back(Point(x, y, z));
          }
          if (letter == "f")
          {
@@ -105,13 +104,11 @@ namespace triangle_quadratures
             temp[1] = i1 - 1;
             temp[2] = i2 - 1;
 
-            result_mesh._faces_ind.push_back(temp);
+            _faces_ind.push_back(temp);
          }
       }
 
-      result_mesh._triangles_count = result_mesh._faces_ind.size();
+      _triangles_count = _faces_ind.size();
       fin.close();
-
-      return result_mesh;
    }
 }
