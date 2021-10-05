@@ -147,6 +147,7 @@
     <ClInclude Include="triangle_quadratures.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="exeptions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="point.cpp" />
