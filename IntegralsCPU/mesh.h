@@ -16,13 +16,13 @@ namespace triangle_quadratures
 
    public:
       Mesh();
-      void InitFromTXT(string fileName);
+      //void InitFromTXT(string fileName);
+      void InitFromOBJ(string fileName);
       //Mesh(Mesh&& mesh) noexcept;
 
       Triangle GetTriangle(int index) const;
       int TriangleCount() const;
 
       //Mesh& operator=(Mesh&& mesh) noexcept;
-      void InitFromOBJ(string fileName);
    };
 }
