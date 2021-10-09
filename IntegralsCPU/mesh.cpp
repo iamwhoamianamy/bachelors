@@ -18,13 +18,13 @@ namespace triangle_quadratures
          throw FileExeption();
 
       fin >> _triangles_count;
-      _vertices = vector<Point>(_triangles_count);
+      _vertices = vector<Vector3>(_triangles_count);
 
       for(size_t i = 0; i < _triangles_count; i++)
       {
          double x, y, z;
          fin >> x >> y >> z;
-         _vertices[i] = Point(x, y, z);
+         _vertices[i] = Vector3(x, y, z);
       }
 
       int faces_count;
@@ -66,7 +66,7 @@ namespace triangle_quadratures
                double x, y, z;
                fin >> x >> y >> z;
 
-               _vertices.push_back(Point(x, y, z));
+               _vertices.push_back(Vector3(x, y, z));
             }
             if(letter == "f")
             {
@@ -131,5 +131,4 @@ namespace triangle_quadratures
    //   _faces_ind = std::move(mesh._faces_ind);
    //   return *this;
    //}
-
 }

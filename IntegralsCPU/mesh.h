@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "vector3.h"
 #include "triangle.h"
 
 using namespace std;
@@ -11,7 +12,7 @@ namespace triangle_quadratures
    {
    private:
       int _triangles_count;
-      vector<Point> _vertices;
+      vector<Vector3> _vertices;
       vector<vector<int>> _faces_ind;
 
    public:
