@@ -7,8 +7,8 @@ namespace triangle_quadratures
    double Triangle::CalcArea()
    {
       //return 0.5 * abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y));
-      Point ab(b.x - a.x, b.y - a.y, b.z - a.z);
-      Point ac(c.x - a.x, c.y - a.y, c.z - a.z);
+      Vector3 ab(b.x - a.x, b.y - a.y, b.z - a.z);
+      Vector3 ac(c.x - a.x, c.y - a.y, c.z - a.z);
 
       double t0 = ab.y * ac.z - ab.z * ac.y;
       double t1 = ab.z * ac.x - ab.x * ac.z;
@@ -38,7 +38,7 @@ namespace triangle_quadratures
       area = CalcArea();
    }
 
-   Triangle::Triangle(Point a, Point b, Point c) : a(a), b(b), c(c)
+   Triangle::Triangle(Vector3 a, Vector3 b, Vector3 c) : a(a), b(b), c(c)
    {
       area = CalcArea();
    }
@@ -60,7 +60,7 @@ namespace triangle_quadratures
       return { a.z, b.z, c.z };
    }
 
-   Point& Triangle::operator[](int i)
+   Vector3& Triangle::operator[](int i)
    {
       switch(i)
       {
@@ -95,11 +95,25 @@ namespace triangle_quadratures
       return a.z + (b.z - a.z) * s + (c.z - a.z) * t;
    }
 
-   Point Triangle::PointFromST(double s, double t) const
+   Vector3 Triangle::PointFromST(double s, double t) const
    {
       if(s > 1.0 || t > 1.0 || t > 1.0 - s)
          throw RangeExeption();
 
-      return Point(XFromST(s, t), YFromST(s, t), ZFromST(s, t));
+      return Vector3(XFromST(s, t), YFromST(s, t), ZFromST(s, t));
+   }
+
+   Vector3 Triangle::Normal() const
+   {
+      Vector3 u = a - b;
+      Vector3 v = a - c;
+
+      Vector3 normal(
+         u.y * v.z - u.z * v.y,
+         u.z * v.x - u.x * v.z,
+         u.x * v.y - u.y * v.x
+      );
+
+      return normal.Normalized() * -1;
    }
 }

@@ -1,19 +1,19 @@
 #pragma once
 #include <vector>
-#include "point.h"
+#include "vector3.h"
 
 namespace triangle_quadratures
 {
-   struct Triangle
+   class Triangle
    {
    private:
       double area;
       double CalcArea();
 
    public:
-      Point a;
-      Point b;
-      Point c;
+      Vector3 a;
+      Vector3 b;
+      Vector3 c;
 
       Triangle();
 
@@ -25,7 +25,7 @@ namespace triangle_quadratures
                double bx, double by,
                double cx, double cy);
 
-      Triangle(Point a, Point b, Point c);
+      Triangle(Vector3 a, Vector3 b, Vector3 c);
 
       double Area() const;
 
@@ -33,11 +33,12 @@ namespace triangle_quadratures
       std::vector<double> Ys() const;
       std::vector<double> Zs() const;
 
-      Point& operator[](int i);
+      Vector3& operator[](int i);
 
       double XFromST(double s, double t) const;
       double YFromST(double s, double t) const;
       double ZFromST(double s, double t) const;
-      Point PointFromST(double s, double t) const;
+      Vector3 PointFromST(double s, double t) const;
+      Vector3 Normal() const;
    };
 }
