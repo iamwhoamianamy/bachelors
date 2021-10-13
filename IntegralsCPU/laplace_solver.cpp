@@ -4,12 +4,14 @@ const double PI = 3.14159265359;
 
 double laplace_solver::u(Vector3 v)
 {
-   return v.x * v.x - v.y * v.y;
+   return 2 * v.x * v.x - v.y * v.y - v.z * v.z;
+   //return v.x;
 }
 
 Vector3 laplace_solver::gradU(Vector3 v)
 {
-   return { 2 * v.x, -2 * v.y, 0 };
+   return { 4 * v.x, -2 * v.y, -2 * v.z };
+   //return { 1.0, 0.0, 0.0 };
 }
 
 double laplace_solver::laplaceIntegral1(Vector3 v,

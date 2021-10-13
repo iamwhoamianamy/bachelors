@@ -3,7 +3,7 @@
 
 namespace triangle_quadratures
 {
-   double calcIntegralOverTriangle(double (*f)(Vector3 v),
+   double calcIntegralOverTriangle(double (*f)(Vector3),
                                    const Triangle& tr,
                                    const QuadPoints& qp)
    {
@@ -11,8 +11,8 @@ namespace triangle_quadratures
 
       for (size_t i = 0; i < qp.order; i++)
       {
-         Vector3 p = tr.PointFromST(qp.x[i], qp.y[i]);
-         result += qp.w[i] * f(Vector3(p.x, p.y, p.z));
+         Vector3 v = tr.PointFromST(qp.x[i], qp.y[i]);
+         result += qp.w[i] * f(v);
       }
 
       return result * tr.Area();
@@ -26,43 +26,21 @@ namespace triangle_quadratures
 
       for (size_t t = 0; t < mesh.TriangleCount(); t++)
       {
-         double tringle_sum = 0;
-
-         Triangle tr = mesh.GetTriangle(t);
-
-         for (size_t o = 0; o < qp.order; o++)
-         {
-            Vector3 v = tr.PointFromST(qp.x[o], qp.y[o]);
-            tringle_sum += qp.w[o] * f(v);
-         }
-
-         integral_sum += tringle_sum * tr.Area();
+         integral_sum += calcIntegralOverTriangle(f, mesh.GetTriangle(t), qp);
       }
 
      return integral_sum;
    }
 
+   double one(Vector3 v)
+   {
+      return 1;
+   }
+
    double calcSurfaceArea(Mesh& mesh,
                           const QuadPoints& qp)
    {
-      double integral_sum = 0;
-
-      for(size_t t = 0; t < mesh.TriangleCount(); t++)
-      {
-         double tringle_sum = 0;
-
-         Triangle tr = mesh.GetTriangle(t);
-
-         for(size_t o = 0; o < qp.order; o++)
-         {
-            Vector3 v = tr.PointFromST(qp.x[o], qp.y[o]);
-            tringle_sum += qp.w[o];
-         }
-
-         integral_sum += tringle_sum * tr.Area();
-      }
-
-      return integral_sum;
+      return calcIntegralOverMesh(one, mesh, qp);
    }
 
    /*void calcIntegralOverMesh(double(*f)(Vector3),

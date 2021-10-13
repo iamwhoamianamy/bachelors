@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 namespace triangle_quadratures
 {
@@ -12,7 +13,9 @@ namespace triangle_quadratures
 
       int order;
 
+      QuadPoints();
       QuadPoints(int order);
+      void InitFromTXT(std::string coordsFileName, std::string weightsFileName);
    };
 };
 

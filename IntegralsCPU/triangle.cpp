@@ -73,32 +73,32 @@ namespace triangle_quadratures
 
    double Triangle::XFromST(double s, double t) const
    {
-      if(s > 1.0 || t > 1.0 || t > 1.0 - s)
-         throw RangeExeption();
+      //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
+      //   throw RangeExeption();
 
       return a.x + (b.x - a.x) * s + (c.x - a.x) * t;
    }
 
    double Triangle::YFromST(double s, double t) const
    {
-      if(s > 1.0 || t > 1.0 || t > 1.0 - s)
-         throw RangeExeption();
+      //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
+      //   throw RangeExeption();
 
       return a.y + (b.y - a.y) * s + (c.y - a.y) * t;
    }
 
    double Triangle::ZFromST(double s, double t) const
    {
-      if(s > 1.0 || t > 1.0 || t > 1.0 - s)
-         throw RangeExeption();
+      //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
+      //   throw RangeExeption();
 
       return a.z + (b.z - a.z) * s + (c.z - a.z) * t;
    }
 
    Vector3 Triangle::PointFromST(double s, double t) const
    {
-      if(s > 1.0 || t > 1.0 || t > 1.0 - s)
-         throw RangeExeption();
+      //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
+      //   throw RangeExeption();
 
       return Vector3(XFromST(s, t), YFromST(s, t), ZFromST(s, t));
    }
@@ -114,6 +114,6 @@ namespace triangle_quadratures
          u.x * v.y - u.y * v.x
       );
 
-      return normal.Normalized() * -1;
+      return normal.Normalized();
    }
 }

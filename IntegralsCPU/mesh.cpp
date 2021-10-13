@@ -86,7 +86,6 @@ namespace triangle_quadratures
                _faces_ind.push_back(temp);
             }
          }
-
       }
       catch(ifstream::failure e)
       {

@@ -16,7 +16,7 @@ const double PI = 3.14159265359;
 
 double f(Vector3 v)
 {
-   return  1;
+   return v.x + v.y + v.z;
 }
 
 int main()
@@ -25,7 +25,8 @@ int main()
 
    try
    {
-      mesh.InitFromOBJ("icoshpere_highres.obj");
+      mesh.InitFromOBJ("meshes/icosphere_highres_big.obj");
+      //mesh.InitFromOBJ("meshes/cube_highres.obj");
    }
    catch(Exeption fileExeption)
    {
@@ -33,19 +34,50 @@ int main()
       exit(1);
    }
 
-   QuadPoints qp(6);
+   QuadPoints qp;
+  
+   try
+   {
+      qp.InitFromTXT("quadratures/gauss15_xy.txt", "quadratures/gauss15_w.txt");
+   }
+   catch(Exeption fileExeption)
+   {
+      cout << fileExeption;
+      exit(1);
+   }
+
    Vector3 n;
 
    vector<double> res;
-   vector<Vector3> points = { {0.0, 0.0, 0.0} };
+   vector<Vector3> points = { {1.100, 0.05, 1.01} };
 
    calcIntegralOverMesh(mesh, qp, points, res);
 
-   cout << "True value =       " << u(points[0]) << endl;
-   cout << "Calculated value = " << res[0] << endl;
+   double true_value = u(points[0]);
+   double calc_value = res[0];
+   double error = abs((true_value - calc_value) / true_value);
 
-   //cout << "True value =       " << 4.0 * PI * 100 * 100 << endl;
-   //cout << "Calculated value = " << calcSurfaceArea(mesh, qp) << endl;
+   cout << "Integral:" << endl;
+   cout << fixed;
+   cout << "True value =       " << setw(16) << true_value << endl;
+   cout << "Calculated value = " << setw(16) << calc_value << endl;
+   cout << scientific;
+   cout << "Error            = " << setw(16) << error << endl;
+
+   true_value = 4.0 * PI;
+   //true_value = 4.0 * 6;
+   calc_value = calcSurfaceArea(mesh, qp);
+   error = abs(true_value - calc_value);
+
+   cout << endl << "Surface:" << endl;
+   cout << fixed;
+   cout << "True value =       " << setw(16) << true_value << endl;
+   cout << "Calculated value = " << setw(16) << calc_value << endl;
+   cout << scientific;
+   cout << "Error            = " << setw(16) << error << endl;
+
+   //cout << calcIntegralOverMesh(f, mesh, qp) << endl;
+   //cout << calcSurfaceArea(mesh, qp);
 
    return 0;
 }

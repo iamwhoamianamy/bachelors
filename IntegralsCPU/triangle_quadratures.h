@@ -8,7 +8,7 @@
 
 namespace triangle_quadratures
 {
-   double calcIntegralOverTriangle(double (*f)(Vector3 v),
+   double calcIntegralOverTriangle(double (*f)(Vector3),
                                    const Triangle& tr,
                                    const QuadPoints& qp);
 
