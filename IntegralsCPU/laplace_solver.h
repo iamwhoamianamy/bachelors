@@ -1,25 +1,27 @@
 #pragma once
 #include <vector>
-#include "triangle_quadratures.h"
+#include "vector3.h"
+#include "mesh.h"
+#include "quad_points.h"
 
 using namespace triangle_quadratures;
+using namespace std;
 
-class LaplaceSolver
+namespace laplace_solver
 {
-public:
-   double U(Vector3 point);
-   Vector3 GradU(Vector3 point);
+   double u(Vector3 point);
+   Vector3 gradU(Vector3 point);
 
-   double LaplaceIntegral1(Vector3 v,
+   double laplaceIntegral1(Vector3 v,
                            Vector3 point,
                            Vector3 normal);
 
-   double LaplaceIntegral2(Vector3 v,
+   double laplaceIntegral2(Vector3 v,
                            Vector3 point,
                            Vector3 normal);
 
    void calcIntegralOverMesh(const Mesh& mesh,
                              const QuadPoints& qp,
                              const vector<Vector3>& points,
-                             std::vector<double>& result)
+                             std::vector<double>& result);
 };
