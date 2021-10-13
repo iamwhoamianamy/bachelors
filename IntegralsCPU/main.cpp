@@ -21,11 +21,11 @@ double f(Vector3 v)
 
 int main()
 {
-   Mesh sphere;
+   Mesh mesh;
 
    try
    {
-      sphere.InitFromOBJ("icosphere.obj");
+      mesh.InitFromOBJ("icoshpere_highres.obj");
    }
    catch(Exeption fileExeption)
    {
@@ -37,17 +37,15 @@ int main()
    Vector3 n;
 
    vector<double> res;
-   vector<Vector3> points = { {0.075, 0.1, 0.025} };
+   vector<Vector3> points = { {0.0, 0.0, 0.0} };
 
-   calcIntegralOverMesh(sphere, qp, points, res);
+   calcIntegralOverMesh(mesh, qp, points, res);
 
    cout << "True value =       " << u(points[0]) << endl;
    cout << "Calculated value = " << res[0] << endl;
 
-   /*cout << "True value =       " << 4.0 * PI << endl;
-   cout << "Calculated value = " << calcIntegralOverMesh(f, sphere, qp) << endl;*/
-
-   
+   //cout << "True value =       " << 4.0 * PI * 100 * 100 << endl;
+   //cout << "Calculated value = " << calcSurfaceArea(mesh, qp) << endl;
 
    return 0;
 }

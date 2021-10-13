@@ -42,6 +42,29 @@ namespace triangle_quadratures
      return integral_sum;
    }
 
+   double calcSurfaceArea(Mesh& mesh,
+                          const QuadPoints& qp)
+   {
+      double integral_sum = 0;
+
+      for(size_t t = 0; t < mesh.TriangleCount(); t++)
+      {
+         double tringle_sum = 0;
+
+         Triangle tr = mesh.GetTriangle(t);
+
+         for(size_t o = 0; o < qp.order; o++)
+         {
+            Vector3 v = tr.PointFromST(qp.x[o], qp.y[o]);
+            tringle_sum += qp.w[o];
+         }
+
+         integral_sum += tringle_sum * tr.Area();
+      }
+
+      return integral_sum;
+   }
+
    /*void calcIntegralOverMesh(double(*f)(Vector3),
                              const Mesh& mesh, 
                              const QuadPoints& qp,

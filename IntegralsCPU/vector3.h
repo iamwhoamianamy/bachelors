@@ -23,13 +23,14 @@ namespace triangle_quadratures
       Vector3& operator /=(const double fac);
 
       double LengthSquared() const;
-      double GetLength() const;
+      double Length() const;
       Vector3 Normalized() const;
       Vector3 Perp() const;
 
       void Normalize();
-      void Limit(const double  limitLength);
-      void SetLength(const double  newLength);
+      void Limit(const double limitLength);
+      void SetLength(const double newLength);
+      Vector3 LeadingCos();
 
       static Vector3 Direction(const Vector3& from, const Vector3& to);
       static double DistanceSquared(const Vector3& vec1, const Vector3& vec2);

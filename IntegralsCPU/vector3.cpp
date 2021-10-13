@@ -109,7 +109,7 @@ namespace triangle_quadratures
              this->z * this->z;
    }
 
-   double Vector3::GetLength() const
+   double Vector3::Length() const
    {
       return sqrt(this->x * this->x + 
                   this->y * this->y +
@@ -119,7 +119,7 @@ namespace triangle_quadratures
    Vector3 Vector3::Normalized() const
    {
       Vector3 res;
-      double length = GetLength();
+      double length = Length();
 
       if (length)
       {
@@ -133,7 +133,7 @@ namespace triangle_quadratures
 
    void Vector3::Normalize()
    {
-      double length = GetLength();
+      double length = Length();
 
       if (length != 0)
       {
@@ -145,7 +145,7 @@ namespace triangle_quadratures
 
    void Vector3::Limit(const double limitLength)
    {
-      double length = GetLength();
+      double length = Length();
 
       if (length != 0 && length > limitLength)
       {
@@ -177,5 +177,12 @@ namespace triangle_quadratures
    double Vector3::DistanceSquared(const Vector3& vec1, const Vector3& vec2)
    {
       return (vec1 - vec2).LengthSquared();
+   }
+
+   Vector3 Vector3::LeadingCos()
+   {
+      double l = Length();
+
+      return Vector3(x / l, y / l, z / l);
    }
 }
