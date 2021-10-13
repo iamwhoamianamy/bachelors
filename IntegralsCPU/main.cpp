@@ -6,9 +6,11 @@
 
 #include "triangle_quadratures.h"
 #include "mesh.h"
+#include "laplace_solver.h"
 
 using namespace std;
 using namespace triangle_quadratures;
+using namespace laplace_solver;
 
 const double PI = 3.14159265359;
 
@@ -35,10 +37,17 @@ int main()
    Vector3 n;
 
    vector<double> res;
+   vector<Vector3> points = { {0.075, 0.1, 0.025} };
 
-   calcIntegralOverMesh(f, sphere, qp, { 0, 0, 0 }, res);
+   calcIntegralOverMesh(sphere, qp, points, res);
 
-   cout << res[0];
+   cout << "True value =       " << u(points[0]) << endl;
+   cout << "Calculated value = " << res[0] << endl;
+
+   /*cout << "True value =       " << 4.0 * PI << endl;
+   cout << "Calculated value = " << calcIntegralOverMesh(f, sphere, qp) << endl;*/
+
+   
 
    return 0;
 }

@@ -18,80 +18,31 @@ namespace triangle_quadratures
       return result * tr.Area();
    }
 
-   void calcIntegralOverMesh(double(*f)(Vector3 v),
-                             const Mesh& mesh,
-                             const QuadPoints& qp,
-                             const vector<Vector3>& points,
-                             std::vector<double>& result)
+   double calcIntegralOverMesh(double(*f)(Vector3),
+                               const Mesh& mesh,
+                               const QuadPoints& qp)
    {
-      vector<double> points_double(points.size() * 3);
+      double integral_sum = 0;
 
-      for (size_t i = 0; i < points.size(); i++)
+      for (size_t t = 0; t < mesh.TriangleCount(); t++)
       {
-         points_double[i * 3 + 0] = points[i].x;
-         points_double[i * 3 + 1] = points[i].y;
-         points_double[i * 3 + 2] = points[i].z;
-      }
+         double tringle_sum = 0;
 
-      vector<double> coords(mesh.TriangleCount() * qp.order * 3);
-      vector<double> areas(mesh.TriangleCount());
+         Triangle tr = mesh.GetTriangle(t);
 
-      for (size_t i = 0; i < mesh.TriangleCount(); i++)
-      {
-         Triangle tr = mesh.GetTriangle(i);
-
-         for (size_t j = 0; j < qp.order; j++)
+         for (size_t o = 0; o < qp.order; o++)
          {
-            int idx = (i * qp.order + j) * 3;
-
-            coords[idx + 0] = tr.XFromST(qp.x[j], qp.y[j]);
-            coords[idx + 1] = tr.YFromST(qp.x[j], qp.y[j]);
-            coords[idx + 2] = tr.ZFromST(qp.x[j], qp.y[j]);
+            Vector3 v = tr.PointFromST(qp.x[o], qp.y[o]);
+            tringle_sum += qp.w[o] * f(v);
          }
 
-         areas[i] = tr.Area();
+         integral_sum += tringle_sum * tr.Area();
       }
 
-      vector<double> weights(qp.order);
-
-      for (size_t i = 0; i < qp.order; i++)
-      {
-         weights[i] = qp.w[i];
-      }
-
-      vector<double> normals(mesh.TriangleCount() * 3);
-
-      result.resize(points.size());
-
-      for (size_t i = 0; i < points.size(); i++)
-      {
-         double total_sum = 0;
-         
-         for(size_t j = 0; j < mesh.TriangleCount(); j++)
-         {
-            double triangle_sum = 0;
-         
-            for(size_t k = 0; k < qp.order; k++)
-            {
-               int idx = (j * qp.order + k) * 3;
-         
-               params[0] = coords[idx + 0];
-               params[0] =    coords[idx + 1],
-               params[0] =    coords[idx + 2],
-               params[0] =    points[i];
-               params[0] =    points[i];
-         
-               triangle_sum += weights[k] * f(params.data());
-            }
-         
-            total_sum += triangle_sum * areas[j];
-         }
-         
-         result[i] = total_sum;
-      }
+     return integral_sum;
    }
 
-   /*void calcIntegralOverMesh(double(*f)(double, double, double),
+   /*void calcIntegralOverMesh(double(*f)(Vector3),
                              const Mesh& mesh, 
                              const QuadPoints& qp,
                              const vector<Vector3>& points,

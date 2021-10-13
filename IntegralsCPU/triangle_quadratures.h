@@ -12,11 +12,9 @@ namespace triangle_quadratures
                                    const Triangle& tr,
                                    const QuadPoints& qp);
 
-   void calcIntegralOverMesh(double (*f)(Vector3 v),
-                             const Mesh& mesh,
-                             const QuadPoints& qp,
-                             const vector<Vector3>& points,
-                             std::vector<double>& result);
+   double calcIntegralOverMesh(double (*f)(Vector3 v),
+                               const Mesh& mesh,
+                               const QuadPoints& qp);
 
    //void calcIntegralOverArray(double (*f)(double*),
    //                           const double* points,

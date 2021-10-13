@@ -111,9 +111,9 @@ namespace triangle_quadratures
 
    double Vector3::GetLength() const
    {
-      return sqrtf(this->x * this->x + 
-                   this->y * this->y +
-                   this->z * this->z);
+      return sqrt(this->x * this->x + 
+                  this->y * this->y +
+                  this->z * this->z);
    }
 
    Vector3 Vector3::Normalized() const
