@@ -5,6 +5,7 @@ const double PI = 3.14159265359;
 double laplace_solver::u(Vector3 v)
 {
    return 2 * v.x * v.x - v.y * v.y - v.z * v.z;
+   //return 1;
    //return v.x;
 }
 
@@ -33,11 +34,11 @@ double laplace_solver::laplaceIntegral2(Vector3 v,
 {
    double l = (point - v).Length();
 
-   double rx = normal.x / ((point.x - v.x) * l);
-   double ry = normal.y / ((point.y - v.y) * l);
-   double rz = normal.z / ((point.z - v.z) * l);
+   double rx = normal.x * (point.x - v.x);
+   double ry = normal.y * (point.y - v.y);
+   double rz = normal.z * (point.z - v.z);
 
-   return (rx + ry + rz) * u(v);
+   return (rx + ry + rz) * u(v) / pow(l, 3.0);
 }
 
 void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,

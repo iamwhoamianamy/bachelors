@@ -25,7 +25,7 @@ int main()
 
    try
    {
-      mesh.InitFromOBJ("meshes/icosphere_highres_big.obj");
+      mesh.InitFromOBJ("meshes/icosphere.obj");
       //mesh.InitFromOBJ("meshes/cube_highres.obj");
    }
    catch(Exeption fileExeption)
@@ -49,7 +49,7 @@ int main()
    Vector3 n;
 
    vector<double> res;
-   vector<Vector3> points = { {1.100, 0.05, 1.01} };
+   vector<Vector3> points = { {0.8, 0.20, 0.00} };
 
    calcIntegralOverMesh(mesh, qp, points, res);
 
@@ -64,17 +64,17 @@ int main()
    cout << scientific;
    cout << "Error            = " << setw(16) << error << endl;
 
-   true_value = 4.0 * PI;
-   //true_value = 4.0 * 6;
-   calc_value = calcSurfaceArea(mesh, qp);
-   error = abs(true_value - calc_value);
+   //true_value = 4.0 * PI;
+   ////true_value = 4.0 * 6;
+   //calc_value = calcSurfaceArea(mesh, qp);
+   //error = abs(true_value - calc_value);
 
-   cout << endl << "Surface:" << endl;
-   cout << fixed;
-   cout << "True value =       " << setw(16) << true_value << endl;
-   cout << "Calculated value = " << setw(16) << calc_value << endl;
-   cout << scientific;
-   cout << "Error            = " << setw(16) << error << endl;
+   //cout << endl << "Surface:" << endl;
+   //cout << fixed;
+   //cout << "True value =       " << setw(16) << true_value << endl;
+   //cout << "Calculated value = " << setw(16) << calc_value << endl;
+   //cout << scientific;
+   //cout << "Error            = " << setw(16) << error << endl;
 
    //cout << calcIntegralOverMesh(f, mesh, qp) << endl;
    //cout << calcSurfaceArea(mesh, qp);
