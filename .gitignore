@@ -335,3 +335,5 @@ ASALocalRun/
 *.bmp
 Tests/
 FromBook/Histogram/text.txt
+
+!meshes/*.obj
