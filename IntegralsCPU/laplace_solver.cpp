@@ -38,7 +38,7 @@ double laplace_solver::laplaceIntegral2(Vector3 v,
    double ry = normal.y * (point.y - v.y);
    double rz = normal.z * (point.z - v.z);
 
-   return (rx + ry + rz) * u(v) / pow(l, 3.0);
+   return (rx + ry + rz) * u(v) / (l * l * l);
 }
 
 void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,
@@ -53,7 +53,7 @@ void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,
       double integral_1 = 0;
       double integral_2 = 0;
 
-      for (size_t t = 0; t < mesh.TriangleCount(); t++)
+      for (size_t t = 0; t < mesh.TrianglesCount(); t++)
       {
          double tringle_sum_1 = 0;
          double tringle_sum_2 = 0;

@@ -22,7 +22,7 @@ namespace triangle_quadratures
       //Mesh(Mesh&& mesh) noexcept;
 
       Triangle GetTriangle(int index) const;
-      int TriangleCount() const;
+      int TrianglesCount() const;
 
       //Mesh& operator=(Mesh&& mesh) noexcept;
    };

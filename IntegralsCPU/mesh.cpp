@@ -118,7 +118,7 @@ namespace triangle_quadratures
                       _vertices[_faces_ind[index][1]],
                       _vertices[_faces_ind[index][2]]);
    }
-   int Mesh::TriangleCount() const
+   int Mesh::TrianglesCount() const
    {
       return _triangles_count;
    }

@@ -24,7 +24,7 @@ namespace triangle_quadratures
    {
       double integral_sum = 0;
 
-      for (size_t t = 0; t < mesh.TriangleCount(); t++)
+      for (size_t t = 0; t < mesh.TrianglesCount(); t++)
       {
          integral_sum += calcIntegralOverTriangle(f, mesh.GetTriangle(t), qp);
       }
@@ -58,10 +58,10 @@ namespace triangle_quadratures
          points_double[i * 3 + 2] = points[i].z;
       }
 
-      vector<double> coords(mesh.TriangleCount() * qp.order * 3);
-      vector<double> areas(mesh.TriangleCount());
+      vector<double> coords(mesh.TrianglesCount() * qp.order * 3);
+      vector<double> areas(mesh.TrianglesCount());
 
-      for(size_t i = 0; i < mesh.TriangleCount(); i++)
+      for(size_t i = 0; i < mesh.TrianglesCount(); i++)
       {
          Triangle tr = mesh.GetTriangle(i);
 
@@ -84,7 +84,7 @@ namespace triangle_quadratures
          weights[i] = qp.w[i];
       }
 
-      vector<double> normals(mesh.TriangleCount() * 3);
+      vector<double> normals(mesh.TrianglesCount() * 3);
 
       result.resize(points.size());
 
@@ -95,7 +95,7 @@ namespace triangle_quadratures
                             areas.data(),
                             normals.data(),
                             points.size(),
-                            mesh.TriangleCount(),
+                            mesh.TrianglesCount(),
                             qp.order,
                             result.data());
    }*/
