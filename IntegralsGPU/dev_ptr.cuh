@@ -1,0 +1,123 @@
+#pragma once
+#include "cuda_runtime.h"
+#include "exeptions.h"
+
+#ifndef DEV_PTR
+#define DEV_PTR
+
+namespace cuda_utilities
+{
+
+   template <class T> class DevPtr
+   {
+   private:
+      T* _data = nullptr;
+      size_t _size = 0;
+
+      DevPtr(const DevPtr&) = delete;
+   public:
+      DevPtr();
+      ~DevPtr<T>();
+      DevPtr<T>(size_t size);
+      DevPtr<T>(const T* data, size_t size);
+
+      T* Get() const;
+
+      void CopyToHost(T* data);
+      void CopyToDevice(const T* data);
+      void Init(size_t size);
+
+      size_t Size() const;
+   };
+
+   template<class T>
+   DevPtr<T>::DevPtr()
+   {
+
+   }
+
+   template<class T>
+   DevPtr<T>::~DevPtr<T>()
+   {
+      cudaFree(_data);
+   }
+
+   template<class T>
+   DevPtr<T>::DevPtr<T>(size_t size)
+   {
+      try
+      {
+         Init(size);
+      }
+      catch(Exeption e)
+      {
+         throw e;
+      }
+   }
+
+   template<class T>
+   DevPtr<T>::DevPtr<T>(const T* data, size_t size)
+   {
+      try
+      {
+         Init(size);
+         CopyToDevice(data);
+      }
+      catch(Exeption e)
+      {
+         throw e;
+      }
+   }
+
+   template<class T>
+   void DevPtr<T>::Init(size_t size)
+   {
+      cudaFree(_data);
+      cudaError_t result = cudaMalloc((void**)&_data,
+                                      size * sizeof(T));
+
+      if(result != cudaError_t::cudaSuccess)
+         throw MallocExeption();
+
+      _size = size;
+   }
+
+   template<class T>
+   T* DevPtr<T>::Get() const
+   {
+      return _data;
+   }
+
+   template<class T>
+   void DevPtr<T>::CopyToHost(T* data)
+   {
+      cudaError_t result = cudaMemcpy(data,
+                                      _data,
+                                      _size * sizeof(T),
+                                      cudaMemcpyKind::cudaMemcpyDeviceToHost);
+
+      //if(result != cudaError_t::cudaSuccess)
+      //   throw CopyExeption();
+   }
+
+   template<class T>
+   void DevPtr<T>::CopyToDevice(const T* data)
+   {
+      cudaError_t result = cudaMemcpy(_data,
+                                      data,
+                                      _size * sizeof(T),
+                                      cudaMemcpyKind::cudaMemcpyHostToDevice);
+
+      if(result != cudaError_t::cudaSuccess)
+         throw CopyExeption();
+   }
+
+   template<class T>
+   size_t DevPtr<T>::Size() const
+   {
+      return _size;
+   }
+}
+
+
+#endif // ! DEV_PTR

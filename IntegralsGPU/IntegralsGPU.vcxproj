@@ -55,6 +55,9 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <CodeGeneration>compute_60,sm_60;%(CodeGeneration)</CodeGeneration>
+      <AdditionalOptions>-arch=sm_60 %(AdditionalOptions)</AdditionalOptions>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -74,10 +77,38 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <CodeGeneration>compute_60,sm_60;%(CodeGeneration)</CodeGeneration>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="cuda_timer.cu" />
+    <CudaCompile Include="dev_ptr.cu" />
+    <CudaCompile Include="laplace_solver_cuda.cu" />
+    <CudaCompile Include="main.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="exeptions.cpp" />
+    <ClCompile Include="laplace_solver.cpp" />
+    <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="quad_points.cpp" />
+    <ClCompile Include="triangle.cpp" />
+    <ClCompile Include="triangle_quadratures.cpp" />
+    <ClCompile Include="vector3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cuda_helper.cuh" />
+    <ClInclude Include="cuda_timer.cuh" />
+    <ClInclude Include="dev_ptr.cuh" />
+    <ClInclude Include="exeptions.h" />
+    <ClInclude Include="kernels_constant_data.cuh" />
+    <ClInclude Include="laplace_solver.h" />
+    <ClInclude Include="laplace_solver_cuda.cuh" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="quad_points.h" />
+    <ClInclude Include="triangle.h" />
+    <ClInclude Include="triangle_quadratures.h" />
+    <ClInclude Include="vector3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
