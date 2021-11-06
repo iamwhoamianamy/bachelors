@@ -7,14 +7,13 @@
 
 #include "triangle_quadratures.h"
 #include "mesh.h"
-#include "laplace_solver_cuda.cuh"
 #include "laplace_solver.h"
 #include "cuda_timer.cuh"
+#include "laplace_solver_arrays.cuh"
 
 using namespace std;
 using namespace triangle_quadratures;
 using namespace cuda_utilities;
-namespace lsgpu = laplace_solver_cuda;
 namespace lscpu = laplace_solver;
 
 int main()
@@ -45,7 +44,7 @@ int main()
 
    Vector3 n;
 
-   const int points_count = 1000;
+   const int points_count = 10;
    vector<double> res;
    vector<Vector3> points(points_count);
 
@@ -65,27 +64,27 @@ int main()
       exit(2);
    }
 
-   // GPU
-   cout << "GPU computation:" << endl;
-   lsgpu::calcIntegralOverMesh(mesh, qp, points, res);
+   //// GPU
+   //cout << "GPU computation:" << endl;
+   //lsgpu::calcIntegralOverMesh(mesh, qp, points, res);
 
-   /*for(size_t i = 0; i < points_count; i++)
-   {
-      cout << "Point: " << scientific << points[i].x << " " << points[i].y << " " << points[i].z << endl;
+   //for(size_t i = 0; i < points_count; i++)
+   //{
+   //   cout << "Point: " << scientific << points[i].x << " " << points[i].y << " " << points[i].z << endl;
 
-      double true_value = laplace_solver::u(points[i]);
-      double calc_value = res[i];
-      double error = abs((true_value - calc_value) / true_value);
+   //   double true_value = laplace_solver::u(points[i]);
+   //   double calc_value = res[i];
+   //   double error = abs((true_value - calc_value) / true_value);
 
-      cout << "Integral:" << endl;
-      cout << fixed;
-      cout << "True value =       " << setw(16) << true_value << endl;
-      cout << "Calculated value = " << setw(16) << calc_value << endl;
-      cout << scientific;
-      cout << "Error            = " << setw(16) << error << endl;
-   }*/
+   //   cout << "Integral:" << endl;
+   //   cout << fixed;
+   //   cout << "True value =       " << setw(16) << true_value << endl;
+   //   cout << "Calculated value = " << setw(16) << calc_value << endl;
+   //   cout << scientific;
+   //   cout << "Error            = " << setw(16) << error << endl;
+   //}
 
-   cout << endl << "-----------------------------------------------" << endl << endl;
+   //cout << endl << "-----------------------------------------------" << endl << endl;
 
    // CPU
    auto start = std::chrono::steady_clock::now();
@@ -97,7 +96,7 @@ int main()
    auto ellapsed_time_cpu = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
    cout << "Calculation time: " << ellapsed_time_cpu << endl << endl;
 
-   /*for(size_t i = 0; i < points_count; i++)
+   for(size_t i = 0; i < points_count; i++)
    {
       cout << "Point: " << scientific << points[i].x << " " << points[i].y << " " << points[i].z << endl;
 
@@ -111,7 +110,31 @@ int main()
       cout << "Calculated value = " << setw(16) << calc_value << endl;
       cout << scientific;
       cout << "Error            = " << setw(16) << error << endl;
-   }*/
+   }
+
+   cout << endl << "-----------------------------------------------" << endl << endl;
+
+   LaplaceSolverArrays laplaceSolverArrays;
+   laplaceSolverArrays.PrepareData(points, mesh, qp);
+   laplaceSolverArrays.CopyToDevice();
+   laplaceSolverArrays.SolveGPU();
+   res = laplaceSolverArrays.GetResultGPU();
+
+   for(size_t i = 0; i < points_count; i++)
+   {
+      cout << "Point: " << scientific << points[i].x << " " << points[i].y << " " << points[i].z << endl;
+
+      double true_value = laplace_solver::u(points[i]);
+      double calc_value = res[i];
+      double error = abs((true_value - calc_value) / true_value);
+
+      cout << "Integral:" << endl;
+      cout << fixed;
+      cout << "True value =       " << setw(16) << true_value << endl;
+      cout << "Calculated value = " << setw(16) << calc_value << endl;
+      cout << scientific;
+      cout << "Error            = " << setw(16) << error << endl;
+   }
 
    return 0;
 }

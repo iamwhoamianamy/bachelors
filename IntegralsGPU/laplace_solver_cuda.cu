@@ -6,10 +6,10 @@
 #include "cuda_timer.cuh"
 #include "cuda_helper.cuh"
 
-#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
-#else
-__device__ double atomicAdd(double* a, double b) { return b; }
-#endif
+//#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
+//#else
+//__device__ double atomicAdd(double* a, double b) { return b; }
+//#endif
 
 using namespace cuda_utilities;
 
@@ -133,9 +133,9 @@ void laplace_solver_cuda::calcIntegralOverMesh(const Mesh& mesh,
       pointsZ[p] = points[p].z;
    }
 
-   DevPtr<double> dev_pointsX(pointsX.data(), points.size());
-   DevPtr<double> dev_pointsY(pointsY.data(), points.size());
-   DevPtr<double> dev_pointsZ(pointsZ.data(), points.size());
+   DevPtr<double> dev_points_X(pointsX.data(), points.size());
+   DevPtr<double> dev_points_Y(pointsY.data(), points.size());
+   DevPtr<double> dev_points_Z(pointsZ.data(), points.size());
 
    // Preparing weights
    DevPtr<double> dev_weights(qp.w.data(), qp.order);
@@ -164,12 +164,12 @@ void laplace_solver_cuda::calcIntegralOverMesh(const Mesh& mesh,
    CudaTimer cuda_timer;
    cuda_timer.Start();
 
-   calcIntegralOverMeshArrays<<<points.size(), 512, 512 * sizeof(double)>>>(
+   /*calcIntegralOverMeshArrays<<<points.size(), 512, 512 * sizeof(double)>>>(
       dev_quadraturesX.Get(), dev_quadraturesY.Get(), dev_quadraturesZ.Get(),
       dev_normalsX.Get(), dev_normalsY.Get(), dev_normalsZ.Get(),
-      dev_pointsX.Get(), dev_pointsY.Get(), dev_pointsZ.Get(),
+      dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),
       dev_weights.Get(), dev_areas.Get(),
-      mesh.TrianglesCount(), points.size(), qp.order, dev_result.Get());
+      mesh.TrianglesCount(), points.size(), qp.order, dev_result.Get());*/
 
    tryKernelLaunch();
    tryKernelSynchronize();
@@ -181,69 +181,69 @@ void laplace_solver_cuda::calcIntegralOverMesh(const Mesh& mesh,
    dev_result.CopyToHost(result.data());
 }
 
-__global__ void laplace_solver_cuda::calcIntegralOverMeshArrays(const double* quadraturesX,
-                                                                const double* quadraturesY,
-                                                                const double* quadraturesZ,
-                                                                const double* normalsX,
-                                                                const double* normalsY,
-                                                                const double* normalsZ,
-                                                                const double* pointsX,
-                                                                const double* pointsY,
-                                                                const double* pointsZ,
-                                                                const double* weights,
-                                                                const double* areas,
-                                                                const int trianglesCount,
-                                                                const int pointsCount,
-                                                                const int quadratureOrder,
-                                                                double* result)
-{
-   uint p = blockIdx.x;
-   extern __shared__ double shared_array[];
-   double* integral = (__shared__ double*)shared_array;
-   uint t = threadIdx.x;
-
-   while(t < trianglesCount)
-   {
-      double tringle_sum_1 = 0;
-      double tringle_sum_2 = 0;
-
-      for(size_t o = 0; o < quadratureOrder; o++)
-      {
-         int ind = t * quadratureOrder + o;
-         tringle_sum_1 += weights[o] * laplaceIntegral1(quadraturesX[ind], quadraturesY[ind], quadraturesZ[ind],
-                                                         pointsX[p], pointsY[p], pointsZ[p],
-                                                         normalsX[t], normalsY[t], normalsZ[t]);
-
-         tringle_sum_2 += weights[o] * laplaceIntegral2(quadraturesX[ind], quadraturesY[ind], quadraturesZ[ind],
-                                                         pointsX[p], pointsY[p], pointsZ[p],
-                                                         normalsX[t], normalsY[t], normalsZ[t]);
-      }
-
-      atomicAdd(&integral[t % blockDim.x], (tringle_sum_1 - tringle_sum_2) * areas[t]);
-      t += blockDim.x;
-   }
-
-   __syncthreads();
-   t = threadIdx.x;
-
-   for(unsigned int s = 1; s < blockDim.x; s *= 2)
-   {
-      if(t % (2 * s) == 0)
-      {
-         if(t + s < trianglesCount)
-         {
-            integral[t] += integral[t + s];
-         }
-      }
-
-      __syncthreads();
-   }
-
-   __syncthreads();
-   t = threadIdx.x;
-
-   if(t == 0)
-   {
-      result[p] = integral[0] / (4.0 * PI);
-   }
-}
+//__global__ void laplace_solver_cuda::calcIntegralOverMeshArrays(const double* quadraturesX,
+//                                                                const double* quadraturesY,
+//                                                                const double* quadraturesZ,
+//                                                                const double* normalsX,
+//                                                                const double* normalsY,
+//                                                                const double* normalsZ,
+//                                                                const double* pointsX,
+//                                                                const double* pointsY,
+//                                                                const double* pointsZ,
+//                                                                const double* weights,
+//                                                                const double* areas,
+//                                                                const int trianglesCount,
+//                                                                const int pointsCount,
+//                                                                const int quadratureOrder,
+//                                                                double* result)
+//{
+//   uint p = blockIdx.x;
+//   extern __shared__ double shared_array[];
+//   double* integral = (__shared__ double*)shared_array;
+//   uint t = threadIdx.x;
+//
+//   while(t < trianglesCount)
+//   {
+//      double tringle_sum_1 = 0;
+//      double tringle_sum_2 = 0;
+//
+//      for(size_t o = 0; o < quadratureOrder; o++)
+//      {
+//         int ind = t * quadratureOrder + o;
+//         tringle_sum_1 += weights[o] * laplaceIntegral1(quadraturesX[ind], quadraturesY[ind], quadraturesZ[ind],
+//                                                         pointsX[p], pointsY[p], pointsZ[p],
+//                                                         normalsX[t], normalsY[t], normalsZ[t]);
+//
+//         tringle_sum_2 += weights[o] * laplaceIntegral2(quadraturesX[ind], quadraturesY[ind], quadraturesZ[ind],
+//                                                         pointsX[p], pointsY[p], pointsZ[p],
+//                                                         normalsX[t], normalsY[t], normalsZ[t]);
+//      }
+//
+//      atomicAdd(&integral[t % blockDim.x], (tringle_sum_1 - tringle_sum_2) * areas[t]);
+//      t += blockDim.x;
+//   }
+//
+//   __syncthreads();
+//   t = threadIdx.x;
+//
+//   for(unsigned int s = 1; s < blockDim.x; s *= 2)
+//   {
+//      if(t % (2 * s) == 0)
+//      {
+//         if(t + s < trianglesCount)
+//         {
+//            integral[t] += integral[t + s];
+//         }
+//      }
+//
+//      __syncthreads();
+//   }
+//
+//   __syncthreads();
+//   t = threadIdx.x;
+//
+//   if(t == 0)
+//   {
+//      result[p] = integral[0] / (4.0 * PI);
+//   }
+//}

@@ -7,10 +7,13 @@
     <CudaCompile Include="dev_ptr.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
-    <CudaCompile Include="laplace_solver_cuda.cu">
+    <CudaCompile Include="main.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
-    <CudaCompile Include="main.cu">
+    <CudaCompile Include="laplace_solver_arrays.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
+    <CudaCompile Include="laplace_data.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
   </ItemGroup>
@@ -56,9 +59,6 @@
     <ClInclude Include="laplace_solver.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
-    <ClInclude Include="laplace_solver_cuda.cuh">
-      <Filter>CUDA includes</Filter>
-    </ClInclude>
     <ClInclude Include="mesh.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
@@ -74,11 +74,14 @@
     <ClInclude Include="vector3.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
+    <ClInclude Include="laplace_solver_arrays.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
+    <ClInclude Include="laplace_data.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="СUDA compiles">
-      <UniqueIdentifier>{2b404a91-b5bf-412e-8fd5-84b534dca316}</UniqueIdentifier>
-    </Filter>
     <Filter Include="CUDA includes">
       <UniqueIdentifier>{a8084c5d-8a64-4262-8775-4571ec576933}</UniqueIdentifier>
     </Filter>
@@ -87,6 +90,9 @@
     </Filter>
     <Filter Include="C++ includes">
       <UniqueIdentifier>{9988fec6-5699-4fd5-932c-7905232fa289}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="СUDA compiles">
+      <UniqueIdentifier>{2b404a91-b5bf-412e-8fd5-84b534dca316}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -28,6 +28,8 @@ namespace cuda_utilities
       void Init(size_t size);
 
       size_t Size() const;
+
+      DevPtr& operator=(DevPtr& devPtr);
    };
 
    template<class T>
@@ -116,6 +118,22 @@ namespace cuda_utilities
    size_t DevPtr<T>::Size() const
    {
       return _size;
+   }
+
+   template<class T>
+   DevPtr<T>& DevPtr<T>::operator=(DevPtr& devPtr)
+   {
+      cudaFree(_data);
+
+      Init(devPtr._size);
+      cudaMemcpy(_data,
+                 devPtr._data,
+                 devPtr._size * sizeof(T),
+                 cudaMemcpyKind::cudaMemcpyDeviceToDevice);
+
+      _size = devPtr._size;
+
+      return *this;
    }
 }
 

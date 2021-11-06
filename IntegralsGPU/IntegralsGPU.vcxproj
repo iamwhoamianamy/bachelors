@@ -84,7 +84,8 @@
   <ItemGroup>
     <CudaCompile Include="cuda_timer.cu" />
     <CudaCompile Include="dev_ptr.cu" />
-    <CudaCompile Include="laplace_solver_cuda.cu" />
+    <CudaCompile Include="laplace_data.cu" />
+    <CudaCompile Include="laplace_solver_arrays.cu" />
     <CudaCompile Include="main.cu" />
   </ItemGroup>
   <ItemGroup>
@@ -102,8 +103,9 @@
     <ClInclude Include="dev_ptr.cuh" />
     <ClInclude Include="exeptions.h" />
     <ClInclude Include="kernels_constant_data.cuh" />
+    <ClInclude Include="laplace_data.cuh" />
+    <ClInclude Include="laplace_solver_arrays.cuh" />
     <ClInclude Include="laplace_solver.h" />
-    <ClInclude Include="laplace_solver_cuda.cuh" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="quad_points.h" />
     <ClInclude Include="triangle.h" />
