@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="cuda_timer.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
+    <CudaCompile Include="dev_ptr.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
+    <CudaCompile Include="laplace_solver_cuda.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
+    <CudaCompile Include="main.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="exeptions.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="laplace_solver.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="quad_points.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle_quadratures.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="vector3.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cuda_helper.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_timer.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dev_ptr.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
+    <ClInclude Include="exeptions.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="kernels_constant_data.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
+    <ClInclude Include="laplace_solver.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="laplace_solver_cuda.cuh">
+      <Filter>CUDA includes</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="quad_points.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle_quadratures.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="СUDA compiles">
+      <UniqueIdentifier>{2b404a91-b5bf-412e-8fd5-84b534dca316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CUDA includes">
+      <UniqueIdentifier>{a8084c5d-8a64-4262-8775-4571ec576933}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C++ compiles">
+      <UniqueIdentifier>{73fc9737-f9d0-4112-b379-18bc9788ac28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C++ includes">
+      <UniqueIdentifier>{9988fec6-5699-4fd5-932c-7905232fa289}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
