@@ -13,6 +13,7 @@ void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, QuadP
    quadraturesCount = quadPoints.order * mesh.TrianglesCount();
    trianglesCount = mesh.TrianglesCount();
    pointsCount = points.size();
+   quadPointsOrder = quadPoints.order;
 
    // Preparing quadratures
    quadratures_X.resize(quadraturesCount);
@@ -105,7 +106,32 @@ void LaplaceSolverArrays::CopyToDevice()
 
 vector<double>& LaplaceSolverArrays::SolveCPU()
 {
+   for(size_t p = 0; p < pointsCount; p++)
+   {
+      double integral = 0;
 
+      for(size_t t = 0; t < trianglesCount; t++)
+      {
+         double tringle_sum_1 = 0;
+         double tringle_sum_2 = 0;
+
+         for(size_t o = 0; o < quadPointsOrder; o++)
+         {
+            int ind = t * quadPointsOrder + o;
+            tringle_sum_1 += weights[o] * laplaceIntegral1(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
+                                                           points_X[p], points_Y[p], points_Z[p],
+                                                           normals_X[t], normals_Y[t], normals_Z[t]);
+
+            tringle_sum_2 += weights[o] * laplaceIntegral2(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
+                                                           points_X[p], points_Y[p], points_Z[p],
+                                                           normals_X[t], normals_Y[t], normals_Z[t]);
+         }
+
+         integral += (tringle_sum_1 - tringle_sum_2) * areas[t];
+      }
+
+      result[p] = integral / (4.0 * PI);
+   }
 
    return result;
 }
@@ -131,7 +157,7 @@ __global__ void SolverKernel(const double* quadratures_X,
                              const double* areas,
                              const int trianglesCount,
                              const int pointsCount,
-                             const int quadratureOrder,
+                             const int quadraturesOrder,
                              double* result)
 {
    uint p = blockIdx.x;
@@ -144,9 +170,9 @@ __global__ void SolverKernel(const double* quadratures_X,
       double tringle_sum_1 = 0;
       double tringle_sum_2 = 0;
 
-      for(size_t o = 0; o < quadratureOrder; o++)
+      for(size_t o = 0; o < quadraturesOrder; o++)
       {
-         int ind = t * quadratureOrder + o;
+         int ind = t * quadraturesOrder + o;
          tringle_sum_1 += weights[o] * laplaceIntegral1(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
                                                         points_X[p], points_Y[p], points_Z[p],
                                                         normals_X[t], normals_Y[t], normals_Z[t]);
@@ -192,7 +218,7 @@ void LaplaceSolverArrays::SolveGPU()
       dev_normals_X.Get(), dev_normals_Y.Get(), dev_normals_Z.Get(),
       dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),
       dev_weights.Get(), dev_areas.Get(),
-      trianglesCount, pointsCount, weights.size(), dev_result.Get());
+      trianglesCount, pointsCount, quadPointsOrder, dev_result.Get());
 
    tryKernelLaunch();
    tryKernelSynchronize();

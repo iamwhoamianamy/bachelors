@@ -98,8 +98,8 @@ namespace cuda_utilities
                                       _size * sizeof(T),
                                       cudaMemcpyKind::cudaMemcpyDeviceToHost);
 
-      //if(result != cudaError_t::cudaSuccess)
-      //   throw CopyExeption();
+      if(result != cudaError_t::cudaSuccess)
+         throw CopyExeption();
    }
 
    template<class T>

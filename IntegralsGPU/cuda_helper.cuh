@@ -6,7 +6,6 @@
 
 namespace cuda_utilities
 {
-
    typedef void handler;
 #define FOREGROUND_WHITE 7
 

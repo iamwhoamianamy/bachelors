@@ -20,6 +20,7 @@ private:
    int quadraturesCount = 0;
    int trianglesCount = 0;
    int pointsCount = 0;
+   int quadPointsOrder = 0;
 
    vector<double> quadratures_X;
    vector<double> quadratures_Y;
