@@ -3,7 +3,7 @@
 #include "triangle.h"
 #include "exeptions.h"
 #include "quad_points.h"
-#include "vector3.h"
+#include "vector3.cuh"
 #include "mesh.h"
 
 namespace triangle_quadratures

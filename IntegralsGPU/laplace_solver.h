@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "vector3.h"
+#include "vector3.cuh"
 #include "mesh.h"
 #include "quad_points.h"
 

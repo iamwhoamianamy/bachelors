@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "vector3.h"
+#include "vector3.cuh"
 
 namespace triangle_quadratures
 {

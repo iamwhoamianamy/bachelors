@@ -1,12 +1,13 @@
 #include "mesh.h"
 #include "quad_points.h"
-#include "vector3.h"
+#include "vector3.cuh"
 #include "dev_ptr.cuh"
+#include "laplace_solver_interface.h"
 
 using namespace cuda_utilities;
 using namespace triangle_quadratures;
 
-class LaplaceSolverArrays
+class LaplaceSolverArrays : public LaplaceSolver
 {
 public:
    LaplaceSolverArrays();

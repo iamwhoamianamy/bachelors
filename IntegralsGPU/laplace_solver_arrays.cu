@@ -1,8 +1,9 @@
-#include "laplace_solver_arrays.cuh"
+#include "laplace_solver_arrays.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "laplace_data.cuh"
 #include "cuda_helper.cuh"
+#include "laplace_solver_kernels.cuh"
 
 LaplaceSolverArrays::LaplaceSolverArrays() {};
 
@@ -137,83 +138,9 @@ vector<double>& LaplaceSolverArrays::SolveCPU()
 }
 
 
-#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600
-#else
-__device__ double atomicAdd(double* a, double b) { return b; }
-#endif
-
-typedef unsigned int uint;
-
-__global__ void SolverKernel(const double* quadratures_X,
-                             const double* quadratures_Y,
-                             const double* quadratures_Z,
-                             const double* normals_X,
-                             const double* normals_Y,
-                             const double* normals_Z,
-                             const double* points_X,
-                             const double* points_Y,
-                             const double* points_Z,
-                             const double* weights,
-                             const double* areas,
-                             const int trianglesCount,
-                             const int pointsCount,
-                             const int quadraturesOrder,
-                             double* result)
-{
-   uint p = blockIdx.x;
-   extern __shared__ double shared_array[];
-   double* integral = (__shared__ double*)shared_array;
-   uint t = threadIdx.x;
-
-   while(t < trianglesCount)
-   {
-      double tringle_sum_1 = 0;
-      double tringle_sum_2 = 0;
-
-      for(size_t o = 0; o < quadraturesOrder; o++)
-      {
-         int ind = t * quadraturesOrder + o;
-         tringle_sum_1 += weights[o] * laplaceIntegral1(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
-                                                        points_X[p], points_Y[p], points_Z[p],
-                                                        normals_X[t], normals_Y[t], normals_Z[t]);
-
-         tringle_sum_2 += weights[o] * laplaceIntegral2(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
-                                                        points_X[p], points_Y[p], points_Z[p],
-                                                        normals_X[t], normals_Y[t], normals_Z[t]);
-      }
-
-      atomicAdd(&integral[t % blockDim.x], (tringle_sum_1 - tringle_sum_2) * areas[t]);
-      t += blockDim.x;
-   }
-
-   __syncthreads();
-   t = threadIdx.x;
-
-   for(unsigned int s = 1; s < blockDim.x; s *= 2)
-   {
-      if(t % (2 * s) == 0)
-      {
-         if(t + s < trianglesCount)
-         {
-            integral[t] += integral[t + s];
-         }
-      }
-
-      __syncthreads();
-   }
-
-   __syncthreads();
-   t = threadIdx.x;
-
-   if(t == 0)
-   {
-      result[p] = integral[0] / (4.0 * PI);
-   }
-}
-
 void LaplaceSolverArrays::SolveGPU()
 {
-   SolverKernel<<<pointsCount, 512, 512 * sizeof(double)>>>(
+   laplace_solver_kernels::SolverKernelArrays<<<pointsCount, 512, 512 * sizeof(double)>>>(
       dev_quadratures_X.Get(), dev_quadratures_Y.Get(), dev_quadratures_Z.Get(),
       dev_normals_X.Get(), dev_normals_Y.Get(), dev_normals_Z.Get(),
       dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),

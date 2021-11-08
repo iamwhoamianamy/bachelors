@@ -1,4 +1,4 @@
-#include "vector3.h"
+#include "vector3.cuh"
 #include "exeptions.h"
 
 namespace triangle_quadratures

@@ -82,11 +82,14 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="cuda_helper.cu" />
     <CudaCompile Include="cuda_timer.cu" />
     <CudaCompile Include="dev_ptr.cu" />
     <CudaCompile Include="laplace_data.cu" />
     <CudaCompile Include="laplace_solver_arrays.cu" />
-    <CudaCompile Include="main.cu" />
+    <CudaCompile Include="laplace_solver_kernels.cu" />
+    <CudaCompile Include="laplace_solver_vector3s.cu" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exeptions.cpp" />
@@ -95,22 +98,24 @@
     <ClCompile Include="quad_points.cpp" />
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="triangle_quadratures.cpp" />
-    <ClCompile Include="vector3.cpp" />
+    <ClCompile Include="vector3.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cuda_helper.cuh" />
     <ClInclude Include="cuda_timer.cuh" />
     <ClInclude Include="dev_ptr.cuh" />
     <ClInclude Include="exeptions.h" />
-    <ClInclude Include="kernels_constant_data.cuh" />
+    <ClInclude Include="laplace_solver_interface.h" />
+    <ClInclude Include="laplace_solver_kernels.cuh" />
     <ClInclude Include="laplace_data.cuh" />
-    <ClInclude Include="laplace_solver_arrays.cuh" />
+    <ClInclude Include="laplace_solver_arrays.h" />
     <ClInclude Include="laplace_solver.h" />
+    <ClInclude Include="laplace_solver_vector3s.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="quad_points.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="triangle_quadratures.h" />
-    <ClInclude Include="vector3.h" />
+    <ClInclude Include="vector3.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
