@@ -84,7 +84,6 @@
   <ItemGroup>
     <CudaCompile Include="cuda_helper.cu" />
     <CudaCompile Include="cuda_timer.cu" />
-    <CudaCompile Include="dev_ptr.cu" />
     <CudaCompile Include="laplace_data.cu" />
     <CudaCompile Include="laplace_solver_arrays.cu" />
     <CudaCompile Include="laplace_solver_kernels.cu" />

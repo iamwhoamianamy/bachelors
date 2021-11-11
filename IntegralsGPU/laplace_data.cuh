@@ -33,4 +33,6 @@ namespace laplace_data
    __device__ __host__ double laplaceIntegral2(const Vector3& q,
                                                const Vector3& p,
                                                const Vector3& n);
+
+   const int threads_per_block = 512;
 };

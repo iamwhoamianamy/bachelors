@@ -112,7 +112,7 @@ vector<double>& LaplaceSolverVector3s::SolveCPU()
 
 void LaplaceSolverVector3s::SolveGPU()
 {
-   laplace_solver_kernels::SolverKernelVector3s<<<pointsCount, 512, 512 * sizeof(double)>>>(
+   laplace_solver_kernels::SolverKernelVector3s<<<pointsCount, threads_per_block, threads_per_block * sizeof(double)>>>(
       dev_quadratures.Get(),
       dev_normals.Get(),
       dev_points.Get(),

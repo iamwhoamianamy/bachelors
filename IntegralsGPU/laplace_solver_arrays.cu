@@ -140,7 +140,7 @@ vector<double>& LaplaceSolverArrays::SolveCPU()
 
 void LaplaceSolverArrays::SolveGPU()
 {
-   laplace_solver_kernels::SolverKernelArrays<<<pointsCount, 512, 512 * sizeof(double)>>>(
+   laplace_solver_kernels::SolverKernelArrays<<<pointsCount, threads_per_block, threads_per_block * sizeof(double)>>>(
       dev_quadratures_X.Get(), dev_quadratures_Y.Get(), dev_quadratures_Z.Get(),
       dev_normals_X.Get(), dev_normals_Y.Get(), dev_normals_Z.Get(),
       dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),

@@ -4,9 +4,6 @@
     <CudaCompile Include="cuda_timer.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
-    <CudaCompile Include="dev_ptr.cu">
-      <Filter>СUDA compiles</Filter>
-    </CudaCompile>
     <CudaCompile Include="laplace_solver_arrays.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>

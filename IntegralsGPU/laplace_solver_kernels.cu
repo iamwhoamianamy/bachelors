@@ -25,10 +25,14 @@ __global__ void laplace_solver_kernels::SolverKernelArrays(
    const int quadraturesOrder,
    double* result)
 {
-   uint p = blockIdx.x;
    extern __shared__ double shared_array[];
    double* integral = (__shared__ double*)shared_array;
+
+   uint p = blockIdx.x;
    uint t = threadIdx.x;
+
+   if(t < blockDim.x)
+      integral[t] = 0;
 
    while(t < trianglesCount)
    {
@@ -56,14 +60,11 @@ __global__ void laplace_solver_kernels::SolverKernelArrays(
    __syncthreads();
    t = threadIdx.x;
 
-   for(unsigned int s = 1; s < blockDim.x; s *= 2)
+   for(unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
    {
-      if(t % (2 * s) == 0)
+      if(t < s)
       {
-         if(t + s < trianglesCount)
-         {
-            integral[t] += integral[t + s];
-         }
+         integral[t] += integral[t + s];
       }
 
       __syncthreads();
@@ -89,10 +90,14 @@ __global__ void laplace_solver_kernels::SolverKernelVector3s(
    const int quadraturesOrder,
    double* result)
 {
-   uint p = blockIdx.x;
    extern __shared__ double shared_array[];
    double* integral = (__shared__ double*)shared_array;
+
+   uint p = blockIdx.x;
    uint t = threadIdx.x;
+
+   if(t < blockDim.x)
+      integral[t] = 0;
 
    while(t < trianglesCount)
    {
@@ -116,14 +121,11 @@ __global__ void laplace_solver_kernels::SolverKernelVector3s(
    __syncthreads();
    t = threadIdx.x;
 
-   for(unsigned int s = 1; s < blockDim.x; s *= 2)
+   for(unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
    {
-      if(t % (2 * s) == 0)
+      if(t < s)
       {
-         if(t + s < trianglesCount)
-         {
-            integral[t] += integral[t + s];
-         }
+         integral[t] += integral[t + s];
       }
 
       __syncthreads();
