@@ -2,7 +2,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "laplace_data.cuh"
-#include "cuda_helper.cuh"
+#include "cuda_helper.h"
 #include "laplace_solver_kernels.cuh"
 
 LaplaceSolverArrays::LaplaceSolverArrays() {};

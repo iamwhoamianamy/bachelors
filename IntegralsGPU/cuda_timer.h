@@ -1,3 +1,4 @@
+#pragma once
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -13,6 +14,5 @@ namespace cuda_utilities
       ~CudaTimer();
       void Start();
       float Ellapsed();
-
    };
 }

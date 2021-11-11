@@ -50,13 +50,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cuda_helper.cuh">
-      <Filter>CUDA includes</Filter>
-    </ClInclude>
-    <ClInclude Include="cuda_timer.cuh">
-      <Filter>CUDA includes</Filter>
-    </ClInclude>
-    <ClInclude Include="dev_ptr.cuh">
+    <ClInclude Include="cuda_helper.h">
       <Filter>CUDA includes</Filter>
     </ClInclude>
     <ClInclude Include="exeptions.h">
@@ -93,6 +87,12 @@
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="laplace_solver_vector3s.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dev_ptr.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_timer.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
   </ItemGroup>

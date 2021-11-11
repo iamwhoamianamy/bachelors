@@ -101,9 +101,9 @@
     <ClCompile Include="vector3.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cuda_helper.cuh" />
-    <ClInclude Include="cuda_timer.cuh" />
-    <ClInclude Include="dev_ptr.cuh" />
+    <ClInclude Include="cuda_helper.h" />
+    <ClInclude Include="cuda_timer.h" />
+    <ClInclude Include="dev_ptr.h" />
     <ClInclude Include="exeptions.h" />
     <ClInclude Include="laplace_solver_interface.h" />
     <ClInclude Include="laplace_solver_kernels.cuh" />

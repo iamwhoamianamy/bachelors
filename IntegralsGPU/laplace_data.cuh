@@ -1,12 +1,10 @@
+#pragma once
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
 #include "vector3.cuh"
 
 using namespace triangle_quadratures;
-
-#ifndef LAPLACE_DATA
-#define LAPLACE_DATA
 
 namespace laplace_data
 {
@@ -36,5 +34,3 @@ namespace laplace_data
                                                const Vector3& p,
                                                const Vector3& n);
 };
-
-#endif // !LAPLACE_DATA

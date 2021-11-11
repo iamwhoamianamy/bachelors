@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <cstdlib>
-#include "cuda_helper.cuh"
+#include "cuda_helper.h"
 
 void cuda_utilities::tryKernelLaunch()
 {

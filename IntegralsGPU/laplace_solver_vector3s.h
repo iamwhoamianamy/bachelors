@@ -1,7 +1,8 @@
+#pragma once
 #include "mesh.h"
 #include "quad_points.h"
 #include "vector3.cuh"
-#include "dev_ptr.cuh"
+#include "dev_ptr.h"
 #include "laplace_solver_interface.h"
 
 using namespace cuda_utilities;

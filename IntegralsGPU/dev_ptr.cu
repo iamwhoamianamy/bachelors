@@ -1,4 +1,4 @@
-#include "dev_ptr.cuh"
+#include "dev_ptr.h"
 #include "cuda_runtime.h"
 
 //template<class T>

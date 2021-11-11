@@ -9,7 +9,7 @@
 #include "triangle_quadratures.h"
 #include "mesh.h"
 #include "laplace_solver.h"
-#include "cuda_timer.cuh"
+#include "cuda_timer.h"
 #include "laplace_solver_arrays.h"
 #include "laplace_solver_vector3s.h"
 

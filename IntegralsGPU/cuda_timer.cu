@@ -1,4 +1,4 @@
-#include "cuda_timer.cuh"
+#include "cuda_timer.h"
 
 using namespace cuda_utilities;
 
