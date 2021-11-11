@@ -43,9 +43,9 @@ enum class LaplaceSolvers
    Vector3s = 1
 };
 
-void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, QuadPoints& QuadPoints, LaplaceSolvers choose)
+void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, QuadPoints& quadPoints, LaplaceSolvers choose)
 {
-   for(size_t points_iteration = 12; points_iteration < 13; points_iteration++)
+   for(size_t points_iteration = 5; points_iteration < 6; points_iteration++)
    {
       const int points_count = pow(2, points_iteration);
       //const int points_count = 10;
@@ -67,13 +67,13 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, QuadPoints& QuadPoints, L
 
       // Preparing quadratures and normals
       auto start = std::chrono::steady_clock::now();
-      laplaceSolver->PrepareData(points, mesh, QuadPoints);
+      laplaceSolver->PrepareData(points, mesh, quadPoints);
       auto stop = std::chrono::steady_clock::now();
       auto preparation_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       // Solving on CPU
       start = std::chrono::steady_clock::now();
-      //cpu_results = laplaceSolver->SolveCPU();
+      cpu_results = laplaceSolver->SolveCPU();
       stop = std::chrono::steady_clock::now();
       auto cpu_solving_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
@@ -95,7 +95,9 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, QuadPoints& QuadPoints, L
       stop = std::chrono::steady_clock::now();
       auto getting_results_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
-      cout << setw(30) << "Points count:" << setw(20) << points_count << endl << endl;
+      cout << setw(30) << "Points count:" << setw(20) << points_count << endl;
+      cout << setw(30) << "Triangles count:" << setw(20) << mesh.TrianglesCount() << endl;
+      cout << setw(30) << "Quadrature order:" << setw(20) << quadPoints.order << endl << endl;
 
       cout << scientific;
       cout << setw(30) << "Preparing quadratures:" << setw(20) << preparation_time << endl;
@@ -110,20 +112,20 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, QuadPoints& QuadPoints, L
       cout << setw(30) << "Total for GPU:" << setw(20) << total_gpu_time << endl;
       cout << endl;
 
-      double speedup_factor = cpu_solving_time / total_gpu_time;
+      double speedup_factor = cpu_solving_time / gpu_solving_time;
       cout << setw(30) << "GPU speedup:" << setw(20) << speedup_factor << endl;
       cout << setw(30) << "Total time:" << setw(20) << cpu_solving_time + total_gpu_time + preparation_time << endl;
       cout << endl;
 
-      /*cout << endl << "----------------CPU results:---------------" << endl << endl;
-      printResults(points_count, points, cpu_results);*/
+      cout << endl << "----------------CPU results:---------------" << endl << endl;
+      printResults(points_count, points, cpu_results);
 
       cout << endl << "----------------GPU results:---------------" << endl << endl;
       printResults(points_count, points, gpu_results);
 
       fout << points_count << "\t";
       fout << cpu_solving_time << "\t";
-      fout << total_gpu_time << "\t";
+      fout << gpu_solving_time << "\t";
       fout << speedup_factor << endl;
    }
 }
@@ -134,7 +136,7 @@ int main()
 
    try
    {
-      mesh.InitFromOBJ("../meshes/icosphere_highres.obj");
+      mesh.InitFromOBJ("../meshes/icospheres/ico5120.obj");
    }
    catch(Exeption fileExeption)
    {
@@ -165,14 +167,14 @@ int main()
    }
 
    ofstream fout;
-   fout.open("results/laplace_solver_arrays_test_results.txt");
+   /*fout.open("results/laplace_solver_arrays_test_results.txt");
    cout << "Laplace solver with arrays" << endl << endl;
    runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Arrays);
-   fout.close();
+   fout.close();*/
 
-   /*fout.open("results/laplace_solver_vector3s_test_results.txt");
+   fout.open("results/laplace_solver_vector3s_test_results.txt");
    cout << endl << "Laplace solver with vector3s" << endl << endl;
-   runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Vector3s);*/
+   runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Vector3s);
 
    return 0;
 }
