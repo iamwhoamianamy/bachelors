@@ -4,17 +4,17 @@
 
 namespace triangle_quadratures
 {
-   class QuadPoints
+   class BasisQuadratures
    {
    public:
-      std::vector<double> x;
-      std::vector<double> y;
-      std::vector<double> w;
+      std::vector<float> x;
+      std::vector<float> y;
+      std::vector<float> w;
 
       int order;
 
-      QuadPoints();
-      QuadPoints(int order);
+      BasisQuadratures();
+      BasisQuadratures(int order);
       void InitFromTXT(std::string coordsFileName, std::string weightsFileName);
    };
 };

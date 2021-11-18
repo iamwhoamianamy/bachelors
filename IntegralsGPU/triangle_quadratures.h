@@ -2,31 +2,31 @@
 #include <vector>
 #include "triangle.h"
 #include "exeptions.h"
-#include "quad_points.h"
+#include "basis_quadratures.h"
 #include "vector3.cuh"
 #include "mesh.h"
 
 namespace triangle_quadratures
 {
-   double calcIntegralOverTriangle(double (*f)(Vector3),
+   float calcIntegralOverTriangle(float (*f)(Vector3),
                                    const Triangle& tr,
-                                   const QuadPoints& qp);
+                                   const BasisQuadratures& qp);
 
-   double calcIntegralOverMesh(double (*f)(Vector3),
+   float calcIntegralOverMesh(float (*f)(Vector3),
                                const Mesh& mesh,
-                               const QuadPoints& qp);
+                               const BasisQuadratures& qp);
 
-   double calcSurfaceArea(Mesh& mesh,
-                          const QuadPoints& qp);
+   float calcSurfaceArea(Mesh& mesh,
+                          const BasisQuadratures& qp);
 
-   //void calcIntegralOverArray(double (*f)(double*),
-   //                           const double* points,
-   //                           const double* coords,
-   //                           const double* weights,
-   //                           const double* areas,
-   //                           const double* normals,
+   //void calcIntegralOverArray(float (*f)(float*),
+   //                           const float* points,
+   //                           const float* coords,
+   //                           const float* weights,
+   //                           const float* areas,
+   //                           const float* normals,
    //                           const int pointsCount,
    //                           const int trianglesCount,
    //                           const int quadratureOrder,
-   //                           double* result);
+   //                           float* results);
 }

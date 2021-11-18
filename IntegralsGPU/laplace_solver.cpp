@@ -1,8 +1,8 @@
 #include "laplace_solver.h"
 
-const double PI = 3.14159265359;
+const float PI = 3.14159265359;
 
-double laplace_solver::u(Vector3 v)
+float laplace_solver::u(Vector3 v)
 {
    return 2 * v.x * v.x - v.y * v.y - v.z * v.z;
    //return 1;
@@ -15,48 +15,48 @@ Vector3 laplace_solver::gradU(Vector3 v)
    //return { 1.0, 0.0, 0.0 };
 }
 
-double laplace_solver::laplaceIntegral1(Vector3 v,
+float laplace_solver::laplaceIntegral1(Vector3 v,
                                         Vector3 point,
                                         Vector3 normal)
 {
    Vector3 grad = gradU(v);
 
-   double dudnx = grad.x * normal.x;
-   double dudny = grad.y * normal.y;
-   double dudnz = grad.z * normal.z;
+   float dudnx = grad.x * normal.x;
+   float dudny = grad.y * normal.y;
+   float dudnz = grad.z * normal.z;
 
    return (dudnx + dudny + dudnz) / (point - v).Length();
 }
 
-double laplace_solver::laplaceIntegral2(Vector3 v,
+float laplace_solver::laplaceIntegral2(Vector3 v,
                                         Vector3 point,
                                         Vector3 normal)
 {
-   double l = (point - v).Length();
+   float l = (point - v).Length();
 
-   double rx = normal.x * (point.x - v.x);
-   double ry = normal.y * (point.y - v.y);
-   double rz = normal.z * (point.z - v.z);
+   float rx = normal.x * (point.x - v.x);
+   float ry = normal.y * (point.y - v.y);
+   float rz = normal.z * (point.z - v.z);
 
    return (rx + ry + rz) * u(v) / pow(l, 3.0);
 }
 
 void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,
-                                          const QuadPoints& qp,
+                                          const BasisQuadratures& qp,
                                           const vector<Vector3>& points,
-                                          vector<double>& result)
+                                          vector<float>& results)
 {
-   result = vector<double>(points.size());
+   results = vector<float>(points.size());
 
    for (size_t p = 0; p < points.size(); p++)
    {
-      double integral1 = 0;
-      double integral_2 = 0;
+      float integral1 = 0;
+      float integral_2 = 0;
 
       for (size_t t = 0; t < mesh.TrianglesCount(); t++)
       {
-         double tringle_sum_1 = 0;
-         double tringle_sum_2 = 0;
+         float tringle_sum_1 = 0;
+         float tringle_sum_2 = 0;
 
          Triangle tr = mesh.GetTriangle(t);
          Vector3 normal = tr.Normal();
@@ -72,6 +72,6 @@ void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,
          integral_2 += tringle_sum_2 * tr.Area();
       }
 
-      result[p] = (integral1 - integral_2) / (4.0 * PI);
+      results[p] = (integral1 - integral_2) / (4.0 * PI);
    }
 }

@@ -8,16 +8,22 @@
 using namespace cuda_utilities;
 using namespace triangle_quadratures;
 
-class LaplaceSolverVector3s : public LaplaceSolver
+struct QuadPoint
+{
+   Vector3 quad;
+   Vector3 normal;
+   float weight;
+};
+
+class LaplaceSolverStructs : public LaplaceSolver
 {
 public:
-   LaplaceSolverVector3s();
+   LaplaceSolverStructs();
    void PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads);
    vector<float>& SolveCPU();
    void CopyToDevice();
    void SolveGPU();
    vector<float>& GetResultGPU();
-   //AlgorythmGPU algorythmGPU;
 
 private:
    int quadraturesCount = 0;
@@ -25,19 +31,13 @@ private:
    int pointsCount = 0;
    int quadraturesOrder = 0;
 
-   vector<Vector3> quadPoints;
-   vector<Vector3> normals;
+   vector<QuadPoint> quadPoints;
    vector<Vector3> points;
 
-   vector<float> weights;
-   vector<float> areas;
    vector<float> results;
 
-   DevPtr<Vector3> dev_quadPoints;
-   DevPtr<Vector3> dev_normals;
+   DevPtr<QuadPoint> dev_quadPoints;
    DevPtr<Vector3> dev_points;
 
-   DevPtr<float> dev_weights;
-   DevPtr<float> dev_areas;
    DevPtr<float> dev_results;
 };

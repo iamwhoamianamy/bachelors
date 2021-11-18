@@ -28,7 +28,7 @@ namespace triangle_quadratures
 
             if(letter == "v")
             {
-               double x, y, z;
+               float x, y, z;
                fin >> x >> y >> z;
 
                _vertices.push_back(Vector3(x, y, z));

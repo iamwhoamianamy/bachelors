@@ -4,15 +4,15 @@
 
 namespace triangle_quadratures
 {
-   double Triangle::CalcArea()
+   float Triangle::CalcArea()
    {
       //return 0.5 * abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y));
       Vector3 ab(b.x - a.x, b.y - a.y, b.z - a.z);
       Vector3 ac(c.x - a.x, c.y - a.y, c.z - a.z);
 
-      double t0 = ab.y * ac.z - ab.z * ac.y;
-      double t1 = ab.z * ac.x - ab.x * ac.z;
-      double t2 = ab.x * ac.y - ab.y * ac.x;
+      float t0 = ab.y * ac.z - ab.z * ac.y;
+      float t1 = ab.z * ac.x - ab.x * ac.z;
+      float t2 = ab.x * ac.y - ab.y * ac.x;
 
       return 0.5 * sqrt(t0 * t0 + t1 * t1 + t2 * t2);
    }
@@ -22,17 +22,17 @@ namespace triangle_quadratures
       area = 0;
    }
 
-   Triangle::Triangle(double ax, double ay, double az,
-                      double bx, double by, double bz,
-                      double cx, double cy, double cz) : 
+   Triangle::Triangle(float ax, float ay, float az,
+                      float bx, float by, float bz,
+                      float cx, float cy, float cz) : 
       a(ax, ay, az), b(bx, by, bz), c(cx, cy, cz)
    {
       area = CalcArea();
    }
 
-   Triangle::Triangle(double ax, double ay,
-                      double bx, double by,
-                      double cx, double cy) :
+   Triangle::Triangle(float ax, float ay,
+                      float bx, float by,
+                      float cx, float cy) :
       a(ax, ay, 0), b(bx, by, 0), c(cx, cy, 0)
    {
       area = CalcArea();
@@ -43,19 +43,19 @@ namespace triangle_quadratures
       area = CalcArea();
    }
 
-   double Triangle::Area() const { return area; }
+   float Triangle::Area() const { return area; }
 
-   std::vector<double> Triangle::Xs() const
+   std::vector<float> Triangle::Xs() const
    {
       return { a.x, b.x, c.x };
    }
 
-   std::vector<double> Triangle::Ys() const
+   std::vector<float> Triangle::Ys() const
    {
       return { a.y, b.y, c.y };
    }
 
-   std::vector<double> Triangle::Zs() const
+   std::vector<float> Triangle::Zs() const
    {
       return { a.z, b.z, c.z };
    }
@@ -71,7 +71,7 @@ namespace triangle_quadratures
       }
    }
 
-   double Triangle::XFromST(double s, double t) const
+   float Triangle::XFromST(float s, float t) const
    {
       //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
       //   throw RangeExeption();
@@ -79,7 +79,7 @@ namespace triangle_quadratures
       return a.x + (b.x - a.x) * s + (c.x - a.x) * t;
    }
 
-   double Triangle::YFromST(double s, double t) const
+   float Triangle::YFromST(float s, float t) const
    {
       //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
       //   throw RangeExeption();
@@ -87,7 +87,7 @@ namespace triangle_quadratures
       return a.y + (b.y - a.y) * s + (c.y - a.y) * t;
    }
 
-   double Triangle::ZFromST(double s, double t) const
+   float Triangle::ZFromST(float s, float t) const
    {
       //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
       //   throw RangeExeption();
@@ -95,7 +95,7 @@ namespace triangle_quadratures
       return a.z + (b.z - a.z) * s + (c.z - a.z) * t;
    }
 
-   Vector3 Triangle::PointFromST(double s, double t) const
+   Vector3 Triangle::PointFromST(float s, float t) const
    {
       //if(s > 1.0 || t > 1.0 || t > 1.0 - s)
       //   throw RangeExeption();

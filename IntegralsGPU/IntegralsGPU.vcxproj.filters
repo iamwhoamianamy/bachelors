@@ -19,6 +19,9 @@
     <CudaCompile Include="cuda_helper.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
+    <CudaCompile Include="laplace_solver_structs.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exeptions.cpp">
@@ -30,7 +33,7 @@
     <ClCompile Include="mesh.cpp">
       <Filter>C++ compiles</Filter>
     </ClCompile>
-    <ClCompile Include="quad_points.cpp">
+    <ClCompile Include="basis_quadratures.cpp">
       <Filter>C++ compiles</Filter>
     </ClCompile>
     <ClCompile Include="triangle.cpp">
@@ -62,7 +65,7 @@
     <ClInclude Include="mesh.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
-    <ClInclude Include="quad_points.h">
+    <ClInclude Include="basis_quadratures.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="triangle.h">
@@ -77,7 +80,7 @@
     <ClInclude Include="vector3.cuh">
       <Filter>CUDA includes</Filter>
     </ClInclude>
-    <ClInclude Include="laplace_solver_interface.h">
+    <ClInclude Include="laplace_solver_abstract.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="laplace_solver_arrays.h">
@@ -90,6 +93,9 @@
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="cuda_timer.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="laplace_solver_structs.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
   </ItemGroup>

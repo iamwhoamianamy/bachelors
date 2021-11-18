@@ -1,17 +1,17 @@
 #include <fstream>
-#include "quad_points.h"
+#include "basis_quadratures.h"
 #include "exeptions.h"
 
 using namespace std;
 
 namespace triangle_quadratures
 {
-   QuadPoints::QuadPoints()
+   BasisQuadratures::BasisQuadratures()
    {
       order = 0;
    }
 
-   QuadPoints::QuadPoints(int order) : order(order)
+   BasisQuadratures::BasisQuadratures(int order) : order(order)
    {
       switch(order)
       {
@@ -34,7 +34,7 @@ namespace triangle_quadratures
       }
    }
 
-   void QuadPoints::InitFromTXT(string coordsFileName, string weightsFileName)
+   void BasisQuadratures::InitFromTXT(string coordsFileName, string weightsFileName)
    {
       ifstream fin;
       fin.open(coordsFileName, ios_base::in);
@@ -46,7 +46,7 @@ namespace triangle_quadratures
 
       try
       {
-         double x_coord, y_coord;
+         float x_coord, y_coord;
 
          while(fin >> x_coord && fin >> y_coord)
          {
@@ -78,7 +78,7 @@ namespace triangle_quadratures
 
       try
       {
-         double w_value, y_coord;
+         float w_value, y_coord;
 
          while(fin >> w_value)
          {

@@ -8,31 +8,40 @@ using namespace triangle_quadratures;
 
 namespace laplace_data
 {
-   __device__ const double PI = 3.14159265359;
+   __device__ const float PI = 3.14159265359;
 
-   __device__ __host__ double u(double x, double y, double z);
-   __device__ __host__ double gradUX(double x, double y, double z);
-   __device__ __host__ double gradUY(double x, double y, double z);
-   __device__ __host__ double gradUZ(double x, double y, double z);
+   __device__ __host__ inline float u(float x, float y, float z);
+   __device__ __host__ inline float gradUX(float x, float y, float z);
+   __device__ __host__ inline float gradUY(float x, float y, float z);
+   __device__ __host__ inline float gradUZ(float x, float y, float z);
 
-   __device__ __host__ double lengthBetween(double x1, double y1, double z1,
-                                            double x2, double y2, double z2);
+   __device__ __host__ float lengthBetween(float x1, float y1, float z1,
+                                            float x2, float y2, float z2);
 
-   __device__ __host__ double laplaceIntegral1(double qx, double qy, double qz,
-                                               double px, double py, double pz,
-                                               double nx, double ny, double nz);
+   __device__ __host__ float laplaceIntegral1(float qx, float qy, float qz,
+                                               float px, float py, float pz,
+                                               float nx, float ny, float nz);
 
-   __device__ __host__ double laplaceIntegral2(double qx, double qy, double qz,
-                                               double px, double py, double pz,
-                                               double nx, double ny, double nz);
+   __device__ __host__ float laplaceIntegral2(float qx, float qy, float qz,
+                                               float px, float py, float pz,
+                                               float nx, float ny, float nz);
 
-   __device__ __host__ double laplaceIntegral1(const Vector3& q,
+   __device__ __host__ float laplaceIntegral1(const Vector3& q,
                                                const Vector3& p,
                                                const Vector3& n);
 
-   __device__ __host__ double laplaceIntegral2(const Vector3& q,
+   __device__ __host__ float laplaceIntegral2(const Vector3& q,
                                                const Vector3& p,
                                                const Vector3& n);
 
-   const int threads_per_block = 512;
+   const int MAX_THREADS = 1024;
+
+   const int THREADS_PER_BLOCK = 512;
+
+   const int QUADS_PER_BLOCK = 32;
+   const int QUAD_ORDER = 64;
+   //const int TR_PER_BLOCK = QUADS_PER_BLOCK / QUAD_ORDER;
+   const int TR_PER_BLOCK = 1;
+
+   const int POINTS_PER_BLOCK = MAX_THREADS / THREADS_PER_BLOCK;
 };

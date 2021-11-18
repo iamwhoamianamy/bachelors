@@ -75,10 +75,10 @@ namespace cuda_utilities
    void DevPtr<T>::Init(size_t size)
    {
       cudaFree(_data);
-      cudaError_t result = cudaMalloc((void**)&_data,
+      cudaError_t results = cudaMalloc((void**)&_data,
                                       size * sizeof(T));
 
-      if(result != cudaError_t::cudaSuccess)
+      if(results != cudaError_t::cudaSuccess)
          throw MallocExeption();
 
       _size = size;
@@ -93,24 +93,24 @@ namespace cuda_utilities
    template<class T>
    void DevPtr<T>::CopyToHost(T* data)
    {
-      cudaError_t result = cudaMemcpy(data,
+      cudaError_t results = cudaMemcpy(data,
                                       _data,
                                       _size * sizeof(T),
                                       cudaMemcpyKind::cudaMemcpyDeviceToHost);
 
-      if(result != cudaError_t::cudaSuccess)
+      if(results != cudaError_t::cudaSuccess)
          throw CopyExeption();
    }
 
    template<class T>
    void DevPtr<T>::CopyToDevice(const T* data)
    {
-      cudaError_t result = cudaMemcpy(_data,
+      cudaError_t results = cudaMemcpy(_data,
                                       data,
                                       _size * sizeof(T),
                                       cudaMemcpyKind::cudaMemcpyHostToDevice);
 
-      if(result != cudaError_t::cudaSuccess)
+      if(results != cudaError_t::cudaSuccess)
          throw CopyExeption();
    }
 

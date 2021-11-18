@@ -3,26 +3,26 @@
 
 namespace triangle_quadratures
 {
-   double calcIntegralOverTriangle(double (*f)(Vector3),
+   float calcIntegralOverTriangle(float (*f)(Vector3),
                                    const Triangle& tr,
-                                   const QuadPoints& qp)
+                                   const BasisQuadratures& qp)
    {
-      double result = 0;
+      float results = 0;
 
       for (size_t i = 0; i < qp.order; i++)
       {
          Vector3 v = tr.PointFromST(qp.x[i], qp.y[i]);
-         result += qp.w[i] * f(v);
+         results += qp.w[i] * f(v);
       }
 
-      return result * tr.Area();
+      return results * tr.Area();
    }
 
-   double calcIntegralOverMesh(double(*f)(Vector3),
+   float calcIntegralOverMesh(float(*f)(Vector3),
                                const Mesh& mesh,
-                               const QuadPoints& qp)
+                               const BasisQuadratures& qp)
    {
-      double integral_sum = 0;
+      float integral_sum = 0;
 
       for (size_t t = 0; t < mesh.TrianglesCount(); t++)
       {
@@ -32,34 +32,34 @@ namespace triangle_quadratures
      return integral_sum;
    }
 
-   double one(Vector3 v)
+   float one(Vector3 v)
    {
       return 1;
    }
 
-   double calcSurfaceArea(Mesh& mesh,
-                          const QuadPoints& qp)
+   float calcSurfaceArea(Mesh& mesh,
+                          const BasisQuadratures& qp)
    {
       return calcIntegralOverMesh(one, mesh, qp);
    }
 
-   /*void calcIntegralOverMesh(double(*f)(Vector3),
+   /*void calcIntegralOverMesh(float(*f)(Vector3),
                              const Mesh& mesh, 
-                             const QuadPoints& qp,
+                             const BasisQuadratures& qp,
                              const vector<Vector3>& points,
-                             std::vector<double>& result)
+                             std::vector<float>& results)
    {
-      vector<double> points_double(points.size() * 3);
+      vector<float> points_float(points.size() * 3);
 
       for(size_t i = 0; i < points.size(); i++)
       {
-         points_double[i * 3 + 0] = points[i].x;
-         points_double[i * 3 + 1] = points[i].y;
-         points_double[i * 3 + 2] = points[i].z;
+         points_float[i * 3 + 0] = points[i].x;
+         points_float[i * 3 + 1] = points[i].y;
+         points_float[i * 3 + 2] = points[i].z;
       }
 
-      vector<double> coords(mesh.TrianglesCount() * qp.order * 3);
-      vector<double> areas(mesh.TrianglesCount());
+      vector<float> coords(mesh.TrianglesCount() * qp.order * 3);
+      vector<float> areas(mesh.TrianglesCount());
 
       for(size_t i = 0; i < mesh.TrianglesCount(); i++)
       {
@@ -77,19 +77,19 @@ namespace triangle_quadratures
          areas[i] = tr.Area();
       }
 
-      vector<double> weights(qp.order);
+      vector<float> weights(qp.order);
 
       for(size_t i = 0; i < qp.order; i++)
       {
          weights[i] = qp.w[i];
       }
 
-      vector<double> normals(mesh.TrianglesCount() * 3);
+      vector<float> normals(mesh.TrianglesCount() * 3);
 
-      result.resize(points.size());
+      results.resize(points.size());
 
       calcIntegralOverArray(f,
-                            points_double.data(),
+                            points_float.data(),
                             coords.data(),
                             weights.data(),
                             areas.data(),
@@ -97,29 +97,29 @@ namespace triangle_quadratures
                             points.size(),
                             mesh.TrianglesCount(),
                             qp.order,
-                            result.data());
+                            results.data());
    }*/
 
-//   void calcIntegralOverArray(double (*f)(double*),
-//                              const double* points,
-//                              const double* coords,
-//                              const double* weights,
-//                              const double* normals,
-//                              const double* areas,
+//   void calcIntegralOverArray(float (*f)(float*),
+//                              const float* points,
+//                              const float* coords,
+//                              const float* weights,
+//                              const float* normals,
+//                              const float* areas,
 //                              const int pointsCount,
 //                              const int trianglesCount,
 //                              const int quadratureOrder,
-//                              double* result)
+//                              float* results)
 //   {
-//      double* params = new double[5];
+//      float* params = new float[5];
 //
 //      for(size_t i = 0; i < pointsCount; i++)
 //      {
-//         double total_sum = 0;
+//         float total_sum = 0;
 //
 //         for(size_t j = 0; j < trianglesCount; j++)
 //         {
-//            double triangle_sum = 0;
+//            float triangle_sum = 0;
 //
 //            for(size_t k = 0; k < quadratureOrder; k++)
 //            {
@@ -137,7 +137,7 @@ namespace triangle_quadratures
 //            total_sum += triangle_sum * areas[j];
 //         }
 //
-//         result[i] = total_sum;
+//         results[i] = total_sum;
 //      }
 //
 //      delete[] params;

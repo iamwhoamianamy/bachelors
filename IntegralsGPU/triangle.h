@@ -7,8 +7,8 @@ namespace triangle_quadratures
    class Triangle
    {
    private:
-      double area;
-      double CalcArea();
+      float area;
+      float CalcArea();
 
    public:
       Vector3 a;
@@ -17,28 +17,28 @@ namespace triangle_quadratures
 
       Triangle();
 
-      Triangle(double ax, double ay, double az,
-               double bx, double by, double bz,
-               double cx, double cy, double cz);
+      Triangle(float ax, float ay, float az,
+               float bx, float by, float bz,
+               float cx, float cy, float cz);
       
-      Triangle(double ax, double ay,
-               double bx, double by,
-               double cx, double cy);
+      Triangle(float ax, float ay,
+               float bx, float by,
+               float cx, float cy);
 
       Triangle(Vector3 a, Vector3 b, Vector3 c);
 
-      double Area() const;
+      float Area() const;
 
-      std::vector<double> Xs() const;
-      std::vector<double> Ys() const;
-      std::vector<double> Zs() const;
+      std::vector<float> Xs() const;
+      std::vector<float> Ys() const;
+      std::vector<float> Zs() const;
 
       Vector3& operator[](int i);
 
-      double XFromST(double s, double t) const;
-      double YFromST(double s, double t) const;
-      double ZFromST(double s, double t) const;
-      Vector3 PointFromST(double s, double t) const;
+      float XFromST(float s, float t) const;
+      float YFromST(float s, float t) const;
+      float ZFromST(float s, float t) const;
+      Vector3 PointFromST(float s, float t) const;
       Vector3 Normal() const;
    };
 }

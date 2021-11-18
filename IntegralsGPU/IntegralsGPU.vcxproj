@@ -47,6 +47,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -67,6 +68,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -87,6 +89,7 @@
     <CudaCompile Include="laplace_data.cu" />
     <CudaCompile Include="laplace_solver_arrays.cu" />
     <CudaCompile Include="laplace_solver_kernels.cu" />
+    <CudaCompile Include="laplace_solver_structs.cu" />
     <CudaCompile Include="laplace_solver_vector3s.cu" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -94,7 +97,7 @@
     <ClCompile Include="exeptions.cpp" />
     <ClCompile Include="laplace_solver.cpp" />
     <ClCompile Include="mesh.cpp" />
-    <ClCompile Include="quad_points.cpp" />
+    <ClCompile Include="basis_quadratures.cpp" />
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="triangle_quadratures.cpp" />
     <ClCompile Include="vector3.cu" />
@@ -104,14 +107,15 @@
     <ClInclude Include="cuda_timer.h" />
     <ClInclude Include="dev_ptr.h" />
     <ClInclude Include="exeptions.h" />
-    <ClInclude Include="laplace_solver_interface.h" />
+    <ClInclude Include="laplace_solver_abstract.h" />
     <ClInclude Include="laplace_solver_kernels.cuh" />
     <ClInclude Include="laplace_data.cuh" />
     <ClInclude Include="laplace_solver_arrays.h" />
     <ClInclude Include="laplace_solver.h" />
+    <ClInclude Include="laplace_solver_structs.h" />
     <ClInclude Include="laplace_solver_vector3s.h" />
     <ClInclude Include="mesh.h" />
-    <ClInclude Include="quad_points.h" />
+    <ClInclude Include="basis_quadratures.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="triangle_quadratures.h" />
     <ClInclude Include="vector3.cuh" />

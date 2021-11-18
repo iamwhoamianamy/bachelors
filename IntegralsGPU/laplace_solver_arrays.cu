@@ -9,14 +9,14 @@ LaplaceSolverArrays::LaplaceSolverArrays() {};
 
 using namespace laplace_data;
 
-void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, QuadPoints& quadPoints)
+void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads)
 {
-   quadraturesCount = quadPoints.order * mesh.TrianglesCount();
+   quadraturesCount = basisQuads.order * mesh.TrianglesCount();
    trianglesCount = mesh.TrianglesCount();
    pointsCount = points.size();
-   quadPointsOrder = quadPoints.order;
+   quadraturesOrder = basisQuads.order;
 
-   // Preparing quadratures
+   // Preparing quadPoints
    quadratures_X.resize(quadraturesCount);
    quadratures_Y.resize(quadraturesCount);
    quadratures_Z.resize(quadraturesCount);
@@ -25,10 +25,10 @@ void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, QuadP
    {
       Triangle tr = mesh.GetTriangle(t);
 
-      for(size_t o = 0; o < quadPoints.order; o++)
+      for(size_t o = 0; o < basisQuads.order; o++)
       {
-         int ind = t * quadPoints.order + o;
-         Vector3 v = tr.PointFromST(quadPoints.x[o], quadPoints.y[o]);
+         int ind = t * basisQuads.order + o;
+         Vector3 v = tr.PointFromST(basisQuads.x[o], basisQuads.y[o]);
 
          quadratures_X[ind] = v.x;
          quadratures_Y[ind] = v.y;
@@ -64,7 +64,7 @@ void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, QuadP
    }
 
    // Preparing weights
-   weights = vector<double>(quadPoints.w);
+   weights = vector<float>(basisQuads.w);
 
    // Preparing areas
    areas.resize(trianglesCount);
@@ -74,51 +74,51 @@ void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, QuadP
       areas[t] = mesh.GetTriangle(t).Area();
    }
 
-   // Preparing result
-   result = vector<double>(pointsCount, 0);
+   // Preparing results
+   results = vector<float>(pointsCount, 0);
 }
 
 void LaplaceSolverArrays::CopyToDevice()
 {
-   // Copying quadratures
-   dev_quadratures_X = DevPtr<double>(quadratures_X.data(), quadraturesCount);
-   dev_quadratures_Y = DevPtr<double>(quadratures_Y.data(), quadraturesCount);
-   dev_quadratures_Z = DevPtr<double>(quadratures_Z.data(), quadraturesCount);
+   // Copying quadPoints
+   dev_quadratures_X = DevPtr<float>(quadratures_X.data(), quadraturesCount);
+   dev_quadratures_Y = DevPtr<float>(quadratures_Y.data(), quadraturesCount);
+   dev_quadratures_Z = DevPtr<float>(quadratures_Z.data(), quadraturesCount);
 
    // Copying normals
-   dev_normals_X = DevPtr<double>(normals_X.data(), trianglesCount);
-   dev_normals_Y = DevPtr<double>(normals_Y.data(), trianglesCount);
-   dev_normals_Z = DevPtr<double>(normals_Z.data(), trianglesCount);
+   dev_normals_X = DevPtr<float>(normals_X.data(), trianglesCount);
+   dev_normals_Y = DevPtr<float>(normals_Y.data(), trianglesCount);
+   dev_normals_Z = DevPtr<float>(normals_Z.data(), trianglesCount);
 
    // Copying points
-   dev_points_X = DevPtr<double>(points_X.data(), pointsCount);
-   dev_points_Y = DevPtr<double>(points_Y.data(), pointsCount);
-   dev_points_Z = DevPtr<double>(points_Z.data(), pointsCount);
+   dev_points_X = DevPtr<float>(points_X.data(), pointsCount);
+   dev_points_Y = DevPtr<float>(points_Y.data(), pointsCount);
+   dev_points_Z = DevPtr<float>(points_Z.data(), pointsCount);
 
    // Copying weights
-   dev_weights = DevPtr<double>(weights.data(), weights.size());
+   dev_weights = DevPtr<float>(weights.data(), weights.size());
 
    // Copying areas
-   dev_areas = DevPtr<double>(areas.data(), trianglesCount);
+   dev_areas = DevPtr<float>(areas.data(), trianglesCount);
 
-   // Copying result
-   dev_result = DevPtr<double>(pointsCount);
+   // Copying results
+   dev_results = DevPtr<float>(pointsCount);
 }
 
-vector<double>& LaplaceSolverArrays::SolveCPU()
+vector<float>& LaplaceSolverArrays::SolveCPU()
 {
    for(size_t p = 0; p < pointsCount; p++)
    {
-      double integral = 0;
+      float integral = 0;
 
       for(size_t t = 0; t < trianglesCount; t++)
       {
-         double tringle_sum_1 = 0;
-         double tringle_sum_2 = 0;
+         float tringle_sum_1 = 0;
+         float tringle_sum_2 = 0;
 
-         for(size_t o = 0; o < quadPointsOrder; o++)
+         for(size_t o = 0; o < quadraturesOrder; o++)
          {
-            int ind = t * quadPointsOrder + o;
+            int ind = t * quadraturesOrder + o;
             tringle_sum_1 += weights[o] * laplaceIntegral1(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
                                                            points_X[p], points_Y[p], points_Z[p],
                                                            normals_X[t], normals_Y[t], normals_Z[t]);
@@ -131,28 +131,28 @@ vector<double>& LaplaceSolverArrays::SolveCPU()
          integral += (tringle_sum_1 - tringle_sum_2) * areas[t];
       }
 
-      result[p] = integral / (4.0 * PI);
+      results[p] = integral / (4.0 * PI);
    }
 
-   return result;
+   return results;
 }
 
 
 void LaplaceSolverArrays::SolveGPU()
 {
-   laplace_solver_kernels::SolverKernelArrays<<<pointsCount, threads_per_block, threads_per_block * sizeof(double)>>>(
+   laplace_solver_kernels::SolverKernelArraysReduction<<<pointsCount, THREADS_PER_BLOCK, THREADS_PER_BLOCK * sizeof(float)>>>(
       dev_quadratures_X.Get(), dev_quadratures_Y.Get(), dev_quadratures_Z.Get(),
       dev_normals_X.Get(), dev_normals_Y.Get(), dev_normals_Z.Get(),
       dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),
       dev_weights.Get(), dev_areas.Get(),
-      trianglesCount, pointsCount, quadPointsOrder, dev_result.Get());
+      trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
 
    tryKernelLaunch();
    tryKernelSynchronize();
 }
 
-vector<double>& LaplaceSolverArrays::GetResultGPU()
+vector<float>& LaplaceSolverArrays::GetResultGPU()
 {
-   dev_result.CopyToHost(result.data());
-   return result;
+   dev_results.CopyToHost(results.data());
+   return results;
 }

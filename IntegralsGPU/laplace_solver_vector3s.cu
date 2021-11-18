@@ -5,28 +5,29 @@
 #include "cuda_helper.h"
 #include "laplace_solver_kernels.cuh"
 
+//LaplaceSolverVector3s::LaplaceSolverVector3s(AlgorythmGPU alg) : algorythmGPU(alg) {};
 LaplaceSolverVector3s::LaplaceSolverVector3s() {};
 
 using namespace laplace_data;
 
-void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, QuadPoints& quadPoints) 
+void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads) 
 {
-   quadraturesCount = quadPoints.order * mesh.TrianglesCount();
+   quadraturesCount = basisQuads.order * mesh.TrianglesCount();
    trianglesCount = mesh.TrianglesCount();
    pointsCount = points.size();
-   quadPointsOrder = quadPoints.order;
+   quadraturesOrder = basisQuads.order;
 
-   // Preparing quadratures
-   quadratures.resize(quadraturesCount);
+   // Preparing quadPoints
+   quadPoints.resize(quadraturesCount);
 
    for(size_t t = 0; t < trianglesCount; t++)
    {
       Triangle tr = mesh.GetTriangle(t);
 
-      for(size_t o = 0; o < quadPoints.order; o++)
+      for(size_t o = 0; o < basisQuads.order; o++)
       {
-         int ind = t * quadPoints.order + o;
-         quadratures[ind] = tr.PointFromST(quadPoints.x[o], quadPoints.y[o]);
+         int ind = t * basisQuads.order + o;
+         quadPoints[ind] = tr.PointFromST(basisQuads.x[o], basisQuads.y[o]);
       }
    }
 
@@ -43,7 +44,7 @@ void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, Qua
    this->points = vector<Vector3>(points);
 
    // Preparing weights
-   weights = vector<double>(quadPoints.w);
+   weights = vector<float>(basisQuads.w);
 
    // Preparing areas
    areas.resize(trianglesCount);
@@ -53,14 +54,14 @@ void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, Qua
       areas[t] = mesh.GetTriangle(t).Area();
    }
 
-   // Preparing result
-   result = vector<double>(pointsCount, 0);
+   // Preparing results
+   results = vector<float>(pointsCount, 0);
 }
 
 void LaplaceSolverVector3s::CopyToDevice() 
 {
-   // Copying quadratures
-   dev_quadratures = DevPtr<Vector3>(quadratures.data(), quadraturesCount);
+   // Copying quadPoints
+   dev_quadPoints = DevPtr<Vector3>(quadPoints.data(), quadraturesCount);
 
    // Copying normals
    dev_normals = DevPtr<Vector3>(normals.data(), trianglesCount);
@@ -69,34 +70,34 @@ void LaplaceSolverVector3s::CopyToDevice()
    dev_points = DevPtr<Vector3>(points.data(), pointsCount);
 
    // Copying weights
-   dev_weights = DevPtr<double>(weights.data(), weights.size());
+   dev_weights = DevPtr<float>(weights.data(), weights.size());
 
    // Copying areas
-   dev_areas = DevPtr<double>(areas.data(), trianglesCount);
+   dev_areas = DevPtr<float>(areas.data(), trianglesCount);
 
-   // Copying result
-   dev_result = DevPtr<double>(pointsCount);
+   // Copying results
+   dev_results = DevPtr<float>(pointsCount);
 }
 
-vector<double>& LaplaceSolverVector3s::SolveCPU()
+vector<float>& LaplaceSolverVector3s::SolveCPU()
 {
    for(size_t p = 0; p < pointsCount; p++)
    {
-      double integral = 0;
+      float integral = 0;
 
       for(size_t t = 0; t < trianglesCount; t++)
       {
-         double tringle_sum_1 = 0;
-         double tringle_sum_2 = 0;
+         float tringle_sum_1 = 0;
+         float tringle_sum_2 = 0;
 
-         for(size_t o = 0; o < quadPointsOrder; o++)
+         for(size_t o = 0; o < quadraturesOrder; o++)
          {
-            int ind = t * quadPointsOrder + o;
-            tringle_sum_1 += weights[o] * laplaceIntegral1(quadratures[ind],
+            int ind = t * quadraturesOrder + o;
+            tringle_sum_1 += weights[o] * laplaceIntegral1(quadPoints[ind],
                                                            points[p],
                                                            normals[t]);
 
-            tringle_sum_2 += weights[o] * laplaceIntegral2(quadratures[ind],
+            tringle_sum_2 += weights[o] * laplaceIntegral2(quadPoints[ind],
                                                            points[p],
                                                            normals[t]);
          }
@@ -104,27 +105,57 @@ vector<double>& LaplaceSolverVector3s::SolveCPU()
          integral += (tringle_sum_1 - tringle_sum_2) * areas[t];
       }
 
-      result[p] = integral / (4.0 * PI);
+      results[p] = integral / (4.0 * PI);
    }
 
-   return result;
+   return results;
 }
 
 void LaplaceSolverVector3s::SolveGPU()
 {
-   laplace_solver_kernels::SolverKernelVector3s<<<pointsCount, threads_per_block, threads_per_block * sizeof(double)>>>(
-      dev_quadratures.Get(),
-      dev_normals.Get(),
-      dev_points.Get(),
-      dev_weights.Get(), dev_areas.Get(),
-      trianglesCount, pointsCount, quadPointsOrder, dev_result.Get());
+   switch(algorythmGPU)
+   {
+      case AlgorythmGPU::Reduction:
+      {
+         laplace_solver_kernels::SolverKernelVector3sReduction<<<
+            pointsCount,
+            THREADS_PER_BLOCK,
+            THREADS_PER_BLOCK * sizeof(float)>>>(
+               dev_quadPoints.Get(),
+               dev_normals.Get(),
+               dev_points.Get(),
+               dev_weights.Get(), dev_areas.Get(),
+               trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
+
+         break;
+      }
+      case AlgorythmGPU::Blocks:
+      {
+         /*dim3 dimBlock(QUADS_PER_BLOCK, POINTS_PER_BLOCK);
+         dim3 dimGrid(1, pointsCount / POINTS_PER_BLOCK);*/
+
+         dim3 dimBlock(POINTS_PER_BLOCK);
+         dim3 dimGrid(pointsCount / POINTS_PER_BLOCK);
+
+         laplace_solver_kernels::SolverKernelVector3sBlocks<<<
+            dimGrid,
+            dimBlock >>>(
+               dev_quadPoints.Get(),
+               dev_normals.Get(),
+               dev_points.Get(),
+               dev_weights.Get(), dev_areas.Get(),
+               trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
+
+         break;
+      }
+   }
 
    tryKernelLaunch();
    tryKernelSynchronize();
 }
 
-vector<double>& LaplaceSolverVector3s::GetResultGPU()
+vector<float>& LaplaceSolverVector3s::GetResultGPU()
 {
-   dev_result.CopyToHost(result.data());
-   return result;
+   dev_results.CopyToHost(results.data());
+   return results;
 }

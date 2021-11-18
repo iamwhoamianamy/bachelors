@@ -3,10 +3,10 @@
 
 namespace triangle_quadratures
 {
-   Vector3::Vector3(double x, double y, double z)
+   Vector3::Vector3(float x, float y, float z)
       : x(x), y(y), z(z) {}
 
-   double& Vector3::operator[](int i)
+   float& Vector3::operator[](int i)
    {
       switch(i)
       {
@@ -37,7 +37,7 @@ namespace triangle_quadratures
       return res;
    }
 
-   Vector3 Vector3::operator *(const double fac) const
+   Vector3 Vector3::operator *(const float fac) const
    {
       Vector3 res;
       res.x = this->x * fac;
@@ -47,7 +47,7 @@ namespace triangle_quadratures
       return res;
    }
 
-   Vector3 Vector3::operator /(const double fac) const
+   Vector3 Vector3::operator /(const float fac) const
    {
       Vector3 res;
       res.x = this->x / fac;
@@ -75,7 +75,7 @@ namespace triangle_quadratures
       return *this;
    }
 
-   Vector3& Vector3::operator *=(const double fac)
+   Vector3& Vector3::operator *=(const float fac)
    {
       this->x *= fac;
       this->y *= fac;
@@ -84,7 +84,7 @@ namespace triangle_quadratures
       return *this;
    }
 
-   Vector3& Vector3::operator /=(const double fac)
+   Vector3& Vector3::operator /=(const float fac)
    {
       if (fac != 0)
       {
@@ -102,14 +102,14 @@ namespace triangle_quadratures
       return *this;
    }
 
-   double Vector3::LengthSquared() const
+   float Vector3::LengthSquared() const
    {
       return this->x * this->x +
              this->y * this->y +
              this->z * this->z;
    }
 
-   double Vector3::Length() const
+   float Vector3::Length() const
    {
       return sqrt(this->x * this->x + 
                   this->y * this->y +
@@ -119,7 +119,7 @@ namespace triangle_quadratures
    Vector3 Vector3::Normalized() const
    {
       Vector3 res;
-      double length = Length();
+      float length = Length();
 
       if (length)
       {
@@ -133,7 +133,7 @@ namespace triangle_quadratures
 
    void Vector3::Normalize()
    {
-      double length = Length();
+      float length = Length();
 
       if (length != 0)
       {
@@ -143,9 +143,9 @@ namespace triangle_quadratures
       }
    }
 
-   void Vector3::Limit(const double limitLength)
+   void Vector3::Limit(const float limitLength)
    {
-      double length = Length();
+      float length = Length();
 
       if (length != 0 && length > limitLength)
       {
@@ -155,7 +155,7 @@ namespace triangle_quadratures
       }
    }
 
-   void Vector3::SetLength(const double newLength)
+   void Vector3::SetLength(const float newLength)
    {
       Normalize();
       this->x *= newLength;
@@ -174,14 +174,14 @@ namespace triangle_quadratures
       return res.Normalized();
    }
 
-   double Vector3::DistanceSquared(const Vector3& vec1, const Vector3& vec2)
+   float Vector3::DistanceSquared(const Vector3& vec1, const Vector3& vec2)
    {
       return (vec1 - vec2).LengthSquared();
    }
 
    Vector3 Vector3::LeadingCos()
    {
-      double l = Length();
+      float l = Length();
 
       return Vector3(x / l, y / l, z / l);
    }
