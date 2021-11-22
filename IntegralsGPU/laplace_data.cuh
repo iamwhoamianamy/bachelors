@@ -3,36 +3,37 @@
 #include "device_launch_parameters.h"
 
 #include "vector3.cuh"
+#include "real.h"
 
 using namespace triangle_quadratures;
 
 namespace laplace_data
 {
-   __device__ const float PI = 3.14159265359;
+   __device__ const real PI = 3.14159265359;
 
-   __device__ __host__ inline float u(float x, float y, float z);
-   __device__ __host__ inline float gradUX(float x, float y, float z);
-   __device__ __host__ inline float gradUY(float x, float y, float z);
-   __device__ __host__ inline float gradUZ(float x, float y, float z);
+   __device__ __host__ inline real u(const real x, const real y, const real z);
+   __device__ __host__ inline real gradUX(const real x, const real y, const real z);
+   __device__ __host__ inline real gradUY(const real x, const real y, const real z);
+   __device__ __host__ inline real gradUZ(const real x, const real y, const real z);
 
-   __device__ __host__ float lengthBetween(float x1, float y1, float z1,
-                                            float x2, float y2, float z2);
+   __device__ __host__ real lengthBetween(const real x1, const real y1, const real z1,
+                                          const real x2, const real y2, const real z2);
 
-   __device__ __host__ float laplaceIntegral1(float qx, float qy, float qz,
-                                               float px, float py, float pz,
-                                               float nx, float ny, float nz);
+   __device__ __host__ real laplaceIntegral1(const real qx, const real qy, const real qz,
+                                             const real px, const real py, const real pz,
+                                             const real nx, const real ny, const real nz);
 
-   __device__ __host__ float laplaceIntegral2(float qx, float qy, float qz,
-                                               float px, float py, float pz,
-                                               float nx, float ny, float nz);
+   __device__ __host__ real laplaceIntegral2(const real qx, const real qy, const real qz,
+                                             const real px, const real py, const real pz,
+                                             const real nx, const real ny, const real nz);
 
-   __device__ __host__ float laplaceIntegral1(const Vector3& q,
-                                               const Vector3& p,
-                                               const Vector3& n);
+   __device__ __host__ real laplaceIntegral1(const Vector3& q,
+                                             const Vector3& p,
+                                             const Vector3& n);
 
-   __device__ __host__ float laplaceIntegral2(const Vector3& q,
-                                               const Vector3& p,
-                                               const Vector3& n);
+   __device__ __host__ real laplaceIntegral2(const Vector3& q,
+                                             const Vector3& p,
+                                             const Vector3& n);
 
    const int MAX_THREADS = 1024;
 
@@ -44,4 +45,8 @@ namespace laplace_data
    const int TR_PER_BLOCK = 1;
 
    const int POINTS_PER_BLOCK = MAX_THREADS / THREADS_PER_BLOCK;
+
+   const int BLOCK_SIZE = 64;
+   const int MATRIX_WIDTH = 16384 / 2;
+   const int MATRIX_HEIGHT = 8192 / 2;
 };

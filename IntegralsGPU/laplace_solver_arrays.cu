@@ -9,7 +9,9 @@ LaplaceSolverArrays::LaplaceSolverArrays() {};
 
 using namespace laplace_data;
 
-void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads)
+void LaplaceSolverArrays::PrepareData(const vector<Vector3>& points,
+                                      const Mesh& mesh,
+                                      const BasisQuadratures& basisQuads)
 {
    quadraturesCount = basisQuads.order * mesh.TrianglesCount();
    trianglesCount = mesh.TrianglesCount();
@@ -64,7 +66,7 @@ void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, Basis
    }
 
    // Preparing weights
-   weights = vector<float>(basisQuads.w);
+   weights = vector<real>(basisQuads.w);
 
    // Preparing areas
    areas.resize(trianglesCount);
@@ -75,46 +77,46 @@ void LaplaceSolverArrays::PrepareData(vector<Vector3>& points, Mesh& mesh, Basis
    }
 
    // Preparing results
-   results = vector<float>(pointsCount, 0);
+   results = vector<real>(pointsCount, 0);
 }
 
 void LaplaceSolverArrays::CopyToDevice()
 {
    // Copying quadPoints
-   dev_quadratures_X = DevPtr<float>(quadratures_X.data(), quadraturesCount);
-   dev_quadratures_Y = DevPtr<float>(quadratures_Y.data(), quadraturesCount);
-   dev_quadratures_Z = DevPtr<float>(quadratures_Z.data(), quadraturesCount);
+   dev_quadratures_X = DevPtr<real>(quadratures_X.data(), quadraturesCount);
+   dev_quadratures_Y = DevPtr<real>(quadratures_Y.data(), quadraturesCount);
+   dev_quadratures_Z = DevPtr<real>(quadratures_Z.data(), quadraturesCount);
 
    // Copying normals
-   dev_normals_X = DevPtr<float>(normals_X.data(), trianglesCount);
-   dev_normals_Y = DevPtr<float>(normals_Y.data(), trianglesCount);
-   dev_normals_Z = DevPtr<float>(normals_Z.data(), trianglesCount);
+   dev_normals_X = DevPtr<real>(normals_X.data(), trianglesCount);
+   dev_normals_Y = DevPtr<real>(normals_Y.data(), trianglesCount);
+   dev_normals_Z = DevPtr<real>(normals_Z.data(), trianglesCount);
 
    // Copying points
-   dev_points_X = DevPtr<float>(points_X.data(), pointsCount);
-   dev_points_Y = DevPtr<float>(points_Y.data(), pointsCount);
-   dev_points_Z = DevPtr<float>(points_Z.data(), pointsCount);
+   dev_points_X = DevPtr<real>(points_X.data(), pointsCount);
+   dev_points_Y = DevPtr<real>(points_Y.data(), pointsCount);
+   dev_points_Z = DevPtr<real>(points_Z.data(), pointsCount);
 
    // Copying weights
-   dev_weights = DevPtr<float>(weights.data(), weights.size());
+   dev_weights = DevPtr<real>(weights.data(), weights.size());
 
    // Copying areas
-   dev_areas = DevPtr<float>(areas.data(), trianglesCount);
+   dev_areas = DevPtr<real>(areas.data(), trianglesCount);
 
    // Copying results
-   dev_results = DevPtr<float>(pointsCount);
+   dev_results = DevPtr<real>(pointsCount);
 }
 
-vector<float>& LaplaceSolverArrays::SolveCPU()
+vector<real>& LaplaceSolverArrays::SolveCPU()
 {
    for(size_t p = 0; p < pointsCount; p++)
    {
-      float integral = 0;
+      real integral = 0;
 
       for(size_t t = 0; t < trianglesCount; t++)
       {
-         float tringle_sum_1 = 0;
-         float tringle_sum_2 = 0;
+         real tringle_sum_1 = 0;
+         real tringle_sum_2 = 0;
 
          for(size_t o = 0; o < quadraturesOrder; o++)
          {
@@ -140,7 +142,7 @@ vector<float>& LaplaceSolverArrays::SolveCPU()
 
 void LaplaceSolverArrays::SolveGPU()
 {
-   laplace_solver_kernels::SolverKernelArraysReduction<<<pointsCount, THREADS_PER_BLOCK, THREADS_PER_BLOCK * sizeof(float)>>>(
+   laplace_solver_kernels::solverKernelArraysReduction<<<pointsCount, THREADS_PER_BLOCK, THREADS_PER_BLOCK * sizeof(real)>>>(
       dev_quadratures_X.Get(), dev_quadratures_Y.Get(), dev_quadratures_Z.Get(),
       dev_normals_X.Get(), dev_normals_Y.Get(), dev_normals_Z.Get(),
       dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),
@@ -151,8 +153,12 @@ void LaplaceSolverArrays::SolveGPU()
    tryKernelSynchronize();
 }
 
-vector<float>& LaplaceSolverArrays::GetResultGPU()
+vector<real>& LaplaceSolverArrays::GetResultGPU()
 {
    dev_results.CopyToHost(results.data());
    return results;
+}
+
+LaplaceSolverArrays::~LaplaceSolverArrays()
+{
 }

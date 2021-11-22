@@ -19,7 +19,7 @@ void CudaTimer::Start()
    cudaEventRecord(start, 0);
 }
 
-float CudaTimer::Ellapsed()
+real CudaTimer::Ellapsed()
 {
    float ellapsed_time = 0;
 

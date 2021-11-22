@@ -1,4 +1,5 @@
 #pragma once
+#include "real.h"
 #include <vector>
 #include <string>
 
@@ -7,9 +8,9 @@ namespace triangle_quadratures
    class BasisQuadratures
    {
    public:
-      std::vector<float> x;
-      std::vector<float> y;
-      std::vector<float> w;
+      std::vector<real> x;
+      std::vector<real> y;
+      std::vector<real> w;
 
       int order;
 

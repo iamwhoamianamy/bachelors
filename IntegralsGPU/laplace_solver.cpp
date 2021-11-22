@@ -1,8 +1,8 @@
 #include "laplace_solver.h"
 
-const float PI = 3.14159265359;
+const real PI = 3.14159265359;
 
-float laplace_solver::u(Vector3 v)
+real laplace_solver::u(Vector3 v)
 {
    return 2 * v.x * v.x - v.y * v.y - v.z * v.z;
    //return 1;
@@ -15,28 +15,28 @@ Vector3 laplace_solver::gradU(Vector3 v)
    //return { 1.0, 0.0, 0.0 };
 }
 
-float laplace_solver::laplaceIntegral1(Vector3 v,
+real laplace_solver::laplaceIntegral1(Vector3 v,
                                         Vector3 point,
                                         Vector3 normal)
 {
    Vector3 grad = gradU(v);
 
-   float dudnx = grad.x * normal.x;
-   float dudny = grad.y * normal.y;
-   float dudnz = grad.z * normal.z;
+   real dudnx = grad.x * normal.x;
+   real dudny = grad.y * normal.y;
+   real dudnz = grad.z * normal.z;
 
    return (dudnx + dudny + dudnz) / (point - v).Length();
 }
 
-float laplace_solver::laplaceIntegral2(Vector3 v,
+real laplace_solver::laplaceIntegral2(Vector3 v,
                                         Vector3 point,
                                         Vector3 normal)
 {
-   float l = (point - v).Length();
+   real l = (point - v).Length();
 
-   float rx = normal.x * (point.x - v.x);
-   float ry = normal.y * (point.y - v.y);
-   float rz = normal.z * (point.z - v.z);
+   real rx = normal.x * (point.x - v.x);
+   real ry = normal.y * (point.y - v.y);
+   real rz = normal.z * (point.z - v.z);
 
    return (rx + ry + rz) * u(v) / pow(l, 3.0);
 }
@@ -44,19 +44,19 @@ float laplace_solver::laplaceIntegral2(Vector3 v,
 void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,
                                           const BasisQuadratures& qp,
                                           const vector<Vector3>& points,
-                                          vector<float>& results)
+                                          vector<real>& results)
 {
-   results = vector<float>(points.size());
+   results = vector<real>(points.size());
 
    for (size_t p = 0; p < points.size(); p++)
    {
-      float integral1 = 0;
-      float integral_2 = 0;
+      real integral1 = 0;
+      real integral_2 = 0;
 
       for (size_t t = 0; t < mesh.TrianglesCount(); t++)
       {
-         float tringle_sum_1 = 0;
-         float tringle_sum_2 = 0;
+         real tringle_sum_1 = 0;
+         real tringle_sum_2 = 0;
 
          Triangle tr = mesh.GetTriangle(t);
          Vector3 normal = tr.Normal();

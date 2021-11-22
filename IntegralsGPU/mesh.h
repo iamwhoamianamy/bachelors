@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
 #include <string>
+
 #include "vector3.cuh"
 #include "triangle.h"
+#include "real.h"
 
 using namespace std;
 

@@ -3,11 +3,11 @@
 
 namespace triangle_quadratures
 {
-   float calcIntegralOverTriangle(float (*f)(Vector3),
+   real calcIntegralOverTriangle(real (*f)(Vector3),
                                    const Triangle& tr,
                                    const BasisQuadratures& qp)
    {
-      float results = 0;
+      real results = 0;
 
       for (size_t i = 0; i < qp.order; i++)
       {
@@ -18,11 +18,11 @@ namespace triangle_quadratures
       return results * tr.Area();
    }
 
-   float calcIntegralOverMesh(float(*f)(Vector3),
+   real calcIntegralOverMesh(real(*f)(Vector3),
                                const Mesh& mesh,
                                const BasisQuadratures& qp)
    {
-      float integral_sum = 0;
+      real integral_sum = 0;
 
       for (size_t t = 0; t < mesh.TrianglesCount(); t++)
       {
@@ -32,34 +32,34 @@ namespace triangle_quadratures
      return integral_sum;
    }
 
-   float one(Vector3 v)
+   real one(Vector3 v)
    {
       return 1;
    }
 
-   float calcSurfaceArea(Mesh& mesh,
+   real calcSurfaceArea(Mesh& mesh,
                           const BasisQuadratures& qp)
    {
       return calcIntegralOverMesh(one, mesh, qp);
    }
 
-   /*void calcIntegralOverMesh(float(*f)(Vector3),
+   /*void calcIntegralOverMesh(real(*f)(Vector3),
                              const Mesh& mesh, 
                              const BasisQuadratures& qp,
                              const vector<Vector3>& points,
-                             std::vector<float>& results)
+                             std::vector<real>& results)
    {
-      vector<float> points_float(points.size() * 3);
+      vector<real> points_real(points.size() * 3);
 
       for(size_t i = 0; i < points.size(); i++)
       {
-         points_float[i * 3 + 0] = points[i].x;
-         points_float[i * 3 + 1] = points[i].y;
-         points_float[i * 3 + 2] = points[i].z;
+         points_real[i * 3 + 0] = points[i].x;
+         points_real[i * 3 + 1] = points[i].y;
+         points_real[i * 3 + 2] = points[i].z;
       }
 
-      vector<float> coords(mesh.TrianglesCount() * qp.order * 3);
-      vector<float> areas(mesh.TrianglesCount());
+      vector<real> coords(mesh.TrianglesCount() * qp.order * 3);
+      vector<real> areas(mesh.TrianglesCount());
 
       for(size_t i = 0; i < mesh.TrianglesCount(); i++)
       {
@@ -77,19 +77,19 @@ namespace triangle_quadratures
          areas[i] = tr.Area();
       }
 
-      vector<float> weights(qp.order);
+      vector<real> weights(qp.order);
 
       for(size_t i = 0; i < qp.order; i++)
       {
          weights[i] = qp.w[i];
       }
 
-      vector<float> normals(mesh.TrianglesCount() * 3);
+      vector<real> normals(mesh.TrianglesCount() * 3);
 
       results.resize(points.size());
 
       calcIntegralOverArray(f,
-                            points_float.data(),
+                            points_real.data(),
                             coords.data(),
                             weights.data(),
                             areas.data(),
@@ -100,26 +100,26 @@ namespace triangle_quadratures
                             results.data());
    }*/
 
-//   void calcIntegralOverArray(float (*f)(float*),
-//                              const float* points,
-//                              const float* coords,
-//                              const float* weights,
-//                              const float* normals,
-//                              const float* areas,
+//   void calcIntegralOverArray(real (*f)(real*),
+//                              const real* points,
+//                              const real* coords,
+//                              const real* weights,
+//                              const real* normals,
+//                              const real* areas,
 //                              const int pointsCount,
 //                              const int trianglesCount,
 //                              const int quadratureOrder,
-//                              float* results)
+//                              real* results)
 //   {
-//      float* params = new float[5];
+//      real* params = new real[5];
 //
 //      for(size_t i = 0; i < pointsCount; i++)
 //      {
-//         float total_sum = 0;
+//         real total_sum = 0;
 //
 //         for(size_t j = 0; j < trianglesCount; j++)
 //         {
-//            float triangle_sum = 0;
+//            real triangle_sum = 0;
 //
 //            for(size_t k = 0; k < quadratureOrder; k++)
 //            {

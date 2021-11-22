@@ -13,13 +13,13 @@
 #include "laplace_solver_arrays.h"
 #include "laplace_solver_vector3s.h"
 #include "laplace_solver_structs.h"
+#include "flops_tests.cuh"
 
 using namespace std;
 using namespace triangle_quadratures;
 using namespace cuda_utilities;
-namespace lscpu = laplace_solver;
 
-void printResults(int pointsCount, vector<Vector3>& points, vector<float>& results)
+void printResults(int pointsCount, vector<Vector3>& points, vector<real>& results)
 {
    cout << setw(8) << "i" << setw(16) << "pointx" << setw(16) << "pointy" << setw(16) << "pointz";
    cout << setw(16) << "true" << setw(16) << "calc" << setw(16) << "error" << endl;
@@ -29,9 +29,9 @@ void printResults(int pointsCount, vector<Vector3>& points, vector<float>& resul
       cout << fixed << setw(8) << i;
       cout << scientific << setw(16) << points[i].x << setw(16) << points[i].y << setw(16) << points[i].z;
 
-      float true_value = laplace_solver::u(points[i]);
-      float calc_value = results[i];
-      float error = abs(true_value - calc_value) / abs(true_value);
+      real true_value = laplace_solver::u(points[i]);
+      real calc_value = results[i];
+      real error = abs(true_value - calc_value) / abs(true_value);
 
       cout << fixed << setw(16) << true_value << setw(16) << calc_value;
       cout << scientific << setw(16) << error << endl;
@@ -49,10 +49,10 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
 {
    for(size_t points_iteration = 11; points_iteration < 12; points_iteration++)
    {
-      const int points_count = pow(2, 11);
+      const size_t points_count = pow(2, 15);
       //const int points_count = 10;
-      vector<float> cpu_results;
-      vector<float> gpu_results;
+      vector<real> cpu_results;
+      vector<real> gpu_results;
       vector<Vector3> points(points_count);
 
       for(size_t i = 0; i < points_count; i++)
@@ -94,7 +94,7 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
 
       // Solving on CPU
       start = std::chrono::steady_clock::now();
-      cpu_results = laplaceSolver->SolveCPU();
+      //cpu_results = laplaceSolver->SolveCPU();
       stop = std::chrono::steady_clock::now();
       auto cpu_solving_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
@@ -105,10 +105,10 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
       auto copying_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       // Solving on GPU
-      CudaTimer cudaTimer;
-      cudaTimer.Start();
+      start = std::chrono::steady_clock::now();
       laplaceSolver->SolveGPU();
-      auto gpu_solving_time = cudaTimer.Ellapsed();
+      stop = std::chrono::steady_clock::now();
+      auto gpu_solving_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       // Getting results from GPU
       start = std::chrono::steady_clock::now();
@@ -149,17 +149,17 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
       fout << gpu_solving_time << "\t";
       fout << speedup_factor << endl;
 
-      delete laplaceSolver;
+      delete (LaplaceSolverStructs*)laplaceSolver;
    }
 }
 
-int main()
+void runLaplaceSolverTests()
 {
    Mesh mesh;
 
    try
    {
-      mesh.InitFromOBJ("../meshes/icospheres/ico5120.obj");
+      mesh.InitFromOBJ("../meshes/icospheres/ico20480.obj");
    }
    catch(Exeption fileExeption)
    {
@@ -205,15 +205,27 @@ int main()
    //runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Vector3s, AlgorythmGPU::Blocks);
    //fout.close();
 
-   fout.open("results/laplace_solver_structs_reduction_test_results.txt");
-   cout << endl << "Laplace solver with structs, alg = reduction" << endl << endl;
-   runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Reduction);
-   fout.close();
-
-   //fout.open("results/laplace_solver_structs_blocks_test_results.txt");
-   //cout << endl << "Laplace solver with structs, alg = blocks" << endl << endl;
-   //runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Blocks);
+   //fout.open("results/laplace_solver_structs_reduction_test_results.txt");
+   //cout << endl << "Laplace solver with structs, alg = reduction" << endl << endl;
+   //runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Reduction);
    //fout.close();
+
+   /*fout.open("results/laplace_solver_structs_blocks_test_results.txt");
+   cout << endl << "Laplace solver with structs, alg = blocks" << endl << endl;
+   runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Blocks);
+   fout.close();*/
+
+   fout.open("results/laplace_solver_structs_grid_test_results.txt");
+   cout << endl << "Laplace solver with structs, alg = grid" << endl << endl;
+   runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Grid);
+   fout.close();
+}
+
+int main()
+{
+   runLaplaceSolverTests();
+   
+   //addMatricesTest();
 
    return 0;
 }

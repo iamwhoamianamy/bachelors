@@ -1,4 +1,5 @@
 #pragma once
+#include "real.h"
 #include "mesh.h"
 #include "basis_quadratures.h"
 #include "vector3.cuh"
@@ -12,11 +13,12 @@ class LaplaceSolverArrays : public LaplaceSolver
 {
 public:
    LaplaceSolverArrays();
-   void PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads);
-   vector<float>& SolveCPU();
+   void PrepareData(const vector<Vector3>& points, const Mesh& mesh, const BasisQuadratures& basisQuads);
+   vector<real>& SolveCPU();
    void CopyToDevice();
    void SolveGPU();
-   vector<float>& GetResultGPU();
+   vector<real>& GetResultGPU();
+   ~LaplaceSolverArrays();
 
 private:
    int quadraturesCount = 0;
@@ -24,35 +26,35 @@ private:
    int pointsCount = 0;
    int quadraturesOrder = 0;
 
-   vector<float> quadratures_X;
-   vector<float> quadratures_Y;
-   vector<float> quadratures_Z;
+   vector<real> quadratures_X;
+   vector<real> quadratures_Y;
+   vector<real> quadratures_Z;
 
-   vector<float> normals_X;
-   vector<float> normals_Y;
-   vector<float> normals_Z;
+   vector<real> normals_X;
+   vector<real> normals_Y;
+   vector<real> normals_Z;
 
-   vector<float> points_X;
-   vector<float> points_Y;
-   vector<float> points_Z;
+   vector<real> points_X;
+   vector<real> points_Y;
+   vector<real> points_Z;
 
-   vector<float> weights;
-   vector<float> areas;
-   vector<float> results;
+   vector<real> weights;
+   vector<real> areas;
+   vector<real> results;
 
-   DevPtr<float> dev_quadratures_X;
-   DevPtr<float> dev_quadratures_Y;
-   DevPtr<float> dev_quadratures_Z;
+   DevPtr<real> dev_quadratures_X;
+   DevPtr<real> dev_quadratures_Y;
+   DevPtr<real> dev_quadratures_Z;
 
-   DevPtr<float> dev_normals_X;
-   DevPtr<float> dev_normals_Y;
-   DevPtr<float> dev_normals_Z;
+   DevPtr<real> dev_normals_X;
+   DevPtr<real> dev_normals_Y;
+   DevPtr<real> dev_normals_Z;
 
-   DevPtr<float> dev_points_X;
-   DevPtr<float> dev_points_Y;
-   DevPtr<float> dev_points_Z;
+   DevPtr<real> dev_points_X;
+   DevPtr<real> dev_points_Y;
+   DevPtr<real> dev_points_Z;
 
-   DevPtr<float> dev_weights;
-   DevPtr<float> dev_areas;
-   DevPtr<float> dev_results;
+   DevPtr<real> dev_weights;
+   DevPtr<real> dev_areas;
+   DevPtr<real> dev_results;
 };

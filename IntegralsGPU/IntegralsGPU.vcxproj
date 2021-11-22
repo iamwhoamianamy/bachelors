@@ -81,11 +81,14 @@
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <CodeGeneration>compute_60,sm_60;%(CodeGeneration)</CodeGeneration>
+      <Optimization>InheritFromHost</Optimization>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="cuda_helper.cu" />
     <CudaCompile Include="cuda_timer.cu" />
+    <CudaCompile Include="flops_tests.cuh" />
+    <CudaCompile Include="flops_tests.cu" />
     <CudaCompile Include="laplace_data.cu" />
     <CudaCompile Include="laplace_solver_arrays.cu" />
     <CudaCompile Include="laplace_solver_kernels.cu" />
@@ -116,6 +119,7 @@
     <ClInclude Include="laplace_solver_vector3s.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="basis_quadratures.h" />
+    <ClInclude Include="real.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="triangle_quadratures.h" />
     <ClInclude Include="vector3.cuh" />

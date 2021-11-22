@@ -10,7 +10,9 @@ LaplaceSolverVector3s::LaplaceSolverVector3s() {};
 
 using namespace laplace_data;
 
-void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads) 
+void LaplaceSolverVector3s::PrepareData(const vector<Vector3>& points,
+                                        const Mesh& mesh,
+                                        const BasisQuadratures& basisQuads)
 {
    quadraturesCount = basisQuads.order * mesh.TrianglesCount();
    trianglesCount = mesh.TrianglesCount();
@@ -44,7 +46,7 @@ void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, Bas
    this->points = vector<Vector3>(points);
 
    // Preparing weights
-   weights = vector<float>(basisQuads.w);
+   weights = vector<real>(basisQuads.w);
 
    // Preparing areas
    areas.resize(trianglesCount);
@@ -55,7 +57,7 @@ void LaplaceSolverVector3s::PrepareData(vector<Vector3>& points, Mesh& mesh, Bas
    }
 
    // Preparing results
-   results = vector<float>(pointsCount, 0);
+   results = vector<real>(pointsCount, 0);
 }
 
 void LaplaceSolverVector3s::CopyToDevice() 
@@ -70,25 +72,25 @@ void LaplaceSolverVector3s::CopyToDevice()
    dev_points = DevPtr<Vector3>(points.data(), pointsCount);
 
    // Copying weights
-   dev_weights = DevPtr<float>(weights.data(), weights.size());
+   dev_weights = DevPtr<real>(weights.data(), weights.size());
 
    // Copying areas
-   dev_areas = DevPtr<float>(areas.data(), trianglesCount);
+   dev_areas = DevPtr<real>(areas.data(), trianglesCount);
 
    // Copying results
-   dev_results = DevPtr<float>(pointsCount);
+   dev_results = DevPtr<real>(pointsCount);
 }
 
-vector<float>& LaplaceSolverVector3s::SolveCPU()
+vector<real>& LaplaceSolverVector3s::SolveCPU()
 {
    for(size_t p = 0; p < pointsCount; p++)
    {
-      float integral = 0;
+      real integral = 0;
 
       for(size_t t = 0; t < trianglesCount; t++)
       {
-         float tringle_sum_1 = 0;
-         float tringle_sum_2 = 0;
+         real tringle_sum_1 = 0;
+         real tringle_sum_2 = 0;
 
          for(size_t o = 0; o < quadraturesOrder; o++)
          {
@@ -117,10 +119,10 @@ void LaplaceSolverVector3s::SolveGPU()
    {
       case AlgorythmGPU::Reduction:
       {
-         laplace_solver_kernels::SolverKernelVector3sReduction<<<
+         laplace_solver_kernels::solverKernelVector3sReduction<<<
             pointsCount,
             THREADS_PER_BLOCK,
-            THREADS_PER_BLOCK * sizeof(float)>>>(
+            THREADS_PER_BLOCK * sizeof(real)>>>(
                dev_quadPoints.Get(),
                dev_normals.Get(),
                dev_points.Get(),
@@ -137,7 +139,7 @@ void LaplaceSolverVector3s::SolveGPU()
          dim3 dimBlock(POINTS_PER_BLOCK);
          dim3 dimGrid(pointsCount / POINTS_PER_BLOCK);
 
-         laplace_solver_kernels::SolverKernelVector3sBlocks<<<
+         laplace_solver_kernels::solverKernelVector3sBlocks<<<
             dimGrid,
             dimBlock >>>(
                dev_quadPoints.Get(),
@@ -154,8 +156,12 @@ void LaplaceSolverVector3s::SolveGPU()
    tryKernelSynchronize();
 }
 
-vector<float>& LaplaceSolverVector3s::GetResultGPU()
+vector<real>& LaplaceSolverVector3s::GetResultGPU()
 {
    dev_results.CopyToHost(results.data());
    return results;
+}
+
+LaplaceSolverVector3s::~LaplaceSolverVector3s()
+{
 }

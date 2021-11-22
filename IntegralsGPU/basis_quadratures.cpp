@@ -46,7 +46,7 @@ namespace triangle_quadratures
 
       try
       {
-         float x_coord, y_coord;
+         real x_coord, y_coord;
 
          while(fin >> x_coord && fin >> y_coord)
          {
@@ -78,7 +78,7 @@ namespace triangle_quadratures
 
       try
       {
-         float w_value, y_coord;
+         real w_value, y_coord;
 
          while(fin >> w_value)
          {

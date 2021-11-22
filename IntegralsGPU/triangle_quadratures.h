@@ -1,4 +1,5 @@
 #pragma once
+#include "real.h"
 #include <vector>
 #include "triangle.h"
 #include "exeptions.h"
@@ -8,25 +9,25 @@
 
 namespace triangle_quadratures
 {
-   float calcIntegralOverTriangle(float (*f)(Vector3),
-                                   const Triangle& tr,
-                                   const BasisQuadratures& qp);
+   real calcIntegralOverTriangle(real (*f)(Vector3),
+                                 const Triangle& tr,
+                                 const BasisQuadratures& qp);
 
-   float calcIntegralOverMesh(float (*f)(Vector3),
-                               const Mesh& mesh,
-                               const BasisQuadratures& qp);
+   real calcIntegralOverMesh(real (*f)(Vector3),
+                             const Mesh& mesh,
+                             const BasisQuadratures& qp);
 
-   float calcSurfaceArea(Mesh& mesh,
-                          const BasisQuadratures& qp);
+   real calcSurfaceArea(Mesh& mesh,
+                        const BasisQuadratures& qp);
 
-   //void calcIntegralOverArray(float (*f)(float*),
-   //                           const float* points,
-   //                           const float* coords,
-   //                           const float* weights,
-   //                           const float* areas,
-   //                           const float* normals,
+   //void calcIntegralOverArray(real (*f)(real*),
+   //                           const real* points,
+   //                           const real* coords,
+   //                           const real* weights,
+   //                           const real* areas,
+   //                           const real* normals,
    //                           const int pointsCount,
    //                           const int trianglesCount,
    //                           const int quadratureOrder,
-   //                           float* results);
+   //                           real* results);
 }

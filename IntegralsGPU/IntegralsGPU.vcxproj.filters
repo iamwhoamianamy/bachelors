@@ -22,6 +22,12 @@
     <CudaCompile Include="laplace_solver_structs.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
+    <CudaCompile Include="flops_tests.cuh">
+      <Filter>CUDA includes</Filter>
+    </CudaCompile>
+    <CudaCompile Include="flops_tests.cu">
+      <Filter>СUDA compiles</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exeptions.cpp">
@@ -50,9 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cuda_helper.h">
-      <Filter>CUDA includes</Filter>
-    </ClInclude>
     <ClInclude Include="exeptions.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
@@ -96,6 +99,12 @@
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="laplace_solver_structs.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="real.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_helper.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
   </ItemGroup>

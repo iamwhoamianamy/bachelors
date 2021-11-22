@@ -1,4 +1,5 @@
 #pragma once
+#include "real.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "vector3.cuh"
@@ -8,56 +9,64 @@ using namespace triangle_quadratures;
 
 namespace laplace_solver_kernels
 {
-   __global__ void SolverKernelArraysReduction(
-      const float* quadratures_X,
-      const float* quadratures_Y,
-      const float* quadratures_Z,
-      const float* normals_X,
-      const float* normals_Y,
-      const float* normals_Z,
-      const float* points_X,
-      const float* points_Y,
-      const float* points_Z,
-      const float* weights,
-      const float* areas,
+   __global__ void solverKernelArraysReduction(
+      const real* quadratures_X,
+      const real* quadratures_Y,
+      const real* quadratures_Z,
+      const real* normals_X,
+      const real* normals_Y,
+      const real* normals_Z,
+      const real* points_X,
+      const real* points_Y,
+      const real* points_Z,
+      const real* weights,
+      const real* areas,
       const int trianglesCount,
       const int pointsCount,
       const int quadraturesOrder,
-      float* results);
+      real* results);
 
-   __global__ void SolverKernelVector3sReduction(
+   __global__ void solverKernelVector3sReduction(
       const Vector3* quadPoints,
       const Vector3* normals,
       const Vector3* points,
-      const float* weights,
-      const float* areas,
+      const real* weights,
+      const real* areas,
       const int trianglesCount,
       const int pointsCount,
       const int quadraturesOrder,
-      float* results);
+      real* results);
 
-   __global__ void SolverKernelVector3sBlocks(
+   __global__ void solverKernelVector3sBlocks(
       const Vector3* quadPoints,
       const Vector3* normals,
       const Vector3* points,
-      const float* weights,
-      const float* areas,
+      const real* weights,
+      const real* areas,
       const int trianglesCount,
       const int pointsCount,
       const int quadraturesOrder,
-      float* results);
+      real* results);
 
-   __global__ void SolverKernelStructsReduction(
+   __global__ void solverKernelStructsReduction(
       const QuadPoint* quadPoints,
       const Vector3* points,
       const int quadraturesCount,
-      float* results);
+      real* results);
 
-   __global__ void SolverKernelStructsBlocks(
+   __global__ void solverKernelStructsBlocks(
       const QuadPoint* quadPoints,
       const Vector3* points,
-      const int trianglesCount,
-      const int pointsCount,
-      const int quadraturesOrder,
-      float* results);
+      const int quadraturesCount,
+      real* results);
+
+   __global__ void solverKernelStructsGrid(
+      const QuadPoint* quadPoints,
+      const Vector3* points,
+      const int matrixWidth,
+      real* resultsMatrix);
+
+   //__global__ void AddMatrices(const real* a, const real* b, real* c);
+   //__global__ void AddMatricesShared(const double* a, const double* b, double* c);
+
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "real.h"
 #include "mesh.h"
 #include "basis_quadratures.h"
 #include "vector3.cuh"
@@ -12,32 +13,36 @@ struct QuadPoint
 {
    Vector3 quad;
    Vector3 normal;
-   float weight;
+   real weight;
 };
 
 class LaplaceSolverStructs : public LaplaceSolver
 {
 public:
    LaplaceSolverStructs();
-   void PrepareData(vector<Vector3>& points, Mesh& mesh, BasisQuadratures& basisQuads);
-   vector<float>& SolveCPU();
+   void PrepareData(const vector<Vector3>& points, const Mesh& mesh, const BasisQuadratures& basisQuads);
+   vector<real>& SolveCPU();
    void CopyToDevice();
    void SolveGPU();
-   vector<float>& GetResultGPU();
+   vector<real>& GetResultGPU();
+   ~LaplaceSolverStructs();
 
 private:
    int quadraturesCount = 0;
    int trianglesCount = 0;
    int pointsCount = 0;
    int quadraturesOrder = 0;
+   int matrixWidth = 0;
 
    vector<QuadPoint> quadPoints;
    vector<Vector3> points;
 
-   vector<float> results;
+   vector<real> resultsMatrix;
+   vector<real> results;
 
    DevPtr<QuadPoint> dev_quadPoints;
    DevPtr<Vector3> dev_points;
 
-   DevPtr<float> dev_results;
+   DevPtr<real> dev_resultsMatrix;
+   DevPtr<real> dev_results;
 };

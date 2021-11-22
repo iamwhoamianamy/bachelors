@@ -1,14 +1,16 @@
 #pragma once
 #include <vector>
+
 #include "vector3.cuh"
+#include"real.h"
 
 namespace triangle_quadratures
 {
    class Triangle
    {
    private:
-      float area;
-      float CalcArea();
+      real area;
+      real CalcArea();
 
    public:
       Vector3 a;
@@ -17,28 +19,28 @@ namespace triangle_quadratures
 
       Triangle();
 
-      Triangle(float ax, float ay, float az,
-               float bx, float by, float bz,
-               float cx, float cy, float cz);
+      Triangle(real ax, real ay, real az,
+               real bx, real by, real bz,
+               real cx, real cy, real cz);
       
-      Triangle(float ax, float ay,
-               float bx, float by,
-               float cx, float cy);
+      Triangle(real ax, real ay,
+               real bx, real by,
+               real cx, real cy);
 
       Triangle(Vector3 a, Vector3 b, Vector3 c);
 
-      float Area() const;
+      real Area() const;
 
-      std::vector<float> Xs() const;
-      std::vector<float> Ys() const;
-      std::vector<float> Zs() const;
+      std::vector<real> Xs() const;
+      std::vector<real> Ys() const;
+      std::vector<real> Zs() const;
 
       Vector3& operator[](int i);
 
-      float XFromST(float s, float t) const;
-      float YFromST(float s, float t) const;
-      float ZFromST(float s, float t) const;
-      Vector3 PointFromST(float s, float t) const;
+      real XFromST(real s, real t) const;
+      real YFromST(real s, real t) const;
+      real ZFromST(real s, real t) const;
+      Vector3 PointFromST(real s, real t) const;
       Vector3 Normal() const;
    };
 }
