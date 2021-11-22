@@ -107,6 +107,9 @@
     <ClInclude Include="cuda_helper.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
+    <ClInclude Include="dev_ptr_pitch.h">
+      <Filter>C++ includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CUDA includes">

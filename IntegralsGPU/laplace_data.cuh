@@ -46,7 +46,7 @@ namespace laplace_data
 
    const int POINTS_PER_BLOCK = MAX_THREADS / THREADS_PER_BLOCK;
 
-   const int BLOCK_SIZE = 64;
+   const int BLOCK_SIZE = 32;
    const int MATRIX_WIDTH = 16384 / 2;
    const int MATRIX_HEIGHT = 8192 / 2;
 };

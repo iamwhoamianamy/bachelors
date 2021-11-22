@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="cuda_helper.h" />
     <ClInclude Include="cuda_timer.h" />
+    <ClInclude Include="dev_ptr_pitch.h" />
     <ClInclude Include="dev_ptr.h" />
     <ClInclude Include="exeptions.h" />
     <ClInclude Include="laplace_solver_abstract.h" />

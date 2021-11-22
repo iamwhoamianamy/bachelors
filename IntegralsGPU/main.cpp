@@ -223,9 +223,9 @@ void runLaplaceSolverTests()
 
 int main()
 {
-   runLaplaceSolverTests();
+   //runLaplaceSolverTests();
    
-   //addMatricesTest();
+   addMatricesTest();
 
    return 0;
 }

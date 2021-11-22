@@ -456,41 +456,40 @@ __global__ void laplace_solver_kernels::solverKernelStructsGrid(
    resultsMatrix[point_idx_g * matrixWidth + blockIdx.x] = result;
 }
 
-//
-//__global__ void laplace_solver_kernels::AddMatrices(const real* a, const real* b, real* c)
-//{
-//   uint i = threadIdx.y + blockDim.y * blockIdx.y;
-//   uint j = threadIdx.x + blockDim.x * blockIdx.x;
-//
-//   c[i * MATRIX_WIDTH + j] = a[i * MATRIX_WIDTH + j] + b[i * MATRIX_WIDTH + j];
-//}
-//
-//__global__ void laplace_solver_kernels::AddMatricesShared(const double* a, const double* b, double* c)
-//{
-//   __shared__ real a_sub[BLOCK_SIZE][BLOCK_SIZE];
-//   __shared__ real b_sub[BLOCK_SIZE][BLOCK_SIZE];
-//   __shared__ real c_sub[BLOCK_SIZE][BLOCK_SIZE];
-//
-//   uint i_g = threadIdx.y + blockDim.y * blockIdx.y;
-//   uint j_g = threadIdx.x + blockDim.x * blockIdx.x;
-//
-//   uint i_l = threadIdx.y;
-//   uint j_l = threadIdx.x;
-//
-//   a_sub[i_l][j_l] = a[i_g * MATRIX_WIDTH + j_g];
-//   b_sub[i_l][j_l] = b[i_g * MATRIX_WIDTH + j_g];
-//
-//   __syncthreads();
-//
-//   double k = 0.0;
-//
-//   while(k < 20000.0)
-//   {
-//      c_sub[i_l][j_l] = a_sub[i_l][j_l] + c_sub[i_l][j_l];
-//      k += 1.0;
-//   }
-//   
-//   __syncthreads();
-//
-//   c[i_g * MATRIX_WIDTH + j_g] = c_sub[i_l][j_l];
-//}
+__global__ void laplace_solver_kernels::AddMatrices(const real* a, const real* b, real* c)
+{
+   uint i = threadIdx.y + blockDim.y * blockIdx.y;
+   uint j = threadIdx.x + blockDim.x * blockIdx.x;
+
+   c[i * MATRIX_WIDTH + j] = a[i * MATRIX_WIDTH + j] + b[i * MATRIX_WIDTH + j];
+}
+
+__global__ void laplace_solver_kernels::AddMatricesShared(const real* a, const real* b, real* c)
+{
+   __shared__ real a_sub[BLOCK_SIZE][BLOCK_SIZE];
+   __shared__ real b_sub[BLOCK_SIZE][BLOCK_SIZE];
+   __shared__ real c_sub[BLOCK_SIZE][BLOCK_SIZE];
+
+   uint i_g = threadIdx.y + blockDim.y * blockIdx.y;
+   uint j_g = threadIdx.x + blockDim.x * blockIdx.x;
+
+   uint i_l = threadIdx.y;
+   uint j_l = threadIdx.x;
+
+   a_sub[i_l][j_l] = a[i_g * MATRIX_WIDTH + j_g];
+   b_sub[i_l][j_l] = b[i_g * MATRIX_WIDTH + j_g];
+
+   __syncthreads();
+
+   real k = 0.0;
+
+   while(k < 200000.0)
+   {
+      c_sub[i_l][j_l] = a_sub[i_l][j_l] + c_sub[i_l][j_l];
+      k += 1.0;
+   }
+   
+   __syncthreads();
+
+   c[i_g * MATRIX_WIDTH + j_g] = c_sub[i_l][j_l];
+}

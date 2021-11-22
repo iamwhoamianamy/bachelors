@@ -126,6 +126,7 @@ namespace cuda_utilities
       cudaFree(_data);
 
       Init(devPtr._size);
+
       cudaMemcpy(_data,
                  devPtr._data,
                  devPtr._size * sizeof(T),
