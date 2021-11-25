@@ -44,12 +44,12 @@ __global__ void laplace_solver_kernels::solverKernelArraysReduction(
       for(size_t o = 0; o < quadraturesOrder; o++)
       {
          int ind = t * quadraturesOrder + o;
-         tringle_sum_1 += weights[o] * laplaceIntegral1(
+         tringle_sum_1 += weights[o] * laplaceIntegral1GPU(
             quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
             points_X[p], points_Y[p], points_Z[p],
             normals_X[t], normals_Y[t], normals_Z[t]);
 
-         tringle_sum_2 += weights[o] * laplaceIntegral2(
+         tringle_sum_2 += weights[o] * laplaceIntegral2GPU(
             quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
             points_X[p], points_Y[p], points_Z[p],
             normals_X[t], normals_Y[t], normals_Z[t]);
@@ -109,10 +109,10 @@ __global__ void laplace_solver_kernels::solverKernelVector3sReduction(
       for(size_t o = 0; o < quadraturesOrder; o++)
       {
          int ind = t * quadraturesOrder + o;
-         tringle_sum_1 += weights[o] * laplaceIntegral1(
+         tringle_sum_1 += weights[o] * laplaceIntegral1GPU(
             quadPoints[ind], points[p], normals[t]);
 
-         tringle_sum_2 += weights[o] * laplaceIntegral2(
+         tringle_sum_2 += weights[o] * laplaceIntegral2GPU(
             quadPoints[ind], points[p], normals[t]);
       }
 
@@ -219,10 +219,10 @@ __global__ void laplace_solver_kernels::solverKernelVector3sBlocks(
          {
             const int idx = t * quadraturesOrder + q;
 
-            triangle_sum_1 += weights_shared[idx] * laplaceIntegral1(
+            triangle_sum_1 += weights_shared[idx] * laplaceIntegral1GPU(
                quads_shared[idx], points_shared[point_idx_l], normals_shared[t]);
 
-            triangle_sum_2 += weights_shared[idx] * laplaceIntegral2(
+            triangle_sum_2 += weights_shared[idx] * laplaceIntegral2GPU(
                quads_shared[idx], points_shared[point_idx_l], normals_shared[t]);
          }
 
@@ -308,10 +308,10 @@ __global__ void laplace_solver_kernels::solverKernelVector3sBlocks(
    //      // Iterating through every quadrature in block
    //      for(size_t q = 0; q < QUADS_PER_BLOCK; q++)
    //      {
-   //         block_sum_1 += weights_shared[q] * laplaceIntegral1(
+   //         block_sum_1 += weights_shared[q] * laplaceIntegral1GPU(
    //            quads_shared[q], points_shared[point_idx_l], normals_shared);
 
-   //         block_sum_2 += weights_shared[q] * laplaceIntegral2(
+   //         block_sum_2 += weights_shared[q] * laplaceIntegral2GPU(
    //            quads_shared[q], points_shared[point_idx_l], normals_shared);
    //      }
 
@@ -354,8 +354,8 @@ __global__ void laplace_solver_kernels::solverKernelStructsReduction(
    {
       QuadPoint qp = quadPoints[quad_idx_g];
 
-      block_sum += qp.weight * (laplaceIntegral1(qp.quad, point, qp.normal) -
-                                laplaceIntegral2(qp.quad, point, qp.normal));
+      block_sum += qp.weight * (laplaceIntegral1GPU(qp.quad, point, qp.normal) -
+                                laplaceIntegral2GPU(qp.quad, point, qp.normal));
    }
 
    thread_sums[quad_idx_l] += block_sum;
@@ -384,12 +384,9 @@ __global__ void laplace_solver_kernels::solverKernelStructsBlocks(
    const int quadraturesCount,
    real* results)
 {
-   // Index of point in global and shared memory
    const uint point_idx_g = threadIdx.x + BLOCK_SIZE * blockIdx.x;
-   const uint point_idx_l = threadIdx.x;
 
-   // Loading points into shared memory
-   Vector3 point = points[point_idx_g];
+   const Vector3 point = points[point_idx_g];
 
    __syncthreads();
 
@@ -413,11 +410,9 @@ __global__ void laplace_solver_kernels::solverKernelStructsBlocks(
       // Iterating through every quadrature in block
       for(size_t q = 0; q < BLOCK_SIZE; q++)
       {
-         QuadPoint qp = quads_shared[q];
-
-         result += qp.weight * (
-            laplaceIntegral1( qp.quad, point, qp.normal) -
-            laplaceIntegral2( qp.quad, point, qp.normal));
+         result += quads_shared[q].weight * (
+            laplaceIntegral1GPU(quads_shared[q].quad, point, quads_shared[q].normal) -
+            laplaceIntegral2GPU(quads_shared[q].quad, point, quads_shared[q].normal));
       }
 
       __syncthreads();
@@ -433,11 +428,33 @@ __global__ void laplace_solver_kernels::solverKernelStructsGrid(
    real* resultsMatrix)
 {
    __shared__ QuadPoint quads_shared[BLOCK_SIZE];
+   __shared__ Vector3 points_shared[BLOCK_SIZE];
+   __shared__ real results_shared[BLOCK_SIZE];
 
    const uint point_idx_g = threadIdx.y + blockDim.y * blockIdx.y;
 
-   const Vector3 point = points[point_idx_g];
    quads_shared[threadIdx.y] = quadPoints[threadIdx.y + blockDim.y * blockIdx.x];
+   points_shared[threadIdx.y] = points[point_idx_g];
+   results_shared[threadIdx.y] = 0;
+
+   __syncthreads();
+
+   for(size_t q = 0; q < BLOCK_SIZE; q++)
+   {
+      results_shared[threadIdx.y] += quads_shared[q].weight * (
+         laplaceIntegral1GPU(quads_shared[q].quad, points_shared[threadIdx.y], quads_shared[q].normal) -
+         laplaceIntegral2GPU(quads_shared[q].quad, points_shared[threadIdx.y], quads_shared[q].normal));
+   }
+
+   resultsMatrix[point_idx_g * matrixWidth + blockIdx.x] = results_shared[threadIdx.y];
+
+   /*__shared__ QuadPoint quads_shared[BLOCK_SIZE];
+   __shared__ Vector3 points_shared[BLOCK_SIZE];
+
+   const uint point_idx_g = threadIdx.y + blockDim.y * blockIdx.y;
+
+   quads_shared[threadIdx.y] = quadPoints[threadIdx.y + blockDim.y * blockIdx.x];
+   points_shared[threadIdx.y] = points[point_idx_g];
 
    __syncthreads();
 
@@ -446,11 +463,11 @@ __global__ void laplace_solver_kernels::solverKernelStructsGrid(
    for(size_t q = 0; q < BLOCK_SIZE; q++)
    {
       result += quads_shared[q].weight * (
-            laplaceIntegral1(quads_shared[q].quad, point, quads_shared[q].normal) -
-            laplaceIntegral2(quads_shared[q].quad, point, quads_shared[q].normal));
+         laplaceIntegral1GPU(quads_shared[q].quad, points_shared[threadIdx.y], quads_shared[q].normal) -
+         laplaceIntegral2GPU(quads_shared[q].quad, points_shared[threadIdx.y], quads_shared[q].normal));
    }
 
-   resultsMatrix[point_idx_g * matrixWidth + blockIdx.x] = result;
+   resultsMatrix[point_idx_g * matrixWidth + blockIdx.x] = result;*/
 }
 
 __global__ void laplace_solver_kernels::AddMatrices(const real* a, const real* b, real* c)
@@ -463,9 +480,13 @@ __global__ void laplace_solver_kernels::AddMatrices(const real* a, const real* b
 
 __global__ void laplace_solver_kernels::AddMatricesShared(const real* a, const real* b, real* c)
 {
-   __shared__ real a_sub[BLOCK_SIZE][BLOCK_SIZE];
+   /*__shared__ real a_sub[BLOCK_SIZE][BLOCK_SIZE];
    __shared__ real b_sub[BLOCK_SIZE][BLOCK_SIZE];
-   __shared__ real c_sub[BLOCK_SIZE][BLOCK_SIZE];
+   __shared__ real c_sub[BLOCK_SIZE][BLOCK_SIZE];*/
+
+   __shared__ real a_sub[1][1];
+   __shared__ real b_sub[1][1];
+   __shared__ real c_sub[1][1];
 
    uint i_g = threadIdx.y + blockDim.y * blockIdx.y;
    uint j_g = threadIdx.x + blockDim.x * blockIdx.x;

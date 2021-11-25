@@ -29,7 +29,7 @@ void printResults(int pointsCount, vector<Vector3>& points, vector<real>& result
       cout << fixed << setw(8) << i;
       cout << scientific << setw(16) << points[i].x << setw(16) << points[i].y << setw(16) << points[i].z;
 
-      real true_value = laplace_solver::u(points[i]);
+      real true_value = laplace_data::u(points[i].x, points[i].y, points[i].z);
       real calc_value = results[i];
       real error = abs(true_value - calc_value) / abs(true_value);
 
@@ -47,9 +47,9 @@ enum class LaplaceSolvers
 
 void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQuads, LaplaceSolvers choose, AlgorythmGPU alg = AlgorythmGPU::Reduction)
 {
-   for(size_t points_iteration = 2; points_iteration < 3; points_iteration++)
+   for(size_t points_iteration = 9; points_iteration < 10; points_iteration++)
    {
-      const size_t points_count = pow(2, points_iteration);
+      const size_t points_count = pow(2, 7);
       vector<real> cpu_results;
       vector<real> gpu_results;
       vector<Vector3> points(points_count);
@@ -93,10 +93,10 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
 
       // Solving on CPU
       start = ::chrono::steady_clock::now();
-      cpu_results = laplaceSolver->SolveCPU();
+      //cpu_results = laplaceSolver->SolveCPU();
       stop = ::chrono::steady_clock::now();
       auto cpu_solving_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
-       
+
       // Copying to device
       start = ::chrono::steady_clock::now();
       laplaceSolver->CopyToDevice();
@@ -115,6 +115,7 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
       stop = ::chrono::steady_clock::now();
       auto getting_results_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
+      cout << "----------------------------------------------------------" << endl;
       cout << setw(30) << "Points count:" << setw(20) << points_count << endl;
       cout << setw(30) << "Triangles count:" << setw(20) << mesh.TrianglesCount() << endl;
       cout << setw(30) << "Quadrature order:" << setw(20) << basisQuads.order << endl << endl;
@@ -135,17 +136,25 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
       auto speedup_factor = cpu_solving_time / gpu_solving_time;
       cout << setw(30) << "GPU speedup:" << setw(20) << speedup_factor << endl;
       cout << setw(30) << "Total time:" << setw(20) << cpu_solving_time + total_gpu_time + preparation_time << endl;
-      cout << endl;
 
-      cout << endl << "----------------CPU results:---------------" << endl << endl;
-      printResults(points_count, points, cpu_results);
+      if(0)
+      {
+         cout << endl << "----------------CPU results:---------------" << endl << endl;
+         printResults(points_count, points, cpu_results);
+      }
+      
+      if(1)
+      {
+         cout << endl << "----------------GPU results:---------------" << endl << endl;
+         printResults(points_count, points, gpu_results);
+      }
 
-      cout << endl << "----------------GPU results:---------------" << endl << endl;
-      printResults(points_count, points, gpu_results);
+      fout << fixed << setprecision(6);
 
-      fout << points_count << "\t";
-      fout << cpu_solving_time << "\t";
-      fout << gpu_solving_time << endl;
+      fout << setw(16) << points_count << " ";
+      fout << setw(16) << cpu_solving_time << " ";
+      fout << setw(16) << gpu_solving_time << " ";
+      fout << setw(16) << speedup_factor << endl;
 
       delete laplaceSolver;
    }
@@ -157,7 +166,7 @@ void runLaplaceSolverTests()
 
    try
    {
-      mesh.InitFromOBJ("../meshes/icospheres/ico20.obj");
+      mesh.InitFromOBJ("../meshes/icospheres/ico20480.obj");
    }
    catch(Exeption fileExeption)
    {
@@ -169,7 +178,7 @@ void runLaplaceSolverTests()
 
    try
    {
-      quad_points.InitFromTXT("../quadratures/gauss3_xy.txt", "../quadratures/gauss3_w.txt");
+      quad_points.InitFromTXT("../quadratures/gauss15_xy.txt", "../quadratures/gauss15_w.txt");
    }
    catch(Exeption fileExeption)
    {

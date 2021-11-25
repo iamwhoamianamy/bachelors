@@ -15,7 +15,7 @@ Vector3 laplace_solver::gradU(Vector3 v)
    //return { 1.0, 0.0, 0.0 };
 }
 
-real laplace_solver::laplaceIntegral1(Vector3 v,
+real laplace_solver::laplaceIntegral1GPU(Vector3 v,
                                         Vector3 point,
                                         Vector3 normal)
 {
@@ -28,7 +28,7 @@ real laplace_solver::laplaceIntegral1(Vector3 v,
    return (dudnx + dudny + dudnz) / (point - v).Length();
 }
 
-real laplace_solver::laplaceIntegral2(Vector3 v,
+real laplace_solver::laplaceIntegral2GPU(Vector3 v,
                                         Vector3 point,
                                         Vector3 normal)
 {
@@ -64,8 +64,8 @@ void laplace_solver::calcIntegralOverMesh(const Mesh& mesh,
          for (size_t o = 0; o < qp.order; o++)
          {
             Vector3 v = tr.PointFromST(qp.x[o], qp.y[o]);
-            tringle_sum_1 += qp.w[o] * laplaceIntegral1(v, points[p], normal);
-            tringle_sum_2 += qp.w[o] * laplaceIntegral2(v, points[p], normal);
+            tringle_sum_1 += qp.w[o] * laplaceIntegral1GPU(v, points[p], normal);
+            tringle_sum_2 += qp.w[o] * laplaceIntegral2GPU(v, points[p], normal);
          }
 
          integral1 += tringle_sum_1 * tr.Area();

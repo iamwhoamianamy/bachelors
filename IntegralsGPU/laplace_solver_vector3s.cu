@@ -95,13 +95,13 @@ vector<real>& LaplaceSolverVector3s::SolveCPU()
          for(size_t o = 0; o < quadraturesOrder; o++)
          {
             int ind = t * quadraturesOrder + o;
-            tringle_sum_1 += weights[o] * laplaceIntegral1(quadPoints[ind],
-                                                           points[p],
-                                                           normals[t]);
+            tringle_sum_1 += weights[o] * laplaceIntegral1CPU(quadPoints[ind],
+                                                              points[p],
+                                                              normals[t]);
 
-            tringle_sum_2 += weights[o] * laplaceIntegral2(quadPoints[ind],
-                                                           points[p],
-                                                           normals[t]);
+            tringle_sum_2 += weights[o] * laplaceIntegral2CPU(quadPoints[ind],
+                                                              points[p],
+                                                              normals[t]);
          }
 
          integral += (tringle_sum_1 - tringle_sum_2) * areas[t];

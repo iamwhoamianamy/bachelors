@@ -13,11 +13,11 @@ namespace laplace_solver
    real u(Vector3 point);
    Vector3 gradU(Vector3 point);
 
-   real laplaceIntegral1(Vector3 v,
+   real laplaceIntegral1GPU(Vector3 v,
                          Vector3 point,
                          Vector3 normal);
 
-   real laplaceIntegral2(Vector3 v,
+   real laplaceIntegral2GPU(Vector3 v,
                          Vector3 point,
                          Vector3 normal);
 

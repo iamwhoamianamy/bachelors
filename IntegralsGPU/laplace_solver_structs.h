@@ -32,9 +32,7 @@ public:
 
 private:
    size_t quadraturesCount = 0;
-   size_t trianglesCount = 0;
    size_t pointsCount = 0;
-   size_t quadraturesOrder = 0;
    size_t matrixWidth = 0;
    //size_t matrixWidthPadded = 0;
 

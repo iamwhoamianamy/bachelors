@@ -16,14 +16,12 @@ void LaplaceSolverStructs::PrepareData(const vector<Vector3>& points,
 {
    // Initializing constants
    quadraturesCount = basisQuads.order * mesh.TrianglesCount();
-   trianglesCount = mesh.TrianglesCount();
    pointsCount = points.size();
-   quadraturesOrder = basisQuads.order;
 
    // Preparing quadPoints, normals and weights
    quadPoints.resize(quadraturesCount);
 
-   for(size_t t = 0; t < trianglesCount; t++)
+   for(size_t t = 0; t < mesh.TrianglesCount(); t++)
    {
       Triangle tr = mesh.GetTriangle(t);
 
@@ -68,32 +66,18 @@ void LaplaceSolverStructs::CopyToDevice()
 
 vector<real>& LaplaceSolverStructs::SolveCPU()
 {
-//   size_t p;
-//   int n_threads;
-//#pragma omp parallel default(none) private(p) shared(trianglesCount, quadraturesOrder, quadPoints, points, results, n_threads)
+   for(size_t p = 0; p < pointsCount; p++)
    {
-//#pragma omp master
-//      n_threads = omp_get_num_threads();
+      real point_sum = 0;
 
-//#pragma omp for
-      for(size_t p = 0; p < pointsCount; p++)
+      for(size_t q = 0; q < quadraturesCount; q++)
       {
-         real point_sum = 0;
-
-         for(size_t t = 0; t < trianglesCount; t++)
-         {
-            for(size_t q = 0; q < quadraturesOrder; q++)
-            {
-               int idx = t * quadraturesOrder + q;
-
-               point_sum += quadPoints[idx].weight * 
-                  (laplaceIntegral1(quadPoints[idx].quad, points[p], quadPoints[idx].normal) - 
-                   laplaceIntegral2(quadPoints[idx].quad, points[p], quadPoints[idx].normal));
-            }
-         }
-
-         results[p] = point_sum / (4.0 * PI);
+         point_sum += quadPoints[q].weight *
+            (laplaceIntegral1CPU(quadPoints[q].quad, points[p], quadPoints[q].normal) -
+             laplaceIntegral2CPU(quadPoints[q].quad, points[p], quadPoints[q].normal));
       }
+
+      results[p] = point_sum / (4.0 * PI);
    }
 
    return results;
@@ -154,7 +138,6 @@ vector<real>& LaplaceSolverStructs::GetResultGPU()
 {
    if(algorythmGPU == AlgorythmGPU::Grid)
    {
-
       dev_resultsMatrix.CopyToHost(resultsMatrix.data());
 
       for(size_t i = 0; i < pointsCount; i++)
@@ -184,4 +167,5 @@ size_t LaplaceSolverStructs::PointsCountPadded() const
 
 LaplaceSolverStructs::~LaplaceSolverStructs()
 {
+   cout << "LaplaceSolverStruct was destroyed!" << endl;
 }

@@ -69,6 +69,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -99,7 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exeptions.cpp" />
-    <ClCompile Include="laplace_solver.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="basis_quadratures.cpp" />
     <ClCompile Include="triangle.cpp" />
@@ -116,7 +116,6 @@
     <ClInclude Include="laplace_solver_kernels.cuh" />
     <ClInclude Include="laplace_data.cuh" />
     <ClInclude Include="laplace_solver_arrays.h" />
-    <ClInclude Include="laplace_solver.h" />
     <ClInclude Include="laplace_solver_structs.h" />
     <ClInclude Include="laplace_solver_vector3s.h" />
     <ClInclude Include="mesh.h" />

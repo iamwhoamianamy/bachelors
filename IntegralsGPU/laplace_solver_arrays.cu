@@ -121,13 +121,13 @@ vector<real>& LaplaceSolverArrays::SolveCPU()
          for(size_t o = 0; o < quadraturesOrder; o++)
          {
             int ind = t * quadraturesOrder + o;
-            tringle_sum_1 += weights[o] * laplaceIntegral1(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
-                                                           points_X[p], points_Y[p], points_Z[p],
-                                                           normals_X[t], normals_Y[t], normals_Z[t]);
+            tringle_sum_1 += weights[o] * laplaceIntegral1CPU(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
+                                                              points_X[p], points_Y[p], points_Z[p],
+                                                              normals_X[t], normals_Y[t], normals_Z[t]);
 
-            tringle_sum_2 += weights[o] * laplaceIntegral2(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
-                                                           points_X[p], points_Y[p], points_Z[p],
-                                                           normals_X[t], normals_Y[t], normals_Z[t]);
+            tringle_sum_2 += weights[o] * laplaceIntegral2CPU(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
+                                                              points_X[p], points_Y[p], points_Z[p],
+                                                              normals_X[t], normals_Y[t], normals_Z[t]);
          }
 
          integral += (tringle_sum_1 - tringle_sum_2) * areas[t];

@@ -33,9 +33,6 @@
     <ClCompile Include="exeptions.cpp">
       <Filter>C++ compiles</Filter>
     </ClCompile>
-    <ClCompile Include="laplace_solver.cpp">
-      <Filter>C++ compiles</Filter>
-    </ClCompile>
     <ClCompile Include="mesh.cpp">
       <Filter>C++ compiles</Filter>
     </ClCompile>
@@ -64,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="laplace_solver_kernels.cuh">
       <Filter>CUDA includes</Filter>
-    </ClInclude>
-    <ClInclude Include="laplace_solver.h">
-      <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="mesh.h">
       <Filter>C++ includes</Filter>
