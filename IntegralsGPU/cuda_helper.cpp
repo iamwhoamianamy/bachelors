@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <cstdlib>
+#include <chrono>
+
 #include "cuda_helper.h"
 
 void cuda_utilities::tryKernelLaunch()
@@ -24,4 +26,12 @@ void cuda_utilities::tryKernelSynchronize()
 
       std::exit(0);
    }
+}
+
+size_t cuda_utilities::nextDevisible(const size_t number, const size_t devidor)
+{
+   if(devidor == 0)
+      return number;
+   else
+      return (number + devidor - 1) / devidor * devidor;
 }

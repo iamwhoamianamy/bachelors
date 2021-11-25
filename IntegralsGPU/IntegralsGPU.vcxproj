@@ -85,7 +85,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="cuda_helper.cu" />
+    <CudaCompile Include="cuda_helper.cpp" />
     <CudaCompile Include="cuda_timer.cu" />
     <CudaCompile Include="flops_tests.cuh" />
     <CudaCompile Include="flops_tests.cu" />
@@ -94,6 +94,7 @@
     <CudaCompile Include="laplace_solver_kernels.cu" />
     <CudaCompile Include="laplace_solver_structs.cu" />
     <CudaCompile Include="laplace_solver_vector3s.cu" />
+    <ClCompile Include="laplace_solver_abstract.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

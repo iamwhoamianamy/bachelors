@@ -16,9 +16,6 @@
     <CudaCompile Include="laplace_solver_kernels.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
-    <CudaCompile Include="cuda_helper.cu">
-      <Filter>СUDA compiles</Filter>
-    </CudaCompile>
     <CudaCompile Include="laplace_solver_structs.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
@@ -27,6 +24,9 @@
     </CudaCompile>
     <CudaCompile Include="flops_tests.cu">
       <Filter>СUDA compiles</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda_helper.cpp">
+      <Filter>C++ compiles</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,6 +52,9 @@
       <Filter>СUDA compiles</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>C++ compiles</Filter>
+    </ClCompile>
+    <ClCompile Include="laplace_solver_abstract.cpp">
       <Filter>C++ compiles</Filter>
     </ClCompile>
   </ItemGroup>

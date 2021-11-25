@@ -68,6 +68,6 @@ namespace laplace_solver_kernels
 
    __global__ void AddMatrices(const real* a, const real* b, real* c);
    __global__ void AddMatricesShared(const real* a, const real* b, real* c);
-   __global__ void AddMatricesPichShared(const real* a, const real* b, real* c);
+   //__global__ void AddMatricesPichShared(const real* a, const real* b, real* c);
 
 }

@@ -14,6 +14,7 @@ void LaplaceSolverStructs::PrepareData(const vector<Vector3>& points,
                                        const Mesh& mesh,
                                        const BasisQuadratures& basisQuads)
 {
+   // Initializing constants
    quadraturesCount = basisQuads.order * mesh.TrianglesCount();
    trianglesCount = mesh.TrianglesCount();
    pointsCount = points.size();
@@ -44,24 +45,24 @@ void LaplaceSolverStructs::PrepareData(const vector<Vector3>& points,
 
    if(algorythmGPU == AlgorythmGPU::Grid)
    {
-      matrixWidth = quadraturesCount / BLOCK_SIZE;
-      resultsMatrix = vector<real>(pointsCount * matrixWidth, 0.0f);
+      matrixWidth = nextDevisible(quadraturesCount, BLOCK_SIZE) / BLOCK_SIZE;
+      resultsMatrix = vector<real>(PointsCountPadded() * matrixWidth, 0.0f);
    }
 }
 
 void LaplaceSolverStructs::CopyToDevice()
 {
    // Copying quadPoints
-   dev_quadPoints = DevPtr<QuadPoint>(quadPoints.data(), quadraturesCount);
+   dev_quadPoints = DevPtr<QuadPoint>(quadPoints.data(), quadraturesCount, BLOCK_SIZE);
 
    // Copying points
-   dev_points = DevPtr<Vector3>(points.data(), pointsCount);
+   dev_points = DevPtr<Vector3>(points.data(), pointsCount, BLOCK_SIZE);
 
    // Copying results
    if(algorythmGPU == AlgorythmGPU::Grid)
       dev_resultsMatrix = DevPtr<real>(resultsMatrix.size());
    else
-      dev_results = DevPtr<real>(pointsCount);
+      dev_results = DevPtr<real>(pointsCount, BLOCK_SIZE);
 
 }
 
@@ -119,9 +120,6 @@ void LaplaceSolverStructs::SolveGPU()
       }
       case AlgorythmGPU::Blocks:
       {
-         /*dim3 dimBlock(QUADS_PER_BLOCK, POINTS_PER_BLOCK);
-         dim3 dimGrid(1, pointsCount / POINTS_PER_BLOCK);*/
-
          dim3 dimBlock(BLOCK_SIZE);
          dim3 dimGrid(pointsCount / BLOCK_SIZE);
 
@@ -136,7 +134,7 @@ void LaplaceSolverStructs::SolveGPU()
       case AlgorythmGPU::Grid:
       {
          dim3 dimBlock(1, BLOCK_SIZE);
-         dim3 dimGrid(matrixWidth, pointsCount / BLOCK_SIZE);
+         dim3 dimGrid(matrixWidth, PointsCountPadded() / BLOCK_SIZE);
 
          laplace_solver_kernels::solverKernelStructsGrid<<<
             dimGrid,
@@ -156,6 +154,7 @@ vector<real>& LaplaceSolverStructs::GetResultGPU()
 {
    if(algorythmGPU == AlgorythmGPU::Grid)
    {
+
       dev_resultsMatrix.CopyToHost(resultsMatrix.data());
 
       for(size_t i = 0; i < pointsCount; i++)
@@ -176,9 +175,13 @@ vector<real>& LaplaceSolverStructs::GetResultGPU()
    return results;
 }
 
+size_t LaplaceSolverStructs::PointsCountPadded() const
+{
+   return nextDevisible(pointsCount, BLOCK_SIZE);
+}
+
 #include <iostream>
 
 LaplaceSolverStructs::~LaplaceSolverStructs()
 {
-   std::cout << "deb";
 }

@@ -47,10 +47,9 @@ enum class LaplaceSolvers
 
 void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQuads, LaplaceSolvers choose, AlgorythmGPU alg = AlgorythmGPU::Reduction)
 {
-   for(size_t points_iteration = 11; points_iteration < 12; points_iteration++)
+   for(size_t points_iteration = 2; points_iteration < 3; points_iteration++)
    {
-      const size_t points_count = pow(2, 15);
-      //const int points_count = 10;
+      const size_t points_count = pow(2, points_iteration);
       vector<real> cpu_results;
       vector<real> gpu_results;
       vector<Vector3> points(points_count);
@@ -87,33 +86,33 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
       }
 
       // Preparing quadPoints and normals
-      auto start = std::chrono::steady_clock::now();
+      auto start = ::chrono::steady_clock::now();
       laplaceSolver->PrepareData(points, mesh, basisQuads);
-      auto stop = std::chrono::steady_clock::now();
+      auto stop = ::chrono::steady_clock::now();
       auto preparation_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       // Solving on CPU
-      start = std::chrono::steady_clock::now();
-      //cpu_results = laplaceSolver->SolveCPU();
-      stop = std::chrono::steady_clock::now();
+      start = ::chrono::steady_clock::now();
+      cpu_results = laplaceSolver->SolveCPU();
+      stop = ::chrono::steady_clock::now();
       auto cpu_solving_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
-
+       
       // Copying to device
-      start = std::chrono::steady_clock::now();
+      start = ::chrono::steady_clock::now();
       laplaceSolver->CopyToDevice();
-      stop = std::chrono::steady_clock::now();
+      stop = ::chrono::steady_clock::now();
       auto copying_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       // Solving on GPU
-      start = std::chrono::steady_clock::now();
+      start = ::chrono::steady_clock::now();
       laplaceSolver->SolveGPU();
-      stop = std::chrono::steady_clock::now();
+      stop = ::chrono::steady_clock::now();
       auto gpu_solving_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       // Getting results from GPU
-      start = std::chrono::steady_clock::now();
+      start = ::chrono::steady_clock::now();
       gpu_results = laplaceSolver->GetResultGPU();
-      stop = std::chrono::steady_clock::now();
+      stop = ::chrono::steady_clock::now();
       auto getting_results_time = chrono::duration_cast<chrono::microseconds>(stop - start).count() * 1e-6;
 
       cout << setw(30) << "Points count:" << setw(20) << points_count << endl;
@@ -138,18 +137,17 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
       cout << setw(30) << "Total time:" << setw(20) << cpu_solving_time + total_gpu_time + preparation_time << endl;
       cout << endl;
 
-      /*cout << endl << "----------------CPU results:---------------" << endl << endl;
-      printResults(points_count, points, cpu_results);*/
+      cout << endl << "----------------CPU results:---------------" << endl << endl;
+      printResults(points_count, points, cpu_results);
 
-      /*cout << endl << "----------------GPU results:---------------" << endl << endl;
-      printResults(points_count, points, gpu_results);*/
+      cout << endl << "----------------GPU results:---------------" << endl << endl;
+      printResults(points_count, points, gpu_results);
 
       fout << points_count << "\t";
       fout << cpu_solving_time << "\t";
-      fout << gpu_solving_time << "\t";
-      fout << speedup_factor << endl;
+      fout << gpu_solving_time << endl;
 
-      delete (LaplaceSolverStructs*)laplaceSolver;
+      delete laplaceSolver;
    }
 }
 
@@ -159,7 +157,7 @@ void runLaplaceSolverTests()
 
    try
    {
-      mesh.InitFromOBJ("../meshes/icospheres/ico20480.obj");
+      mesh.InitFromOBJ("../meshes/icospheres/ico20.obj");
    }
    catch(Exeption fileExeption)
    {
@@ -171,7 +169,7 @@ void runLaplaceSolverTests()
 
    try
    {
-      quad_points.InitFromTXT("../quadratures/gauss15_xy.txt", "../quadratures/gauss15_w.txt");
+      quad_points.InitFromTXT("../quadratures/gauss3_xy.txt", "../quadratures/gauss3_w.txt");
    }
    catch(Exeption fileExeption)
    {
@@ -223,9 +221,9 @@ void runLaplaceSolverTests()
 
 int main()
 {
-   //runLaplaceSolverTests();
+   runLaplaceSolverTests();
    
-   addMatricesTest();
+   //addMatricesTest();
 
    return 0;
 }

@@ -434,13 +434,10 @@ __global__ void laplace_solver_kernels::solverKernelStructsGrid(
 {
    __shared__ QuadPoint quads_shared[BLOCK_SIZE];
 
-   const uint quad_idx_l = threadIdx.y;
-   const uint quad_idx_g = threadIdx.y + blockDim.y * blockIdx.x;
-
    const uint point_idx_g = threadIdx.y + blockDim.y * blockIdx.y;
 
    const Vector3 point = points[point_idx_g];
-   quads_shared[quad_idx_l] = quadPoints[quad_idx_g];
+   quads_shared[threadIdx.y] = quadPoints[threadIdx.y + blockDim.y * blockIdx.x];
 
    __syncthreads();
 

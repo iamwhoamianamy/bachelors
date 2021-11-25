@@ -32,13 +32,9 @@ __device__ __host__ real laplace_data::laplaceIntegral1(const real qx, const rea
                                                         const real px, const real py, const real pz,
                                                         const real nx, const real ny, const real nz)
 {
-   real gradx = gradUX(qx, qy, qz);
-   real grady = gradUY(qx, qy, qz);
-   real gradz = gradUZ(qx, qy, qz);
-
-   real dudnx = gradx * nx;
-   real dudny = grady * ny;
-   real dudnz = gradz * nz;
+   real dudnx = gradUX(qx, qy, qz) * nx;
+   real dudny = gradUY(qx, qy, qz) * ny;
+   real dudnz = gradUZ(qx, qy, qz) * nz;
 
    return (dudnx + dudny + dudnz) / lengthBetween(qx, qy, qz, px, py, pz);
 }

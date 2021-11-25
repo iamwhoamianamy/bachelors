@@ -20,19 +20,23 @@ class LaplaceSolverStructs : public LaplaceSolver
 {
 public:
    LaplaceSolverStructs();
-   void PrepareData(const vector<Vector3>& points, const Mesh& mesh, const BasisQuadratures& basisQuads);
+   void PrepareData(const vector<Vector3>& points,
+                    const Mesh& mesh,
+                    const BasisQuadratures& basisQuads);
    vector<real>& SolveCPU();
    void CopyToDevice();
    void SolveGPU();
    vector<real>& GetResultGPU();
+   size_t PointsCountPadded() const;
    ~LaplaceSolverStructs();
 
 private:
-   int quadraturesCount = 0;
-   int trianglesCount = 0;
-   int pointsCount = 0;
-   int quadraturesOrder = 0;
-   int matrixWidth = 0;
+   size_t quadraturesCount = 0;
+   size_t trianglesCount = 0;
+   size_t pointsCount = 0;
+   size_t quadraturesOrder = 0;
+   size_t matrixWidth = 0;
+   //size_t matrixWidthPadded = 0;
 
    vector<QuadPoint> quadPoints;
    vector<Vector3> points;
