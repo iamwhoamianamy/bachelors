@@ -1,4 +1,5 @@
 #pragma once
+#include "real.h"
 #include "cuda_runtime.h"
 //#include <windows.h>
 
@@ -81,4 +82,7 @@ namespace cuda_utilities
 
    void tryKernelLaunch();
    void tryKernelSynchronize();
+
+   // Gets next closest integer to number that is devisible on devider
+   size_t nextDevisible(const size_t number, const size_t devidor);
 }
