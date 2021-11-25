@@ -105,7 +105,7 @@ void LaplaceSolverStructs::SolveGPU()
       case AlgorythmGPU::Blocks:
       {
          dim3 dimBlock(BLOCK_SIZE);
-         dim3 dimGrid(pointsCount / BLOCK_SIZE);
+         dim3 dimGrid(PointsCountPadded() / BLOCK_SIZE);
 
          laplace_solver_kernels::solverKernelStructsBlocks<<<
             dimGrid,

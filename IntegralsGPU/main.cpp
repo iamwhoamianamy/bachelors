@@ -47,9 +47,9 @@ enum class LaplaceSolvers
 
 void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQuads, LaplaceSolvers choose, AlgorythmGPU alg = AlgorythmGPU::Reduction)
 {
-   for(size_t points_iteration = 9; points_iteration < 10; points_iteration++)
+   for(size_t points_iteration = 10; points_iteration < 11; points_iteration++)
    {
-      const size_t points_count = pow(2, 7);
+      const size_t points_count = pow(2, points_iteration);
       vector<real> cpu_results;
       vector<real> gpu_results;
       vector<Vector3> points(points_count);
@@ -143,7 +143,7 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
          printResults(points_count, points, cpu_results);
       }
       
-      if(1)
+      if(0)
       {
          cout << endl << "----------------GPU results:---------------" << endl << endl;
          printResults(points_count, points, gpu_results);
@@ -151,10 +151,11 @@ void runLaplaceSolverTests(ofstream& fout, Mesh& mesh, BasisQuadratures& basisQu
 
       fout << fixed << setprecision(6);
 
-      fout << setw(16) << points_count << " ";
-      fout << setw(16) << cpu_solving_time << " ";
-      fout << setw(16) << gpu_solving_time << " ";
-      fout << setw(16) << speedup_factor << endl;
+      //fout << setw(16) << points_count << " ";
+      //fout << setw(16) << cpu_solving_time << " ";
+      fout << gpu_solving_time << endl;
+      //fout << setw(16) << gpu_solving_time << " ";
+      //fout << setw(16) << speedup_factor << endl;
 
       delete laplaceSolver;
    }
@@ -217,15 +218,15 @@ void runLaplaceSolverTests()
    //runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Reduction);
    //fout.close();
 
-   /*fout.open("results/laplace_solver_structs_blocks_test_results.txt");
+   fout.open("results/laplace_solver_structs_blocks_test_results.txt");
    cout << endl << "Laplace solver with structs, alg = blocks" << endl << endl;
    runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Blocks);
-   fout.close();*/
+   fout.close();
 
-   fout.open("results/laplace_solver_structs_grid_test_results.txt");
+   /*fout.open("results/laplace_solver_structs_grid_test_results.txt");
    cout << endl << "Laplace solver with structs, alg = grid" << endl << endl;
    runLaplaceSolverTests(fout, mesh, quad_points, LaplaceSolvers::Structs, AlgorythmGPU::Grid);
-   fout.close();
+   fout.close();*/
 }
 
 int main()
