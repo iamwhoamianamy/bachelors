@@ -13,13 +13,14 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{24C47DA6-338D-4520-8CE3-0467BEB17781}</ProjectGuid>
     <RootNamespace>IntegralsGPU</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -88,8 +89,6 @@
   <ItemGroup>
     <CudaCompile Include="cuda_helper.cpp" />
     <CudaCompile Include="cuda_timer.cu" />
-    <CudaCompile Include="flops_tests.cuh" />
-    <CudaCompile Include="flops_tests.cu" />
     <CudaCompile Include="laplace_data.cu" />
     <CudaCompile Include="laplace_solver_arrays.cu" />
     <CudaCompile Include="laplace_solver_kernels.cu" />
@@ -103,7 +102,6 @@
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="basis_quadratures.cpp" />
     <ClCompile Include="triangle.cpp" />
-    <ClCompile Include="triangle_quadratures.cpp" />
     <ClCompile Include="vector3.cu" />
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +120,6 @@
     <ClInclude Include="basis_quadratures.h" />
     <ClInclude Include="real.h" />
     <ClInclude Include="triangle.h" />
-    <ClInclude Include="triangle_quadratures.h" />
     <ClInclude Include="vector3.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

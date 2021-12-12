@@ -115,22 +115,18 @@ vector<real>& LaplaceSolverArrays::SolveCPU()
 
       for(size_t t = 0; t < trianglesCount; t++)
       {
-         real tringle_sum_1 = 0;
-         real tringle_sum_2 = 0;
+         real tringle_sum = 0;
 
          for(size_t o = 0; o < quadraturesOrder; o++)
          {
             int ind = t * quadraturesOrder + o;
-            tringle_sum_1 += weights[o] * laplaceIntegral1CPU(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
-                                                              points_X[p], points_Y[p], points_Z[p],
-                                                              normals_X[t], normals_Y[t], normals_Z[t]);
-
-            tringle_sum_2 += weights[o] * laplaceIntegral2CPU(quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
-                                                              points_X[p], points_Y[p], points_Z[p],
-                                                              normals_X[t], normals_Y[t], normals_Z[t]);
+            tringle_sum += weights[o] * calcLaplaceIntegralCPU(
+               quadratures_X[ind], quadratures_Y[ind], quadratures_Z[ind],
+               points_X[p], points_Y[p], points_Z[p],
+               normals_X[t], normals_Y[t], normals_Z[t]);
          }
 
-         integral += (tringle_sum_1 - tringle_sum_2) * areas[t];
+         integral += tringle_sum * areas[t];
       }
 
       results[p] = integral / (4.0 * PI);
@@ -142,12 +138,6 @@ vector<real>& LaplaceSolverArrays::SolveCPU()
 
 void LaplaceSolverArrays::SolveGPU()
 {
-   laplace_solver_kernels::solverKernelArraysReduction<<<pointsCount, THREADS_PER_BLOCK, THREADS_PER_BLOCK * sizeof(real)>>>(
-      dev_quadratures_X.Get(), dev_quadratures_Y.Get(), dev_quadratures_Z.Get(),
-      dev_normals_X.Get(), dev_normals_Y.Get(), dev_normals_Z.Get(),
-      dev_points_X.Get(), dev_points_Y.Get(), dev_points_Z.Get(),
-      dev_weights.Get(), dev_areas.Get(),
-      trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
 
    tryKernelLaunch();
    tryKernelSynchronize();

@@ -19,12 +19,6 @@
     <CudaCompile Include="laplace_solver_structs.cu">
       <Filter>СUDA compiles</Filter>
     </CudaCompile>
-    <CudaCompile Include="flops_tests.cuh">
-      <Filter>CUDA includes</Filter>
-    </CudaCompile>
-    <CudaCompile Include="flops_tests.cu">
-      <Filter>СUDA compiles</Filter>
-    </CudaCompile>
     <CudaCompile Include="cuda_helper.cpp">
       <Filter>C++ compiles</Filter>
     </CudaCompile>
@@ -40,9 +34,6 @@
       <Filter>C++ compiles</Filter>
     </ClCompile>
     <ClCompile Include="triangle.cpp">
-      <Filter>C++ compiles</Filter>
-    </ClCompile>
-    <ClCompile Include="triangle_quadratures.cpp">
       <Filter>C++ compiles</Filter>
     </ClCompile>
     <ClCompile Include="vector3.cu">
@@ -69,9 +60,6 @@
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="triangle.h">
-      <Filter>C++ includes</Filter>
-    </ClInclude>
-    <ClInclude Include="triangle_quadratures.h">
       <Filter>C++ includes</Filter>
     </ClInclude>
     <ClInclude Include="laplace_data.cuh">

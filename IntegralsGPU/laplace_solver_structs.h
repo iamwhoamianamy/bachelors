@@ -34,17 +34,12 @@ private:
    size_t quadraturesCount = 0;
    size_t pointsCount = 0;
    size_t matrixWidth = 0;
-   //size_t matrixWidthPadded = 0;
 
    vector<QuadPoint> quadPoints;
    vector<Vector3> points;
-
-   vector<real> resultsMatrix;
    vector<real> results;
 
    DevPtr<QuadPoint> dev_quadPoints;
    DevPtr<Vector3> dev_points;
-
-   DevPtr<real> dev_resultsMatrix;
    DevPtr<real> dev_results;
 };

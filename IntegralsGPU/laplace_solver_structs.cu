@@ -40,12 +40,6 @@ void LaplaceSolverStructs::PrepareData(const vector<Vector3>& points,
 
    // Preparing results
    results = vector<real>(pointsCount, 0.0f);
-
-   if(algorythmGPU == AlgorythmGPU::Grid)
-   {
-      matrixWidth = nextDevisible(quadraturesCount, BLOCK_SIZE) / BLOCK_SIZE;
-      resultsMatrix = vector<real>(PointsCountPadded() * matrixWidth, 0.0f);
-   }
 }
 
 void LaplaceSolverStructs::CopyToDevice()
@@ -57,11 +51,7 @@ void LaplaceSolverStructs::CopyToDevice()
    dev_points = DevPtr<Vector3>(points.data(), pointsCount, BLOCK_SIZE);
 
    // Copying results
-   if(algorythmGPU == AlgorythmGPU::Grid)
-      dev_resultsMatrix = DevPtr<real>(resultsMatrix.size());
-   else
-      dev_results = DevPtr<real>(pointsCount, BLOCK_SIZE);
-
+   dev_results = DevPtr<real>(pointsCount, BLOCK_SIZE);
 }
 
 vector<real>& LaplaceSolverStructs::SolveCPU()
@@ -73,8 +63,9 @@ vector<real>& LaplaceSolverStructs::SolveCPU()
       for(size_t q = 0; q < quadraturesCount; q++)
       {
          point_sum += quadPoints[q].weight *
-            (laplaceIntegral1CPU(quadPoints[q].quad, points[p], quadPoints[q].normal) -
-             laplaceIntegral2CPU(quadPoints[q].quad, points[p], quadPoints[q].normal));
+            calcLaplaceIntegralCPU(quadPoints[q].quad.x, quadPoints[q].quad.y, quadPoints[q].quad.z,
+                                   points[p].x, points[p].y, points[p].z,
+                                   quadPoints[q].normal.x, quadPoints[q].normal.y, quadPoints[q].normal.z);
       }
 
       results[p] = point_sum / (4.0 * PI);
@@ -85,50 +76,14 @@ vector<real>& LaplaceSolverStructs::SolveCPU()
 
 void LaplaceSolverStructs::SolveGPU()
 {
-   switch(algorythmGPU)
-   {
-      case AlgorythmGPU::Reduction:
-      { 
-         dim3 dimBlock(THREADS_PER_BLOCK, POINTS_PER_BLOCK);
-         dim3 dimGrid(1, pointsCount / POINTS_PER_BLOCK);
+   dim3 dimBlock(BLOCK_SIZE);
+   dim3 dimGrid(PointsCountPadded() / BLOCK_SIZE);
 
-         laplace_solver_kernels::solverKernelStructsReduction<<<
-            dimGrid,
-            dimBlock,
-            THREADS_PER_BLOCK * POINTS_PER_BLOCK * sizeof(real)>>>(
-               dev_quadPoints.Get(),
-               dev_points.Get(),
-               quadraturesCount, dev_results.Get());
-
-         break;
-      }
-      case AlgorythmGPU::Blocks:
-      {
-         dim3 dimBlock(BLOCK_SIZE);
-         dim3 dimGrid(PointsCountPadded() / BLOCK_SIZE);
-
-         laplace_solver_kernels::solverKernelStructsBlocks<<<
-            dimGrid,
-            dimBlock >> > (
-               dev_quadPoints.Get(), dev_points.Get(),
-               quadraturesCount, dev_results.Get());
-
-         break;
-      }
-      case AlgorythmGPU::Grid:
-      {
-         dim3 dimBlock(1, BLOCK_SIZE);
-         dim3 dimGrid(matrixWidth, PointsCountPadded() / BLOCK_SIZE);
-
-         laplace_solver_kernels::solverKernelStructsGrid<<<
-            dimGrid,
-            dimBlock>>>(
-               dev_quadPoints.Get(), dev_points.Get(),
-               matrixWidth, dev_resultsMatrix.Get());
-
-         break;
-      }
-   }
+   laplace_solver_kernels::solverKernelStructs<<<
+      dimGrid,
+      dimBlock>>>(
+         dev_quadPoints.Get(), dev_points.Get(),
+         quadraturesCount, dev_results.Get());
    
    tryKernelLaunch();
    tryKernelSynchronize();
@@ -136,24 +91,7 @@ void LaplaceSolverStructs::SolveGPU()
 
 vector<real>& LaplaceSolverStructs::GetResultGPU()
 {
-   if(algorythmGPU == AlgorythmGPU::Grid)
-   {
-      dev_resultsMatrix.CopyToHost(resultsMatrix.data());
-
-      for(size_t i = 0; i < pointsCount; i++)
-      {
-         results[i] = 0.0f;
-
-         for(size_t j = 0; j < matrixWidth; j++)
-         {
-            results[i] += resultsMatrix[i * matrixWidth + j];
-         }
-
-         results[i] /= (4.0 * PI);
-      }
-   }
-   else
-      dev_results.CopyToHost(results.data());
+   dev_results.CopyToHost(results.data());
 
    return results;
 }

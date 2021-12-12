@@ -24,6 +24,4 @@ public:
    virtual void SolveGPU() = 0;
    virtual vector<real>& GetResultGPU() = 0;
    virtual ~LaplaceSolver() = 0;
-
-   AlgorythmGPU algorythmGPU;
 };

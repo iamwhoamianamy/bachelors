@@ -10,51 +10,37 @@ using namespace triangle_quadratures;
 namespace laplace_data
 {
    __device__ const real PI = 3.14159265359;
+   __device__ const real fourPI = 4 * 3.14159265359;
 
-   __device__ __host__ inline real u(const real x, const real y, const real z);
-   __device__ __host__ inline real gradUX(const real x, const real y, const real z);
-   __device__ __host__ inline real gradUY(const real x, const real y, const real z);
-   __device__ __host__ inline real gradUZ(const real x, const real y, const real z);
+   __device__ __host__ inline real u(
+      const real x, const real y, const real z);
 
-   __device__ real inverseDistanceGPU(const real x1, const real y1, const real z1,
-                                    const real x2, const real y2, const real z2);
+   __device__ __host__ inline real gradUX(
+      const real x, const real y, const real z);
 
-   __device__ real laplaceIntegral1GPU(const real qx, const real qy, const real qz,
-                                       const real px, const real py, const real pz,
-                                       const real nx, const real ny, const real nz);
+   __device__ __host__ inline real gradUY(
+      const real x, const real y, const real z);
 
-   __device__ real laplaceIntegral2GPU(const real qx, const real qy, const real qz,
-                                       const real px, const real py, const real pz,
-                                       const real nx, const real ny, const real nz);
+   __device__ __host__ inline real gradUZ(
+      const real x, const real y, const real z);
 
-   __device__ real laplaceIntegral2GPU(const Vector3& q,
-                                       const Vector3& p,
-                                       const Vector3& n);
+   __device__ inline real calcInverseDistanceGPU(
+      const real x1, const real y1, const real z1,
+      const real x2, const real y2, const real z2);
 
-   __device__ real laplaceIntegral1GPU(const Vector3& q,
-                                       const Vector3& p,
-                                       const Vector3& n);
+   __device__ real calcLaplaceIntegralGPU(
+      const real qx, const real qy, const real qz,
+      const real px, const real py, const real pz,
+      const real nx, const real ny, const real nz);
 
-   __host__ real lengthBetweenCPU(const real x1, const real y1, const real z1,
-                                  const real x2, const real y2, const real z2);
+   __host__ real calcLaplaceIntegralCPU(
+      const real qx, const real qy, const real qz,
+      const real px, const real py, const real pz,
+      const real nx, const real ny, const real nz);
 
-
-   __host__ real laplaceIntegral1CPU(const real qx, const real qy, const real qz,
-                                     const real px, const real py, const real pz,
-                                     const real nx, const real ny, const real nz);
-
-
-   __host__ real laplaceIntegral2CPU(const real qx, const real qy, const real qz,
-                                  const real px, const real py, const real pz,
-                                  const real nx, const real ny, const real nz);
-
-   __host__ real laplaceIntegral1CPU(const Vector3& q,
-                                     const Vector3& p,
-                                     const Vector3& n);
-
-   __host__ real laplaceIntegral2CPU(const Vector3& q,
-                                     const Vector3& p,
-                                     const Vector3& n);
+   __host__ inline real calcDistanceCPU(
+      const real x1, const real y1, const real z1,
+      const real x2, const real y2, const real z2);
 
    const int MAX_THREADS = 1024;
 
@@ -68,6 +54,4 @@ namespace laplace_data
    const int POINTS_PER_BLOCK = MAX_THREADS / THREADS_PER_BLOCK;
 
    const int BLOCK_SIZE = 512;
-   const int MATRIX_WIDTH = 16384 / 2;
-   const int MATRIX_HEIGHT = 8192 / 2;
 };

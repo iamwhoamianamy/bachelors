@@ -95,13 +95,10 @@ vector<real>& LaplaceSolverVector3s::SolveCPU()
          for(size_t o = 0; o < quadraturesOrder; o++)
          {
             int ind = t * quadraturesOrder + o;
-            tringle_sum_1 += weights[o] * laplaceIntegral1CPU(quadPoints[ind],
-                                                              points[p],
-                                                              normals[t]);
-
-            tringle_sum_2 += weights[o] * laplaceIntegral2CPU(quadPoints[ind],
-                                                              points[p],
-                                                              normals[t]);
+            tringle_sum_1 += weights[o] * calcLaplaceIntegralCPU(
+               quadPoints[ind].x, quadPoints[ind].y, quadPoints[ind].z,
+               points[p].x, points[p].y, points[p].z,
+               normals[t].x, normals[t].y, normals[t].z);
          }
 
          integral += (tringle_sum_1 - tringle_sum_2) * areas[t];
@@ -115,42 +112,17 @@ vector<real>& LaplaceSolverVector3s::SolveCPU()
 
 void LaplaceSolverVector3s::SolveGPU()
 {
-   switch(algorythmGPU)
-   {
-      case AlgorythmGPU::Reduction:
-      {
-         laplace_solver_kernels::solverKernelVector3sReduction<<<
-            pointsCount,
-            THREADS_PER_BLOCK,
-            THREADS_PER_BLOCK * sizeof(real)>>>(
-               dev_quadPoints.Get(),
-               dev_normals.Get(),
-               dev_points.Get(),
-               dev_weights.Get(), dev_areas.Get(),
-               trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
+   dim3 dimBlock(POINTS_PER_BLOCK);
+   dim3 dimGrid(pointsCount / POINTS_PER_BLOCK);
 
-         break;
-      }
-      case AlgorythmGPU::Blocks:
-      {
-         /*dim3 dimBlock(QUADS_PER_BLOCK, POINTS_PER_BLOCK);
-         dim3 dimGrid(1, pointsCount / POINTS_PER_BLOCK);*/
-
-         dim3 dimBlock(POINTS_PER_BLOCK);
-         dim3 dimGrid(pointsCount / POINTS_PER_BLOCK);
-
-         laplace_solver_kernels::solverKernelVector3sBlocks<<<
-            dimGrid,
-            dimBlock >>>(
-               dev_quadPoints.Get(),
-               dev_normals.Get(),
-               dev_points.Get(),
-               dev_weights.Get(), dev_areas.Get(),
-               trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
-
-         break;
-      }
-   }
+   laplace_solver_kernels::solverKernelVector3s<<<
+      dimGrid,
+      dimBlock>>>(
+         dev_quadPoints.Get(),
+         dev_normals.Get(),
+         dev_points.Get(),
+         dev_weights.Get(), dev_areas.Get(),
+         trianglesCount, pointsCount, quadraturesOrder, dev_results.Get());
 
    tryKernelLaunch();
    tryKernelSynchronize();
