@@ -333,8 +333,13 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 *.bmp
+
+# Deb
 Tests/
 FromBook/Histogram/text.txt
+gmsh-4.9.4-Windows64/
+Documents/
+IntegralsGPU/results/
 
 !meshes/*.obj
 !meshes/*/*.obj

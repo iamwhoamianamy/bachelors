@@ -1,32 +1,65 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-points_count = []
-cpu_with_vector3s_t = []
-gpu_with_vector3s_t = []
+def read_values(device, datatype):
+   values = []
+   with open("laplace_solver_structs_results_" + device + "_" + datatype + ".txt") as f:
+      for line in f:
+         values.append(float(line))
+   return values
 
-with open("laplace_solver_vector3s_test_results.txt") as f:
-   for line in f:
-      cols = line.split("\t")
-      points_count.append(float(cols[0]))
-      cpu_with_vector3s_t.append(float(cols[1]))
-      gpu_with_vector3s_t.append(float(cols[2]))
+def fix_cpu_values_double(values):
+   for i in range(len(values)):
+      values[i] /= 32
+   return values
+
+def fix_cpu_values_float(values):
+   for i in range(len(values)):
+      values[i] /= 64
+   return values
+
+def plot_data(xs, values, device, datatype):
+   plt.xlabel("Количество точек")
+   plt.ylabel("Время выполнения, c")
+   plt.xticks(np.arange(0, xs[-1] * 2, xs[-1] / 8))
+   plt.yticks(np.arange(0, values[-1] * 2, values[-1] / 16))
+   #plt.plot(xs[:n_CPU], ys_CPU, '-ro')
    
-n = len(cpu_with_vector3s_t)
-x = np.arange(2, 2**n)
+   color = 'b' if device == "GPU" else 'r'
+   stroke = '--' if datatype == "double" else '-'
+   
+   plt.plot(xs, values, stroke + color + 'o')
+   plt.grid(True)
+   
+def plot_one(device, datatype):
+   values = []
 
-plt.figure(figsize=(20, 10))
-plt.subplot(1, 2, 1)
+   values = read_values(device, datatype)
 
-plt.xticks(x)
-# plt.xlim([cpu_with_vector3s_t[0], cpu_with_vector3s_t[n - 1]])
-plt.xlabel("Количество точек")
-plt.ylabel("Время выполнения, c")
-plt.plot(points_count, cpu_with_vector3s_t)
-plt.plot(points_count, gpu_with_vector3s_t)
+   if device == "CPU":
+      if datatype == "double":
+         values = fix_cpu_values_double(values)
+      else:
+         values = fix_cpu_values_float(values)
+         
 
-plt.subplot(1, 2, 2)
-plt.xlabel("Количество точек")
-plt.ylabel("Ускорение видеокарты, c")
-plt.plot(points_count, [float(cpu_with_vector3s_t[i])  / float(gpu_with_vector3s_t[i]) for i in range(len(cpu_with_vector3s_t))])
+   count = len(values)
+
+   xs = []
+
+   for i in range(1, count + 1):
+      xs.append(2**i)
+
+   plot_data(xs, values, device, datatype)
+   
+# plot_one("GPU", "float")
+# plot_one("GPU", "double")
+
+# plt.legend(["CPU float", "CPU double"])
+
+plot_one("CPU", "float")
+plot_one("CPU", "double")
+plt.legend(["CPU float", "CPU double"])
+
 plt.show()
