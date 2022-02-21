@@ -139,13 +139,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
+    <ClCompile Include="torus.cpp" />
     <ClCompile Include="vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="real.hpp" />
     <ClInclude Include="tetrahedron.hpp" />
+    <ClInclude Include="torus.hpp" />
     <ClInclude Include="vector3.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
