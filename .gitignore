@@ -340,6 +340,7 @@ FromBook/Histogram/text.txt
 gmsh-4.9.4-Windows64/
 Documents/
 IntegralsGPU/results/
+*.blend
 
 !meshes/*.obj
 !meshes/*/*.obj
