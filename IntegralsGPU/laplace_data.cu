@@ -27,7 +27,6 @@ __device__ __host__ inline real laplace_data::gradUZ(
 }
 
 __device__ float rsqrtf(float  x);
-__device__ float rsqrtf(float  x);
 __device__ double rsqrt(double  x);
 __device__ float norm3df(float  a, float  b, float  c);
 __device__ float rnorm3df(float  a, float  b, float  c);
@@ -38,6 +37,19 @@ __device__ inline real laplace_data::calcInverseDistanceGPU(
 {
 #ifdef REAL_IS_FLOAT
    return rsqrtf((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
+#endif // REAL_IS_FLOAT
+
+#ifdef REAL_IS_DOUBLE
+   return rsqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
+#endif // REAL_IS_DOUBLE
+}
+
+__host__ inline real laplace_data::calcDistanceCPU(
+   const real x1, const real y1, const real z1,
+   const real x2, const real y2, const real z2)
+{
+#ifdef REAL_IS_FLOAT
+   return sqrtf((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
 #endif // REAL_IS_FLOAT
 
 #ifdef REAL_IS_DOUBLE
@@ -78,19 +90,5 @@ __host__ real laplace_data::calcLaplaceIntegralCPU(
    real ry = ny * (py - qy);
    real rz = nz * (pz - qz);
 
-   return (dudnx + dudny + dudnz -
-           (rx + ry + rz) * u(qx, qy, qz) * (l * l)) * l;
-}
-
-__host__ inline real laplace_data::calcDistanceCPU(
-   const real x1, const real y1, const real z1,
-   const real x2, const real y2, const real z2)
-{
-#ifdef REAL_IS_FLOAT
-   return sqrtf((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
-#endif // REAL_IS_FLOAT
-
-#ifdef REAL_IS_DOUBLE
-   return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
-#endif // REAL_IS_DOUBLE
+   return (dudnx + dudny + dudnz - (rx + ry + rz) * u(qx, qy, qz) * (l * l)) * l;
 }

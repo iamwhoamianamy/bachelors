@@ -68,7 +68,7 @@ vector<real>& LaplaceSolverStructs::SolveCPU()
                                    quadPoints[q].normal.x, quadPoints[q].normal.y, quadPoints[q].normal.z);
       }
 
-      results[p] = point_sum / (4.0 * PI);
+      results[p] = point_sum / (fourPI);
    }
 
    return results;

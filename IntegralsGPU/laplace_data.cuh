@@ -28,6 +28,10 @@ namespace laplace_data
       const real x1, const real y1, const real z1,
       const real x2, const real y2, const real z2);
 
+   __host__ inline real calcDistanceCPU(
+      const real x1, const real y1, const real z1,
+      const real x2, const real y2, const real z2);
+
    __device__ real calcLaplaceIntegralGPU(
       const real qx, const real qy, const real qz,
       const real px, const real py, const real pz,
@@ -37,10 +41,6 @@ namespace laplace_data
       const real qx, const real qy, const real qz,
       const real px, const real py, const real pz,
       const real nx, const real ny, const real nz);
-
-   __host__ inline real calcDistanceCPU(
-      const real x1, const real y1, const real z1,
-      const real x2, const real y2, const real z2);
 
    const int MAX_THREADS = 1024;
 
@@ -53,5 +53,5 @@ namespace laplace_data
 
    const int POINTS_PER_BLOCK = MAX_THREADS / THREADS_PER_BLOCK;
 
-   const int BLOCK_SIZE = 512;
+   const int BLOCK_SIZE = 128;
 };
