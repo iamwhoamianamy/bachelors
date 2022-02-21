@@ -1,54 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Исходные файлы">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Файлы заголовков">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Файлы ресурсов">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\Geometry">
-      <UniqueIdentifier>{80cdfdda-d3f2-4d7a-a57f-97d9e5de588e}</UniqueIdentifier>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{de140080-12b7-4ffa-90e0-64853e4628e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry\Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Geometry\Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{1c8388af-ddd8-4029-9dc5-3ed1a909ad6f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="vector3.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="tetrahedron.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="hexahedron.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="torus.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Geometry\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tetrahedron.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="vector3.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="real.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="hexahedron.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="torus.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
