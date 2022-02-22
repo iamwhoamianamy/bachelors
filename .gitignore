@@ -341,6 +341,7 @@ gmsh-4.9.4-Windows64/
 Documents/
 IntegralsGPU/results/
 *.blend
+*.blend1
 
 !meshes/*.obj
 !meshes/*/*.obj
