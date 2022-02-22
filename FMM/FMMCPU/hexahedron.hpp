@@ -4,9 +4,8 @@
 
 class Hexahedron
 {
-private:
-   std::vector<Vector3> points;
 public:
+   std::vector<Vector3> points;
    Hexahedron();
    Hexahedron(std::vector<Vector3> points);
 };
