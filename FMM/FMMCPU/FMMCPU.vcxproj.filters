@@ -19,6 +19,15 @@
     <Filter Include="Test">
       <UniqueIdentifier>{1c8388af-ddd8-4029-9dc5-3ed1a909ad6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FMMSolver">
+      <UniqueIdentifier>{f705a509-8433-4739-b1fe-c38368bbb8dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FMMSolver\Исходные файлы">
+      <UniqueIdentifier>{e60e7060-83ad-49d7-8a93-9608b8b1e26e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FMMSolver\Файлы заголовков">
+      <UniqueIdentifier>{5286a02f-5aa9-42c7-9470-8951975e3dea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vector3.cpp">
@@ -27,14 +36,26 @@
     <ClCompile Include="tetrahedron.cpp">
       <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="hexahedron.cpp">
-      <Filter>Geometry\Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="torus.cpp">
       <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="hexahedron.cpp">
+      <Filter>Geometry\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="fast_multipole_method_solver.cpp">
+      <Filter>Geometry\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="basis_quadratures.cpp">
+      <Filter>FMMSolver\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="exeptions.cpp">
+      <Filter>FMMSolver\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="tetrahedron_transformer.cpp">
+      <Filter>FMMSolver\Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -47,11 +68,23 @@
     <ClInclude Include="real.hpp">
       <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="torus.hpp">
+      <Filter>Geometry\Файлы заголовков</Filter>
+    </ClInclude>
     <ClInclude Include="hexahedron.hpp">
       <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="torus.hpp">
+    <ClInclude Include="fast_multipole_method_solver.h">
       <Filter>Geometry\Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="basis_quadratures.hpp">
+      <Filter>FMMSolver\Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="exeptions.hpp">
+      <Filter>FMMSolver\Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="tetrahedron_transformer.hpp">
+      <Filter>FMMSolver\Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

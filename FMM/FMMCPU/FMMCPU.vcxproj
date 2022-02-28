@@ -139,16 +139,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="basis_quadratures.cpp" />
+    <ClCompile Include="exeptions.cpp" />
+    <ClCompile Include="fast_multipole_method_solver.cpp" />
     <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
+    <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
     <ClCompile Include="vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="basis_quadratures.hpp" />
+    <ClInclude Include="exeptions.hpp" />
+    <ClInclude Include="fast_multipole_method_solver.h" />
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="real.hpp" />
     <ClInclude Include="tetrahedron.hpp" />
+    <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />
     <ClInclude Include="vector3.hpp" />
   </ItemGroup>
