@@ -13,4 +13,9 @@ public:
    Vector3& b();
    Vector3& c();
    Vector3& d();
+
+   Vector3 a() const;
+   Vector3 b() const;
+   Vector3 c() const;
+   Vector3 d() const;
 };
