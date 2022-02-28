@@ -39,4 +39,6 @@ public:
 
    static Vector3 Direction(const Vector3& from, const Vector3& to);
    static real DistanceSquared(const Vector3& vec1, const Vector3& vec2);
+   static double Dot(const Vector3& vec1, const Vector3& vec2);
+   static Vector3 Cross(const Vector3& vec1, const Vector3& vec2);
 };

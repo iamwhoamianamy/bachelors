@@ -209,6 +209,18 @@ real Vector3::DistanceSquared(const Vector3& vec1, const Vector3& vec2)
    return (vec1 - vec2).LengthSquared();
 }
 
+double Vector3::Dot(const Vector3& vec1, const Vector3& vec2)
+{
+   return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+}
+
+Vector3 Vector3::Cross(const Vector3& vec1, const Vector3& vec2)
+{
+   return Vector3(vec1.y * vec2.z - vec1.z * vec2.y,
+                  vec1.z * vec2.x - vec1.x * vec2.z,
+                  vec1.x * vec2.y - vec1.y * vec2.x);
+}
+
 Vector3 Vector3::LeadingCos()
 {
    real l = Length();
