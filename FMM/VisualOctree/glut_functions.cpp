@@ -17,41 +17,41 @@ void glut_functions::registerFunctions()
 void glut_functions::onTimer(int millisec)
 {
    if(window)
-      window->OnTimer(millisec);
+      window->onTimer(millisec);
 }
 
 void glut_functions::exitingFunction()
 {
    if(window)
-      window->ExitingFunction();
+      window->exitingFunction();
 }
 
 void glut_functions::display()
 {
    if(window)
-      window->Display();
+      window->display();
 }
 
 void glut_functions::reshape(GLint w, GLint h)
 {
    if(window)
-      window->Reshape(w, h);
+      window->reshape(w, h);
 }
 
 void glut_functions::keyboardLetters(unsigned char key, int x, int y)
 {
    if(window)
-      window->KeyboardLetters(key, x, y);
+      window->keyboardLetters(key, x, y);
 }
 
 void glut_functions::mouse(int button, int state, int x, int y)
 {
    if(window)
-      window->Mouse(button, state, x, y);
+      window->mouse(button, state, x, y);
 }
 
 void glut_functions::mousePassive(int x, int y)
 {
    if(window)
-      window->MousePassive(x, y);
+      window->mousePassive(x, y);
 }
