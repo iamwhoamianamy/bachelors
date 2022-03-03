@@ -12,7 +12,6 @@ private:
    const int onLengthStepCount;
    const int onWidthStepCount;
    const int onHeightStepCount;
-   std::vector<Tetrahedron> tetrahedra;
 public:
    Torus(const double radius,
          const double sectionWidth,
@@ -24,6 +23,7 @@ public:
    double bottom() const;
    double top() const;
    double stepAngle() const;
+   std::vector<Tetrahedron> tetrahedra;
 
 private:
    void buildHexahedra(std::vector<Hexahedron>& hexahedra);

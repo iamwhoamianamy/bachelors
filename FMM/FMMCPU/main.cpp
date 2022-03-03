@@ -1,32 +1,61 @@
 ﻿#include <iostream>
+#include <string>
+#include <fstream>
 #include "vector3.hpp"
 #include "tetrahedron.hpp"
 #include "hexahedron.hpp"
+#include "torus.hpp"
+#include "basis_quadratures.hpp"
+#include "exeptions.hpp"
 
-void deb(Vector3 vec)
-{
-
-}
+using namespace std;
+const double PI = 3.14159265359;
 
 int main()
 {
-   Vector3 a(1, 2, 3);
-   Vector3 b(3, 4, 5);
-   Vector3 c(6, 4, 8);
-   Vector3 d(0, 3, 7);
-   Vector3 e(4, 6, 3);
-   Vector3 f(0, 4, 8);
-   Vector3 g(2, 3, 4);
-   Vector3 h(1, 5, 3);
+   const double torusRadius = 3;
+   const double torusSectionWidth = 1;
 
-   Tetrahedron tetr;
+   Torus torus(torusRadius, torusSectionWidth, 20, 2, 4);
 
-   std::vector<Vector3> vec = { a, b, c, d, e, f, g, h };
+   BasisQuadratures bq;
+   string bqDir = "basis_quadratures/";
 
-   Hexahedron hex(vec);
+   try
+   {
+      bq.InitFromTXT(bqDir + "keast 7 x.txt", bqDir + "keast 7 w.txt");
+      cout << "Quadratures were successfully read. Order = " << bq.order << endl;
+   }
+   catch(Exeption ex)
+   {
+      cout << ex;
+   }
 
-   vec[0] = Vector3(0, 0, 0);
+   //Vector3 a(0, 0, 0);
+   //Vector3 b(0, 1, 0);
+   //Vector3 c(1, 0, 0);
+   //Vector3 d(0, 0, 1);
 
-   auto deb = a + b - c;
+   //Tetrahedron tetr(a, b, c, d);
 
+   //cout << tetr.Volume();
+
+   /*double res = 0;
+
+   for(auto &t :torus.tetrahedra)
+   {
+      res += t.Volume();
+   }
+
+   double majorTorusRadius = PI * pow(torusRadius + torusSectionWidth / 2, 2);
+   double minorTorusRadius = PI * pow(torusRadius - torusSectionWidth / 2, 2);
+
+   double trueTorusVolume = (majorTorusRadius - minorTorusRadius) * torusSectionWidth;
+
+   cout << "True torus volume = " << trueTorusVolume << endl;
+   cout << "Generated torus volume = " << res << endl;*/
+
+   auto vec = Vector3(200, 200, 0);
+   std::vector<Vector3> vectors;
+   vectors.push_back(vec);
 }
