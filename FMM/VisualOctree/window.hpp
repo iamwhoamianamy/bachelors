@@ -2,9 +2,11 @@
 #include <iostream>
 #include <vector>
 
+#include "GL/freeglut.h"
+
 #include "../FMMCPU/real.hpp"
 #include "../FMMCPU/vector3.hpp"
-#include "GL/freeglut.h"
+#include "octree.hpp"
 
 class Window
 {

@@ -19,9 +19,6 @@ Window::Window(int argc, char** argv, float screenWidth, float screenHeight, std
 
 void Window::initData()
 {
-   points = std::vector<Vector3>();
-   auto vec = Vector3(200, 200);
-   points.push_back(vec);
 }
 
 void Window::run(int FPS)
@@ -62,7 +59,8 @@ void Window::keyboardLetters(unsigned char key, int x, int y)
 
 void Window::mouse(int button, int state, int x, int y)
 {
-   points.push_back(Vector3(x, y, 0));
+   if(state == 0)
+      points.push_back(Vector3(x, y, 0));
 }
 
 void Window::mousePassive(int x, int y)
@@ -78,12 +76,31 @@ void Window::display()
 
    auto pointColor = drawing::Color(255, 255, 255);
 
+   glEnable(GL_POINT_SMOOTH);
+      
    for(auto& point : points)
    {
-      drawing::DrawPoint(point, pointColor, 20);
+      drawing::drawPoint(point, pointColor, 5);
    }
 
-   drawing::DrawRectangle(mousePos, 20, 20, pointColor);
+   Box mouseBox(mousePos, Vector3(40, 40, 40));
+   drawing::drawRectangle(mousePos, mouseBox.halfDimensions.x, mouseBox.halfDimensions.y, pointColor);
+
+   Octree octree(Box(Vector3(screenWidth / 2, screenHeight / 2, 0),
+                 Vector3(screenWidth / 2, screenHeight / 2, 50)), 1);
+   std::vector<Vector3*> foundPoints;
+
+   octree.insert(points);
+   octree.quarry(mouseBox, foundPoints);
+
+   auto foundColor = drawing::Color(255, 0, 0);
+
+   for(auto point : foundPoints)
+   {
+      drawing::drawPoint(*point, foundColor, 5);
+   }
+
+   drawing::drawOctree(octree);
 
    glFinish();
 }
