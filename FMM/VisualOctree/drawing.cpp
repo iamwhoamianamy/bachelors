@@ -5,7 +5,7 @@ namespace drawing
    Color::Color(UCHAR r, UCHAR g, UCHAR b, UCHAR a) :
       r(r), g(g), b(b), a(a) {}
 
-   void DrawPoint(Vector3 point, Color color, float size)
+   void drawPoint(Vector3 point, Color color, float size)
    {
       glColor3ub(color.r, color.g, color.b);
       glPointSize(size);
@@ -16,7 +16,7 @@ namespace drawing
       glEnd();
    }
 
-   void DrawRectangle(Vector3 center, float halfWidth, float halfHeight, Color color)
+   void drawRectangle(Vector3 center, float halfWidth, float halfHeight, Color color)
    {
       glColor3ub(color.r, color.g, color.b);
       glBegin(GL_LINE_LOOP);
@@ -29,7 +29,7 @@ namespace drawing
       glEnd();
    }
 
-   void DrawRectangle(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Color color)
+   void drawRectangle(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Color color)
    {
       glColor3ub(color.r, color.g, color.b);
       glBegin(GL_LINE_LOOP);
@@ -40,5 +40,22 @@ namespace drawing
          glVertex3f(d.x, d.y, 0);
       }
       glEnd();
+   }
+
+   Color octreeColor(255, 255, 0);
+
+   void drawOctree(const Octree& octree)
+   {
+      drawRectangle(octree.box().center,
+                    octree.box().halfDimensions.x,
+                    octree.box().halfDimensions.y, octreeColor);
+
+      if(octree.isSubdivided())
+      {
+         for(auto child : octree.children())
+         {
+            drawOctree(*child);
+         }
+      }
    }
 }
