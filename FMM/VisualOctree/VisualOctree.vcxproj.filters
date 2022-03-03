@@ -1,42 +1,66 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Исходные файлы">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Файлы заголовков">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Файлы ресурсов">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="FreeGLUT">
+      <UniqueIdentifier>{bddd2d2f-485b-4f47-adeb-20da12951682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeGLUT\Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="FreeGLUT\Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Octree">
+      <UniqueIdentifier>{96cc69f6-2deb-4462-bda3-30da03fe07f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Octree\Исходные файлы">
+      <UniqueIdentifier>{3d8dd30a-a1d1-4623-9011-6321034e15ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Octree\Файлы заголовков">
+      <UniqueIdentifier>{c87f327c-6daa-4e1c-8085-2fc95d6632d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>FreeGLUT\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="window.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>FreeGLUT\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="glut_functions.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>FreeGLUT\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="drawing.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>FreeGLUT\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="box.cpp">
+      <Filter>Octree\Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="octree.cpp">
+      <Filter>Octree\Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>FreeGLUT\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="glut_functions.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>FreeGLUT\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="drawing.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>FreeGLUT\Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="octree.hpp">
+      <Filter>Octree\Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="box.hpp">
+      <Filter>Octree\Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
