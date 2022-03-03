@@ -141,11 +141,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="drawing.cpp" />
     <ClCompile Include="glut_functions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="drawing.hpp" />
     <ClInclude Include="glut_functions.hpp" />
     <ClInclude Include="window.hpp" />
   </ItemGroup>

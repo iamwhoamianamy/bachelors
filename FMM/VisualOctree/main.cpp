@@ -5,6 +5,6 @@
 
 int main(int argc, char** argv)
 {
-   glut_functions::window = new Window(argc, argv, 10, 800, 300, "Octree");
-   glut_functions::window->run();
+   glut_functions::window = new Window(argc, argv, 800, 800, "Octree");
+   glut_functions::window->run(30);
 }
