@@ -9,16 +9,17 @@
 class Window
 {
 private:
-   const int FPS;
+   int FPS;
    float screenWidth;
    float screenHeight;
    std::string name;
    std::vector<Vector3> points;
+   Vector3 mousePos;
 public:
-   Window(int argc, char** argv, int FPS,
+   Window(int argc, char** argv,
           float screenWidth, float screenHeight, std::string name);
 
-   void run();
+   void run(int FPS);
    void onTimer(int millisec);
    void exitingFunction();
    void display();

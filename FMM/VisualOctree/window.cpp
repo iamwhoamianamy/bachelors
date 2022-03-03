@@ -1,11 +1,12 @@
 #include "window.hpp"
+#include "drawing.hpp"
 #include "glut_functions.hpp"
 #include "../FMMCPU/vector3.cpp"
 
 namespace glf = glut_functions;
 
-Window::Window(int argc, char** argv, int FPS, float screenWidth, float screenHeight, std::string name) :
-   FPS(FPS), screenWidth(screenWidth), screenHeight(screenHeight), name(name)
+Window::Window(int argc, char** argv, float screenWidth, float screenHeight, std::string name) :
+   screenWidth(screenWidth), screenHeight(screenHeight), name(name)
 {
    glutInit(&argc, argv);
    glutInitDisplayMode(GLUT_RGB);
@@ -23,8 +24,9 @@ void Window::initData()
    points.push_back(vec);
 }
 
-void Window::run()
+void Window::run(int FPS)
 {
+   this->FPS = FPS;
    glutMainLoop();
 }
 
@@ -42,6 +44,9 @@ void Window::exitingFunction()
 
 void Window::reshape(GLint w, GLint h)
 {
+   screenWidth = w;
+   screenHeight = h;
+
    glViewport(0, 0, screenWidth, screenHeight);
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
@@ -62,25 +67,23 @@ void Window::mouse(int button, int state, int x, int y)
 
 void Window::mousePassive(int x, int y)
 {
-
+   mousePos.x = x;
+   mousePos.y = y;
 }
-
 
 void Window::display()
 {
    glClearColor(0, 0, 0, 255);
    glClear(GL_COLOR_BUFFER_BIT);
 
-   glColor3ub(255, 255, 255);
-   glPointSize(10);
-   for (auto &point : points)
+   auto pointColor = drawing::Color(255, 255, 255);
+
+   for(auto& point : points)
    {
-      glBegin(GL_POINTS);
-      {
-         glVertex2f(point.x, point.y);
-      }
-      glEnd();
+      drawing::DrawPoint(point, pointColor, 20);
    }
+
+   drawing::DrawRectangle(mousePos, 20, 20, pointColor);
 
    glFinish();
 }
