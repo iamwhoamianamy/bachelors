@@ -37,6 +37,10 @@ public:
    void SetLength(const real newLength);
    Vector3 LeadingCos();
 
+   real r() const;
+   real t() const;
+   real f() const;
+
    static Vector3 Direction(const Vector3& from, const Vector3& to);
    static real DistanceSquared(const Vector3& vec1, const Vector3& vec2);
    static double Dot(const Vector3& vec1, const Vector3& vec2);

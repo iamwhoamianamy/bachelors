@@ -13,7 +13,7 @@ const double PI = 3.14159265359;
 
 int main()
 {
-   const double torusRadius = 3;
+   /*const double torusRadius = 3;
    const double torusSectionWidth = 1;
 
    Torus torus(torusRadius, torusSectionWidth, 20, 2, 4);
@@ -29,7 +29,7 @@ int main()
    catch(Exeption ex)
    {
       cout << ex;
-   }
+   }*/
 
    //Vector3 a(0, 0, 0);
    //Vector3 b(0, 1, 0);
@@ -55,7 +55,17 @@ int main()
    cout << "True torus volume = " << trueTorusVolume << endl;
    cout << "Generated torus volume = " << res << endl;*/
 
-   auto vec = Vector3(200, 200, 0);
-   std::vector<Vector3> vectors;
-   vectors.push_back(vec);
+   //auto vec = Vector3(200, 200, 0);
+   //std::vector<Vector3> vectors;
+   //vectors.push_back(vec);
+
+   Vector3 vec(10, 3, 5);
+
+   real r = vec.r();
+   real t = vec.t();
+   real f = vec.f();
+
+   real x = r * cos(f) * sin(t);
+   real y = r * sin(f) * sin(t);
+   real z = r * cos(t);
 }

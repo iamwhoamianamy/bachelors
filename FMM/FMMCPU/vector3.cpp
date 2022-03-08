@@ -227,3 +227,20 @@ Vector3 Vector3::LeadingCos()
 
    return Vector3(x / l, y / l, z / l);
 }
+
+real Vector3::r() const
+{
+   return sqrt(x * x + y * y + z * z);
+}
+
+real Vector3::t() const
+{
+   return atan(sqrt(x * x + y + y) / z);
+   //return powf(tanf(y / x), -1);
+}
+
+real Vector3::f() const
+{
+   return atan2(y, x);
+   //return powf(tanf(sqrtf(x * x + y * y) / z), -1);
+}
