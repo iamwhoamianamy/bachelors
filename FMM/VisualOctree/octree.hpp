@@ -23,15 +23,4 @@ public:
    const Box& box() const;
    const bool isSubdivided() const;
    const std::vector<Octree*> children() const;
-
-   /*Octree* botSouthWest();
-   Octree* botSouthEast();
-   Octree* botNorthEast();
-   Octree* botNorthWest();
-
-   Octree* topSouthWest();
-   Octree* topSouthEast();
-   Octree* topNorthEast();
-   Octree* topNorthWest();*/
-
 };
