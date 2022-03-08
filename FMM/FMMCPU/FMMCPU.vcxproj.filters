@@ -57,7 +57,7 @@
     <ClCompile Include="tetrahedron_transformer.cpp">
       <Filter>FMMSolver\Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="legendre_polynomial.cpp">
+    <ClCompile Include="math.cpp">
       <Filter>FMMSolver\Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,7 +89,7 @@
     <ClInclude Include="tetrahedron_transformer.hpp">
       <Filter>FMMSolver\Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="legendre_polynomial.hpp">
+    <ClInclude Include="math.hpp">
       <Filter>FMMSolver\Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

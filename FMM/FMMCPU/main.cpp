@@ -8,7 +8,7 @@
 #include "torus.hpp"
 #include "basis_quadratures.hpp"
 #include "exeptions.hpp"
-#include "legendre_polynomial.hpp"
+#include "math.hpp"
 
 using namespace std;
 const double PI = 3.14159265359;
@@ -61,5 +61,5 @@ int main()
    //std::vector<Vector3> vectors;
    //vectors.push_back(vec);
 
-   std::cout << legendre_polynomial::pn(2.0, 4);
+   std::cout << math::calcFactorial(3);
 }
