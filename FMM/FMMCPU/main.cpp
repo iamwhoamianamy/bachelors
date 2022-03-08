@@ -1,12 +1,14 @@
 ﻿#include <iostream>
 #include <string>
 #include <fstream>
+
 #include "vector3.hpp"
 #include "tetrahedron.hpp"
 #include "hexahedron.hpp"
 #include "torus.hpp"
 #include "basis_quadratures.hpp"
 #include "exeptions.hpp"
+#include "legendre_polynomial.hpp"
 
 using namespace std;
 const double PI = 3.14159265359;
@@ -59,13 +61,5 @@ int main()
    //std::vector<Vector3> vectors;
    //vectors.push_back(vec);
 
-   Vector3 vec(10, 3, 5);
-
-   real r = vec.r();
-   real t = vec.t();
-   real f = vec.f();
-
-   real x = r * cos(f) * sin(t);
-   real y = r * sin(f) * sin(t);
-   real z = r * cos(t);
+   std::cout << legendre_polynomial::pn(2.0, 4);
 }
