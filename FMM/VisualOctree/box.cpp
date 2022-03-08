@@ -6,17 +6,24 @@ Box::Box(const Vector3& center, const Vector3& halfDimensions):
 {
 }
 
-bool Box::contains(const Vector3& point) const
+bool isInRange(real value, real rangeCenter, real rangeHalfWidth)
 {
-   return (fabs(center.x - point.x) <= halfDimensions.x) &&
-          (fabs(center.y - point.y) <= halfDimensions.y) &&
-          (fabs(center.z - point.z) <= halfDimensions.z);
+   return (rangeCenter - rangeHalfWidth <= value &&
+           value < rangeCenter + rangeHalfWidth);
 }
 
-bool Box::intersects(const Box& _box) const
+bool Box::doContain(const Vector3& point) const
 {
-   return Box(_box.center, halfDimensions + _box.halfDimensions).contains(center);
+   return (isInRange(point.x, center.x, halfDimensions.x) &&
+           isInRange(point.y, center.y, halfDimensions.y) &&
+           isInRange(point.z, center.z, halfDimensions.z));
 }
+
+bool Box::doIntersect(const Box& _box) const
+{
+   return Box(_box.center, halfDimensions + _box.halfDimensions).doContain(center);
+}
+
 //
 //real Box::left() const
 //{

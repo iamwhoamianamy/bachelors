@@ -7,6 +7,6 @@ struct Box
    Vector3 halfDimensions;
 
    Box(const Vector3& center, const Vector3& halfDimensions);
-   bool contains(const Vector3& point) const;
-   bool intersects(const Box& _box) const;
+   bool doContain(const Vector3& point) const;
+   bool doIntersect(const Box& _box) const;
 };
