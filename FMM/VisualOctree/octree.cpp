@@ -119,3 +119,14 @@ const std::vector<Octree*> Octree::children() const
 {
    return _children;
 }
+
+Octree::~Octree()
+{
+   if(_isSubdivided)
+   {
+      for(auto child : _children)
+      {
+         delete child;
+      }
+   }
+}
