@@ -11,7 +11,7 @@ private:
    Box _box;
    bool _isSubdivided;
    size_t _capacity;
-   std::vector<Vector3*> points;
+   std::vector<Vector3*> _points;
 
 public:
    Octree(const Box& _box, const size_t capacity);

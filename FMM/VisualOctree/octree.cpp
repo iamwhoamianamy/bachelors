@@ -21,11 +21,11 @@ void Octree::insert(Vector3& point)
       return;
    }
 
-   if(points.size() < _capacity)
+   if(_points.size() < _capacity)
    {
       if(!_isSubdivided)
       {
-         points.push_back(&point);
+         _points.push_back(&point);
       }
       else
       {
@@ -40,9 +40,9 @@ void Octree::insert(Vector3& point)
       subdivide();
       _isSubdivided = true;
 
-      points.push_back(&point);
+      _points.push_back(&point);
 
-      for(auto p : points)
+      for(auto p : _points)
       {
          for(auto& child : _children)
          {
@@ -50,7 +50,7 @@ void Octree::insert(Vector3& point)
          }
       }
 
-      points.clear();
+      _points.clear();
    }
 }
 
@@ -87,7 +87,7 @@ void Octree::quarry(const Box& range, std::vector<Vector3*>& found)
    }
    else
    {
-      for(auto point : points)
+      for(auto point : _points)
       {
          if(range.doContain(*point))
          {
