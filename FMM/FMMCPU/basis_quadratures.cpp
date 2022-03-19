@@ -6,13 +6,38 @@ using namespace std;
 
 BasisQuadratures::BasisQuadratures()
 {
-   order = 0;
+   _order = 0;
 }
 
 void BasisQuadratures::InitFromTXT(string coordsFileName, string weightsFileName)
 {
    InitCoordinatesFromTXT(coordsFileName);
    InitWeightsFromTXT(weightsFileName);
+}
+
+int BasisQuadratures::order() const
+{
+   return _order;
+}
+
+const std::vector<real>& BasisQuadratures::x() const
+{
+   return _x;
+}
+
+const std::vector<real>& BasisQuadratures::y() const
+{
+   return _y;
+}
+
+const std::vector<real>& BasisQuadratures::z() const
+{
+   return _z;
+}
+
+const std::vector<real>& BasisQuadratures::w() const
+{
+   return _w;
 }
 
 void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
@@ -30,9 +55,9 @@ void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
 
       while(fin >> x_coord && fin >> y_coord && fin >> z_coord)
       {
-         x.push_back(x_coord);
-         y.push_back(y_coord);
-         z.push_back(z_coord);
+         _x.push_back(x_coord);
+         _y.push_back(y_coord);
+         _z.push_back(z_coord);
       }
 
    }
@@ -45,7 +70,7 @@ void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
       }
       else
       {
-         order = x.size();
+         _order = _x.size();
          fin.close();
       }
    }
@@ -66,7 +91,7 @@ void BasisQuadratures::InitWeightsFromTXT(std::string weightsFileName)
 
       while(fin >> w_value)
       {
-         w.push_back(w_value);
+         _w.push_back(w_value);
       }
 
    }
@@ -79,10 +104,11 @@ void BasisQuadratures::InitWeightsFromTXT(std::string weightsFileName)
       }
       else
       {
-         if(w.size() != order)
+         if(_w.size() != _order)
             throw Exeption("Bad data!");
 
          fin.close();
       }
    }
 }
+

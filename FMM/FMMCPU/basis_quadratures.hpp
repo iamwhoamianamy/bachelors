@@ -5,16 +5,25 @@
 
 class BasisQuadratures
 {
-public:
-   std::vector<real> x;
-   std::vector<real> y;
-   std::vector<real> z;
-   std::vector<real> w;
+private:
+   int _order;
+   std::vector<real> _x;
+   std::vector<real> _y;
+   std::vector<real> _z;
+   std::vector<real> _w;
 
-   int order;
+public:
 
    BasisQuadratures();
-   void InitFromTXT(std::string coordsFileName, std::string weightsFileName);
+   void InitFromTXT(std::string coordsFileName, std::string weightsFileame);
+
+   int order() const;
+   const std::vector<real>& x() const;
+   const std::vector<real>& y() const;
+   const std::vector<real>& z() const;
+   const std::vector<real>& w() const;
+
+private:
    void InitCoordinatesFromTXT(std::string coordsFileName);
    void InitWeightsFromTXT( std::string weightsFileName);
 };
