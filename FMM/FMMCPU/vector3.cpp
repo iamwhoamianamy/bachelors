@@ -149,13 +149,13 @@ real Vector3::length() const
 Vector3 Vector3::normalized() const
 {
    Vector3 res;
-   real length = length();
+   real l = length();
 
-   if(length)
+   if(l)
    {
-      res.x = this->x / length;
-      res.y = this->y / length;
-      res.z = this->z / length;
+      res.x = this->x / l;
+      res.y = this->y / l;
+      res.z = this->z / l;
    }
 
    return res;
@@ -163,25 +163,25 @@ Vector3 Vector3::normalized() const
 
 void Vector3::normalize()
 {
-   real length = length();
+   real l = length();
 
-   if(length != 0)
+   if(l != 0)
    {
-      this->x /= length;
-      this->y /= length;
-      this->z /= length;
+      this->x /= l;
+      this->y /= l;
+      this->z /= l;
    }
 }
 
 void Vector3::limit(const real limitLength)
 {
-   real length = length();
+   real l = length();
 
-   if(length != 0 && length > limitLength)
+   if(l != 0 && l > limitLength)
    {
-      this->x = this->x / length * limitLength;
-      this->y = this->y / length * limitLength;
-      this->z = this->z / length * limitLength;
+      this->x = this->x / l * limitLength;
+      this->y = this->y / l * limitLength;
+      this->z = this->z / l * limitLength;
    }
 }
 
