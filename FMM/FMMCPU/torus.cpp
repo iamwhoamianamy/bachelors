@@ -61,7 +61,7 @@ void Torus::buildHexahedra(std::vector<Hexahedron>& hexahedra)
    auto getPointOnWidthSection = [&](Vector3 innerRadiusPoint, int n)
    {
       double onWidthStepLength = sectionWidth / onWidthStepCount;
-      return innerRadiusPoint + innerRadiusPoint.Normalized() * onWidthStepLength * n;
+      return innerRadiusPoint + innerRadiusPoint.normalized() * onWidthStepLength * n;
    };
 
    size_t hexahedronsCount = 0;

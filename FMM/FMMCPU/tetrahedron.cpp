@@ -12,7 +12,7 @@ Tetrahedron::Tetrahedron(Vector3& a, Vector3& b, Vector3& c, Vector3& d)
 
 real Tetrahedron::Volume() const
 {
-   return abs(Vector3::Dot(a() - d(), Vector3::Cross(b() - d(), c() - d()))) / 6.0;
+   return abs(Vector3::dot(a() - d(), Vector3::cross(b() - d(), c() - d()))) / 6.0;
 }
 
 Vector3& Tetrahedron::a()
