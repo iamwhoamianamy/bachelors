@@ -60,6 +60,9 @@
     <ClCompile Include="math.cpp">
       <Filter>FMMSolver\Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="spherical_harmonics.cpp">
+      <Filter>FMMSolver\Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tetrahedron.hpp">
@@ -90,6 +93,9 @@
       <Filter>FMMSolver\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="math.hpp">
+      <Filter>FMMSolver\Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="spherical_harmonics.hpp">
       <Filter>FMMSolver\Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

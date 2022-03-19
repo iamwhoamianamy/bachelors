@@ -9,6 +9,7 @@
 #include "basis_quadratures.hpp"
 #include "exeptions.hpp"
 #include "math.hpp"
+#include "spherical_harmonics.hpp"
 
 using namespace std;
 const double PI = 3.14159265359;
@@ -60,6 +61,5 @@ int main()
    //auto vec = Vector3(200, 200, 0);
    //std::vector<Vector3> vectors;
    //vectors.push_back(vec);
-
-   std::cout << math::calcFactorial(3);
+   SphericalHarmonics harmonics(6, Vector3(1, 3, 2));
 }

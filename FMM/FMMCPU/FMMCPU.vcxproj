@@ -146,6 +146,7 @@
     <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="spherical_harmonics.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="math.hpp" />
     <ClInclude Include="real.hpp" />
+    <ClInclude Include="spherical_harmonics.hpp" />
     <ClInclude Include="tetrahedron.hpp" />
     <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />
