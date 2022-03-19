@@ -20,19 +20,9 @@ int BasisQuadratures::order() const
    return _order;
 }
 
-const std::vector<real>& BasisQuadratures::x() const
+const std::vector<Vector3>& BasisQuadratures::value() const
 {
-   return _x;
-}
-
-const std::vector<real>& BasisQuadratures::y() const
-{
-   return _y;
-}
-
-const std::vector<real>& BasisQuadratures::z() const
-{
-   return _z;
+   return _values;
 }
 
 const std::vector<real>& BasisQuadratures::w() const
@@ -55,9 +45,7 @@ void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
 
       while(fin >> x_coord && fin >> y_coord && fin >> z_coord)
       {
-         _x.push_back(x_coord);
-         _y.push_back(y_coord);
-         _z.push_back(z_coord);
+         _values.push_back(Vector3(x_coord, y_coord, z_coord));
       }
 
    }
@@ -70,7 +58,7 @@ void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
       }
       else
       {
-         _order = _x.size();
+         _order = _values.size();
          fin.close();
       }
    }
