@@ -27,22 +27,22 @@ public:
    Vector3& operator *=(const real fac);
    Vector3& operator /=(const real fac);
 
-   real LengthSquared() const;
-   real Length() const;
-   Vector3 Normalized() const;
-   Vector3 Perp() const;
+   real lengthSquared() const;
+   real length() const;
+   Vector3 normalized() const;
+   Vector3 perp() const;
 
-   void Normalize();
-   void Limit(const real limitLength);
-   void SetLength(const real newLength);
-   Vector3 LeadingCos();
+   void normalize();
+   void limit(const real limitLength);
+   void setLength(const real newLength);
+   Vector3 leadingCos();
 
    real r() const;
    real t() const;
    real f() const;
 
-   static Vector3 Direction(const Vector3& from, const Vector3& to);
-   static real DistanceSquared(const Vector3& vec1, const Vector3& vec2);
-   static double Dot(const Vector3& vec1, const Vector3& vec2);
-   static Vector3 Cross(const Vector3& vec1, const Vector3& vec2);
+   static Vector3 direction(const Vector3& from, const Vector3& to);
+   static real distanceSquared(const Vector3& vec1, const Vector3& vec2);
+   static double dot(const Vector3& vec1, const Vector3& vec2);
+   static Vector3 cross(const Vector3& vec1, const Vector3& vec2);
 };

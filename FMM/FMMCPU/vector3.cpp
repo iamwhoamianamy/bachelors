@@ -132,24 +132,24 @@ Vector3& Vector3::operator /=(const real fac)
    return *this;
 }
 
-real Vector3::LengthSquared() const
+real Vector3::lengthSquared() const
 {
    return this->x * this->x +
       this->y * this->y +
       this->z * this->z;
 }
 
-real Vector3::Length() const
+real Vector3::length() const
 {
    return sqrt(this->x * this->x +
                this->y * this->y +
                this->z * this->z);
 }
 
-Vector3 Vector3::Normalized() const
+Vector3 Vector3::normalized() const
 {
    Vector3 res;
-   real length = Length();
+   real length = length();
 
    if(length)
    {
@@ -161,9 +161,9 @@ Vector3 Vector3::Normalized() const
    return res;
 }
 
-void Vector3::Normalize()
+void Vector3::normalize()
 {
-   real length = Length();
+   real length = length();
 
    if(length != 0)
    {
@@ -173,9 +173,9 @@ void Vector3::Normalize()
    }
 }
 
-void Vector3::Limit(const real limitLength)
+void Vector3::limit(const real limitLength)
 {
-   real length = Length();
+   real length = length();
 
    if(length != 0 && length > limitLength)
    {
@@ -185,45 +185,45 @@ void Vector3::Limit(const real limitLength)
    }
 }
 
-void Vector3::SetLength(const real newLength)
+void Vector3::setLength(const real newLength)
 {
-   Normalize();
+   normalize();
    this->x *= newLength;
    this->y *= newLength;
    this->z *= newLength;
 }
 
-Vector3 Vector3::Perp() const
+Vector3 Vector3::perp() const
 {
    return Vector3(-y, x);
 }
 
-Vector3 Vector3::Direction(const Vector3& from, const Vector3& to)
+Vector3 Vector3::direction(const Vector3& from, const Vector3& to)
 {
    Vector3 res = to - from;
-   return res.Normalized();
+   return res.normalized();
 }
 
-real Vector3::DistanceSquared(const Vector3& vec1, const Vector3& vec2)
+real Vector3::distanceSquared(const Vector3& vec1, const Vector3& vec2)
 {
-   return (vec1 - vec2).LengthSquared();
+   return (vec1 - vec2).lengthSquared();
 }
 
-double Vector3::Dot(const Vector3& vec1, const Vector3& vec2)
+double Vector3::dot(const Vector3& vec1, const Vector3& vec2)
 {
    return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
 }
 
-Vector3 Vector3::Cross(const Vector3& vec1, const Vector3& vec2)
+Vector3 Vector3::cross(const Vector3& vec1, const Vector3& vec2)
 {
    return Vector3(vec1.y * vec2.z - vec1.z * vec2.y,
                   vec1.z * vec2.x - vec1.x * vec2.z,
                   vec1.x * vec2.y - vec1.y * vec2.x);
 }
 
-Vector3 Vector3::LeadingCos()
+Vector3 Vector3::leadingCos()
 {
-   real l = Length();
+   real l = length();
 
    return Vector3(x / l, y / l, z / l);
 }
@@ -236,11 +236,9 @@ real Vector3::r() const
 real Vector3::t() const
 {
    return atan(sqrt(x * x + y + y) / z);
-   //return powf(tanf(y / x), -1);
 }
 
 real Vector3::f() const
 {
    return atan2(y, x);
-   //return powf(tanf(sqrtf(x * x + y * y) / z), -1);
 }
