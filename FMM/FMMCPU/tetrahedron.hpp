@@ -9,7 +9,7 @@ public:
    Tetrahedron();
    Tetrahedron(Vector3& a, Vector3& b, Vector3& c, Vector3& d);
    std::vector<Vector3> points;
-   real Volume() const;
+   real volume() const;
 
    Vector3& a();
    Vector3& b();

@@ -12,14 +12,14 @@
 #include "spherical_harmonics.hpp"
 
 using namespace std;
-const double PI = 3.14159265359;
+using namespace math;
 
 int main()
 {
-   /*const double torusRadius = 3;
-   const double torusSectionWidth = 1;
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
 
-   Torus torus(torusRadius, torusSectionWidth, 20, 2, 4);
+   Torus torus(torusRadius, torusSectionWidth, 100, 4, 4);
 
    BasisQuadratures bq;
    string bqDir = "basis_quadratures/";
@@ -27,21 +27,24 @@ int main()
    try
    {
       bq.InitFromTXT(bqDir + "keast 7 x.txt", bqDir + "keast 7 w.txt");
-      cout << "Quadratures were successfully read. Order = " << bq.order << endl;
+      cout << "Quadratures were successfully read. Order = " << bq.order() << endl;
    }
    catch(Exeption ex)
    {
       cout << ex;
+   }
+
+   real current = 5;
+   Vector3 point(2, 1, 3);
+   Vector3 H = calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
+
+   /*for(size_t i = 0; i < torus.tetrahedra.size(); i++)
+   {
+      cout << i << " " << torus.tetrahedra[i].volume() << endl;
    }*/
 
-   //Vector3 a(0, 0, 0);
-   //Vector3 b(0, 1, 0);
-   //Vector3 c(1, 0, 0);
-   //Vector3 d(0, 0, 1);
-
-   //Tetrahedron tetr(a, b, c, d);
-
-   //cout << tetr.Volume();
+   cout << endl;
+   cout << H / 1.256e-6 << endl;
 
    /*double res = 0;
 
@@ -61,5 +64,6 @@ int main()
    //auto vec = Vector3(200, 200, 0);
    //std::vector<Vector3> vectors;
    //vectors.push_back(vec);
-   SphericalHarmonics harmonics(6, Vector3(1, 3, 2));
+   
+   //SphericalHarmonics harmonics(6, Vector3(1, 3, 2));
 }

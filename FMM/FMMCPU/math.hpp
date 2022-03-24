@@ -1,9 +1,22 @@
 #pragma once
+#include <vector>
 #include "real.hpp"
+#include "vector3.hpp"
+#include "tetrahedron.hpp"
+#include "basis_quadratures.hpp"
 
 namespace math
 {
+   const real PI = 3.14159265359;
+   const real mu0 = 1.2566370614e-6;
    real calcLegendrePolynomial(real x, int n);
    real calcFactorial(int n);
+   Vector3 calcBioSavartLaplace(real current, const Vector3& point,
+                                const std::vector<Tetrahedron>& mesh,
+                                const BasisQuadratures& basisQuadratures);
+   Vector3 pointFromBasisQuadrature(const Tetrahedron& tetr,
+                                    const Vector3& quadr);
+   Vector3 bioSavartLaplaceFunction(const Vector3& point,
+                                    const Vector3& integr);
 }
 

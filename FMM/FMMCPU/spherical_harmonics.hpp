@@ -13,7 +13,7 @@ public:
    const int maxFactorialNum = 20;
    
    SphericalHarmonics(int n, const Vector3& vec);
-   real getharmonic(int l, int m);
+   real getharmonic(int l, int m) const;
 
 private:
    void calcFactorials();

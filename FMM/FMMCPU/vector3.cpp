@@ -242,3 +242,9 @@ real Vector3::f() const
 {
    return atan2(y, x);
 }
+
+std::ostream& operator<<(std::ostream& os, const Vector3& vec)
+{
+   os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+   return os;
+}

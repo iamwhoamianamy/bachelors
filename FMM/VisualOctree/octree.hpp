@@ -7,14 +7,15 @@
 class Octree
 {
 private:
-   std::vector<Octree*> _children;
-   Box _box;
    bool _isSubdivided;
    size_t _capacity;
+   Box _box;
    std::vector<Vector3*> _points;
+   std::vector<Octree*> _children;
 
 public:
    Octree(const Box& _box, const size_t capacity);
+
    void insert(Vector3& point);
    void insert(std::vector<Vector3>& points);
    void subdivide();

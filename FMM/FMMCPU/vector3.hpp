@@ -1,5 +1,6 @@
 #pragma once
 #include "real.hpp"
+#include <ostream>
 
 class Vector3
 {
@@ -46,3 +47,5 @@ public:
    static double dot(const Vector3& vec1, const Vector3& vec2);
    static Vector3 cross(const Vector3& vec1, const Vector3& vec2);
 };
+
+std::ostream& operator<<(std::ostream& os, const Vector3& vec);
