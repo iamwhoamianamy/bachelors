@@ -1,27 +1,32 @@
 #include <complex>
+#include <limits>
 #include "spherical_harmonics.hpp"
 
-SphericalHarmonics::SphericalHarmonics(int n, const Vector3& vec) :
+Factorials SphericalHarmonics::_factorials;
+
+SphericalHarmonics::SphericalHarmonics(int n, const Vector3& point) :
    _n(n)
 {
-   if(_factorials.empty())
-      calcFactorials();
-
-   calcSphericalHarmonics(vec);
+   calcSphericalHarmonics(point);
 }
 
-real SphericalHarmonics::getharmonic(int l, int m) const
+real SphericalHarmonics::getHarmonic(int l, int m) const
 {
    return _sphericalHarmonics[l][m];
 }
 
-void SphericalHarmonics::calcSphericalHarmonics(const Vector3& vec)
+const std::vector<std::vector<real>>& SphericalHarmonics::sphericalHarmonics() const
+{
+   return _sphericalHarmonics;
+}
+
+void SphericalHarmonics::calcSphericalHarmonics(const Vector3& point)
 {
    initHarmonicArrays();
-   fillWithLegendrePolynomials(vec.z);
-   fillWithLegendrePolynomialDerivatives(vec.z);
-   mirrorLegendrePolynomialDerivatives(vec.z);
-   addComplex(vec.x, vec.y);
+   fillWithLegendrePolynomials(point.z);
+   fillWithLegendrePolynomialDerivatives(point.z);
+   mirrorLegendrePolynomialDerivatives(point.z);
+   addComplex(point.x, point.y);
 }
 
 void SphericalHarmonics::initHarmonicArrays()
@@ -102,13 +107,40 @@ void SphericalHarmonics::addComplex(real x, real y)
    }
 }
 
-void SphericalHarmonics::calcFactorials()
+std::vector<std::vector<real>> SphericalHarmonics::calcSolidHarmonics(size_t n,
+                                                                      Vector3 point,
+                                                                      bool isRegular)
 {
-   _factorials.resize(maxFactorialNum);
-   _factorials[0] = 1;
+#if defined REAL_IS_DOUBLE
+   real r = point.length() + std::numeric_limits<double>::epsilon();
+#endif // !REAL_IS_DOUBLE
+#if defined REAL_IS_FLOAT
+   real r = point.length() + std::numeric_limits<float>::epsilon();
+#endif // !REAL_IS_FLOAT
 
-   for(size_t i = 1; i < maxFactorialNum; i++)
+   point /= r;
+
+   auto solidlHarmonics = SphericalHarmonics(n, point).sphericalHarmonics();
+
+   real mult = isRegular ? r : 1 / r;
+   real curr = isRegular ? 1 : mult;
+
+   for(size_t l = 0; l < n; l++)
    {
-      _factorials[i] = _factorials[i - 1] * i;
+      size_t center = solidlHarmonics[l].size() / 2;
+
+      for(size_t m = 0; m <= l; m++)
+      {
+         solidlHarmonics[l][center + m] *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
+      }
+
+      for(size_t m = 1; m <= l; m++)
+      {
+         solidlHarmonics[l][center - m] *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
+      }
+
+      curr *= -mult;
    }
+
+   return solidlHarmonics;
 }

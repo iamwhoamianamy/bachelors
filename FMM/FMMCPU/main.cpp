@@ -14,12 +14,12 @@
 using namespace std;
 using namespace math;
 
-int main()
+void runCalculations()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
 
-   Torus torus(torusRadius, torusSectionWidth, 100, 4, 4);
+   Torus torus(torusRadius, torusSectionWidth, 40, 4, 4);
 
    BasisQuadratures bq;
    string bqDir = "basis_quadratures/";
@@ -45,25 +45,15 @@ int main()
 
    cout << endl;
    cout << H / 1.256e-6 << endl;
+}
 
-   /*double res = 0;
+void runTest()
+{
+   Vector3 point(1, 2, 3);
+   auto solidHarmonics = SphericalHarmonics::calcSolidHarmonics(15, point, true);
+}
 
-   for(auto &t :torus.tetrahedra)
-   {
-      res += t.Volume();
-   }
-
-   double majorTorusRadius = PI * pow(torusRadius + torusSectionWidth / 2, 2);
-   double minorTorusRadius = PI * pow(torusRadius - torusSectionWidth / 2, 2);
-
-   double trueTorusVolume = (majorTorusRadius - minorTorusRadius) * torusSectionWidth;
-
-   cout << "True torus volume = " << trueTorusVolume << endl;
-   cout << "Generated torus volume = " << res << endl;*/
-
-   //auto vec = Vector3(200, 200, 0);
-   //std::vector<Vector3> vectors;
-   //vectors.push_back(vec);
-   
-   //SphericalHarmonics harmonics(6, Vector3(1, 3, 2));
+int main()
+{   
+   runTest();
 }

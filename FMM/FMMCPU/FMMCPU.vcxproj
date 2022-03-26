@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="basis_quadratures.cpp" />
     <ClCompile Include="exeptions.cpp" />
+    <ClCompile Include="factorials.cpp" />
     <ClCompile Include="fast_multipole_method_solver.cpp" />
     <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="math.cpp" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="basis_quadratures.hpp" />
     <ClInclude Include="exeptions.hpp" />
+    <ClInclude Include="factorials.hpp" />
     <ClInclude Include="fast_multipole_method_solver.h" />
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="math.hpp" />
