@@ -26,7 +26,8 @@ namespace math
                                          const Vector3& integr);
 
    Vector3 calcAViaMultipoleMethod(real current, const Vector3& point,
-                                   const std::vector<Tetrahedron>& mesh);
+                                   const std::vector<Tetrahedron>& mesh,
+                                   const BasisQuadratures& basisQuadratures, int n);
 
    Vector3 calcBioSavartLaplace(real current, const Vector3& point,
                                 const std::vector<Tetrahedron>& mesh,

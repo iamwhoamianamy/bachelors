@@ -17,7 +17,7 @@ public:
    void InitFromTXT(std::string coordsFileName, std::string weightsFileame);
 
    int order() const;
-   const std::vector<Vector3>& value() const;
+   const std::vector<Vector3>& values() const;
    const std::vector<real>& w() const;
 
 private:

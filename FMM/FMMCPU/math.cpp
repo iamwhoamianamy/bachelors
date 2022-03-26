@@ -1,4 +1,5 @@
 #include "math.hpp"
+#include "spherical_harmonics.hpp"
 
 namespace math
 {
@@ -30,7 +31,7 @@ namespace math
 
          for(size_t i = 0; i < basisQuadratures.order(); i++)
          {
-            Vector3 quadrature = pointFromBasisQuadrature(tetrahedron, basisQuadratures.value()[0]);
+            Vector3 quadrature = pointFromBasisQuadrature(tetrahedron, basisQuadratures.values()[i]);
             tetrahedronRes += f(point, quadrature) * basisQuadratures.w()[i];
          }
 
@@ -49,7 +50,9 @@ namespace math
          (tetr.d() - tetr.a()) * quadr.z;
    }
 
-   Vector3 calcAViaSimpleIntegration(real current, const Vector3& point, const std::vector<Tetrahedron>& mesh, const BasisQuadratures& basisQuadratures)
+   Vector3 calcAViaSimpleIntegration(real current, const Vector3& point, 
+                                     const std::vector<Tetrahedron>& mesh, 
+                                     const BasisQuadratures& basisQuadratures)
    {
       return calcVectorFunctionIntegral(simpleIntegrationFunctionForA,
                                         point, mesh, basisQuadratures) / (4 * PI) * current;
@@ -57,16 +60,56 @@ namespace math
 
    Vector3 simpleIntegrationFunctionForA(const Vector3& point, const Vector3& integr)
    {
-      return 1 / (point - integr).length();
+      return integr.perp().normalized() / (point - integr).length();
    }
 
-   Vector3 calcAViaMultipoleMethod(real current, const Vector3& point, const std::vector<Tetrahedron>& mesh)
+   Vector3 calcAViaMultipoleMethod(real current, const Vector3& point,
+                                   const std::vector<Tetrahedron>& mesh,
+                                   const BasisQuadratures& basisQuadratures, int n)
    {
+      auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
+      std::vector<std::vector<Vector3>> integrals(n);
+
+      for(size_t l = 0; l < n; l++)
+      {
+         integrals[l] = std::vector<Vector3>(irregularHarmonics[l].size());
+      }
+
+      for(auto& tetrahedron : mesh)
+      {
+         real volume = tetrahedron.volume();
+
+         for(size_t i = 0; i < basisQuadratures.order(); i++)
+         {
+            Vector3 quadrature = pointFromBasisQuadrature(tetrahedron,
+                                                          basisQuadratures.values()[i]);
+            auto regularHarmonics = Harmonics::calcSolidHarmonics(n, quadrature, true);
+
+            for(int l = 0; l < n; l++)
+            {
+               for(int m = -l; m <= l; m++)
+               {
+                  integrals[l][integrals[l].size() / 2 + m] += 
+                     quadrature.perp().normalized() *
+                     Harmonics::getHarmonic(l, m, regularHarmonics) * volume * 
+                     basisQuadratures.w()[i];
+               }
+            }
+         }
+      }
+
       Vector3 res;
 
+      for(int l = 0; l < n; l++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            res += integrals[l][integrals[l].size() / 2 + m] * 
+               Harmonics::getHarmonic(l, m, irregularHarmonics);
+         }
+      }
 
-
-      return res;
+      return res / (4.0 * PI) * current;
    }
 
    Vector3 calcBioSavartLaplace(real current, const Vector3& point,

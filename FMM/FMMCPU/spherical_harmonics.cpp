@@ -2,25 +2,20 @@
 #include <limits>
 #include "spherical_harmonics.hpp"
 
-Factorials SphericalHarmonics::_factorials;
+Factorials Harmonics::_factorials;
 
-SphericalHarmonics::SphericalHarmonics(int n, const Vector3& point) :
+Harmonics::Harmonics(int n, const Vector3& point) :
    _n(n)
 {
    calcSphericalHarmonics(point);
 }
 
-real SphericalHarmonics::getHarmonic(int l, int m) const
-{
-   return _sphericalHarmonics[l][m];
-}
-
-const std::vector<std::vector<real>>& SphericalHarmonics::sphericalHarmonics() const
+const std::vector<std::vector<real>>& Harmonics::sphericalHarmonics() const
 {
    return _sphericalHarmonics;
 }
 
-void SphericalHarmonics::calcSphericalHarmonics(const Vector3& point)
+void Harmonics::calcSphericalHarmonics(const Vector3& point)
 {
    initHarmonicArrays();
    fillWithLegendrePolynomials(point.z);
@@ -29,7 +24,7 @@ void SphericalHarmonics::calcSphericalHarmonics(const Vector3& point)
    addComplex(point.x, point.y);
 }
 
-void SphericalHarmonics::initHarmonicArrays()
+void Harmonics::initHarmonicArrays()
 {
    _sphericalHarmonics = std::vector<std::vector<real>>(_n);
 
@@ -39,7 +34,7 @@ void SphericalHarmonics::initHarmonicArrays()
    }
 }
 
-void SphericalHarmonics::fillWithLegendrePolynomials(real z)
+void Harmonics::fillWithLegendrePolynomials(real z)
 {
    _sphericalHarmonics[0][0] = 1;
    _sphericalHarmonics[1][1] = z;
@@ -50,7 +45,7 @@ void SphericalHarmonics::fillWithLegendrePolynomials(real z)
    }
 }
 
-void SphericalHarmonics::fillWithLegendrePolynomialDerivatives(real z)
+void Harmonics::fillWithLegendrePolynomialDerivatives(real z)
 {
    _sphericalHarmonics[0][0] = 1;
    _sphericalHarmonics[1][0] = 1;
@@ -71,7 +66,7 @@ void SphericalHarmonics::fillWithLegendrePolynomialDerivatives(real z)
    }
 }
 
-void SphericalHarmonics::mirrorLegendrePolynomialDerivatives(real z)
+void Harmonics::mirrorLegendrePolynomialDerivatives(real z)
 {
    for(size_t l = 2; l < _n; l++)
    {
@@ -82,13 +77,13 @@ void SphericalHarmonics::mirrorLegendrePolynomialDerivatives(real z)
    }
 }
 
-real SphericalHarmonics::calcLegendrePolynomial(int i, real z)
+real Harmonics::calcLegendrePolynomial(int i, real z)
 {
    return ((2 * i - 1) * z * _sphericalHarmonics[i - 1][i - 1] -
            (i - 1) * _sphericalHarmonics[i - 2][i - 2]) / (i);
 }
 
-void SphericalHarmonics::addComplex(real x, real y)
+void Harmonics::addComplex(real x, real y)
 {
    std::complex<real> ephi1m(sqrt(2.0));
    std::complex<real> mult(x, y);
@@ -107,7 +102,7 @@ void SphericalHarmonics::addComplex(real x, real y)
    }
 }
 
-std::vector<std::vector<real>> SphericalHarmonics::calcSolidHarmonics(size_t n,
+std::vector<std::vector<real>> Harmonics::calcSolidHarmonics(size_t n,
                                                                       Vector3 point,
                                                                       bool isRegular)
 {
@@ -120,7 +115,7 @@ std::vector<std::vector<real>> SphericalHarmonics::calcSolidHarmonics(size_t n,
 
    point /= r;
 
-   auto solidlHarmonics = SphericalHarmonics(n, point).sphericalHarmonics();
+   auto solidlHarmonics = Harmonics(n, point).sphericalHarmonics();
 
    real mult = isRegular ? r : 1 / r;
    real curr = isRegular ? 1 : mult;
@@ -143,4 +138,9 @@ std::vector<std::vector<real>> SphericalHarmonics::calcSolidHarmonics(size_t n,
    }
 
    return solidlHarmonics;
+}
+
+real Harmonics::getHarmonic(int l, int m, const std::vector<std::vector<real>>& harmonics)
+{
+   return harmonics[l][harmonics[l].size() / 2 + m];
 }

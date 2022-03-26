@@ -20,7 +20,7 @@ int BasisQuadratures::order() const
    return _order;
 }
 
-const std::vector<Vector3>& BasisQuadratures::value() const
+const std::vector<Vector3>& BasisQuadratures::values() const
 {
    return _values;
 }

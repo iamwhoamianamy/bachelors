@@ -19,7 +19,7 @@ void runCalculations()
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
 
-   Torus torus(torusRadius, torusSectionWidth, 40, 4, 4);
+   Torus torus(torusRadius, torusSectionWidth, 40, 8, 8);
 
    BasisQuadratures bq;
    string bqDir = "basis_quadratures/";
@@ -34,26 +34,37 @@ void runCalculations()
       cout << ex;
    }
 
+   int n = 10;
    real current = 5;
    Vector3 point(2, 1, 3);
-   Vector3 H = calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
+   Vector3 integrRes = calcAViaSimpleIntegration(current, point, torus.tetrahedra, bq);
+   Vector3 multRes = calcAViaMultipoleMethod(current, point, torus.tetrahedra, bq, n);
 
-   /*for(size_t i = 0; i < torus.tetrahedra.size(); i++)
+   cout << "Simple integration: " << integrRes << endl;
+   cout << "Multipole method:   " << multRes<< endl;
+
+   if(integrRes.length() < multRes.length())
    {
-      cout << i << " " << torus.tetrahedra[i].volume() << endl;
-   }*/
+      cout << multRes.x / integrRes.x << " " << multRes.y / integrRes.y << endl;
+   }
+   else
+   {
+      cout << integrRes.x / multRes.x << " " << integrRes.y / multRes.y << endl;
+   }
 
+   Vector3 H = calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
    cout << endl;
    cout << H / 1.256e-6 << endl;
 }
 
 void runTest()
 {
+   real current = 5;
    Vector3 point(1, 2, 3);
-   auto solidHarmonics = SphericalHarmonics::calcSolidHarmonics(15, point, true);
+   auto solidHarmonics = Harmonics::calcSolidHarmonics(15, point, false);
 }
 
 int main()
 {   
-   runTest();
+   runCalculations();
 }
