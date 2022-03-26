@@ -43,15 +43,6 @@ void runCalculations()
    cout << "Simple integration: " << integrRes << endl;
    cout << "Multipole method:   " << multRes<< endl;
 
-   if(integrRes.length() < multRes.length())
-   {
-      cout << multRes.x / integrRes.x << " " << multRes.y / integrRes.y << endl;
-   }
-   else
-   {
-      cout << integrRes.x / multRes.x << " " << integrRes.y / multRes.y << endl;
-   }
-
    Vector3 H = calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
    cout << endl;
    cout << H / 1.256e-6 << endl;

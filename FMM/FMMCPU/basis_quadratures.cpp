@@ -20,14 +20,14 @@ int BasisQuadratures::order() const
    return _order;
 }
 
-const std::vector<Vector3>& BasisQuadratures::values() const
+const Vector3& BasisQuadratures::values(size_t i) const
 {
-   return _values;
+   return _values[i];
 }
 
-const std::vector<real>& BasisQuadratures::w() const
+const real BasisQuadratures::w(size_t i) const
 {
-   return _w;
+   return _w[i];
 }
 
 void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)

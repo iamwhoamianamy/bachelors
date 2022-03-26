@@ -31,8 +31,8 @@ namespace math
 
          for(size_t i = 0; i < basisQuadratures.order(); i++)
          {
-            Vector3 quadrature = pointFromBasisQuadrature(tetrahedron, basisQuadratures.values()[i]);
-            tetrahedronRes += f(point, quadrature) * basisQuadratures.w()[i];
+            Vector3 quadrature = pointFromBasisQuadrature(tetrahedron, basisQuadratures.values(i));
+            tetrahedronRes += f(point, quadrature) * basisQuadratures.w(i);
          }
 
          res += tetrahedronRes * tetrahedron.volume();
@@ -82,7 +82,7 @@ namespace math
          for(size_t i = 0; i < basisQuadratures.order(); i++)
          {
             Vector3 quadrature = pointFromBasisQuadrature(tetrahedron,
-                                                          basisQuadratures.values()[i]);
+                                                          basisQuadratures.values(i));
             auto regularHarmonics = Harmonics::calcSolidHarmonics(n, quadrature, true);
 
             for(int l = 0; l < n; l++)
@@ -92,7 +92,7 @@ namespace math
                   integrals[l][integrals[l].size() / 2 + m] += 
                      quadrature.perp().normalized() *
                      Harmonics::getHarmonic(l, m, regularHarmonics) * volume * 
-                     basisQuadratures.w()[i];
+                     basisQuadratures.w(i);
                }
             }
          }
