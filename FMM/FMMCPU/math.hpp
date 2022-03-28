@@ -5,6 +5,7 @@
 #include "tetrahedron.hpp"
 #include "basis_quadratures.hpp"
 #include "quadrature.hpp"
+#include "harmonic_series.hpp"
 
 namespace math
 {
@@ -35,8 +36,19 @@ namespace math
                                 const BasisQuadratures& basisQuadratures);
    Vector3 bioSavartLaplaceFunction(const Vector3& point,
                                     const Vector3& integr);
+   
+   HarmonicSeries<Vector3> calcIntegralContribution(
+      std::vector<Quadrature>& quadratures,
+      int n, const Vector3& center = Vector3());
 
-   std::vector<Quadrature> tetrahedraToQuadratures(const std::vector<Tetrahedron>& mesh,
-                                                   const BasisQuadratures& basisQuadratures);
+   HarmonicSeries<Vector3> calcIntegralContribution(
+      const std::vector<Quadrature*>& quadratures,
+      int n, const Vector3& center = Vector3());
+
+   real calcAlm(int l, int m);
+
+   std::vector<Quadrature> tetrahedraToQuadratures(
+      const std::vector<Tetrahedron>& mesh,
+      const BasisQuadratures& basisQuadratures);
 }
 

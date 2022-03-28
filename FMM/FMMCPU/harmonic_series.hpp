@@ -8,11 +8,13 @@ struct HarmonicSeries
    HarmonicSeries();
    HarmonicSeries(int n);
    T& getHarmonic(int l, int m);
+   const T& getHarmonic(int l, int m) const;
    std::vector<T>& operator[](int i);
    HarmonicSeries<T>(HarmonicSeries<T>&& harmonicSeries) noexcept;
    HarmonicSeries<T>(const HarmonicSeries<T>& harmonicSeries) noexcept;
    HarmonicSeries<T>& operator=(HarmonicSeries<T>&& harmonicSeries) noexcept;
    HarmonicSeries<T>& operator=(const HarmonicSeries<T>& harmonicSeries);
+   void add(const HarmonicSeries<T>& harmonicSeries);
 };
 
 template<class T>
@@ -38,6 +40,12 @@ inline T& HarmonicSeries<T>::getHarmonic(int l, int m)
 }
 
 template<class T>
+inline const T& HarmonicSeries<T>::getHarmonic(int l, int m) const
+{
+   return data[l][data[l].size() / 2 + m];
+}
+
+template<class T>
 inline std::vector<T>& HarmonicSeries<T>::operator[](int i)
 {
    return data[i];
@@ -55,6 +63,18 @@ inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(const HarmonicSeries<T>& 
 {
    data = harmonicSeries.data;
    return *this;
+}
+
+template<class T>
+inline void HarmonicSeries<T>::add(const HarmonicSeries<T>& harmonicSeries)
+{
+   for(int l = 0; l < data.size(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         getHarmonic(l, m) += harmonicSeries.getHarmonic(l, m);
+      }
+   }
 }
 
 template<class T>

@@ -1,6 +1,10 @@
 #include <math.h>
 #include "box.hpp"
 
+Box::Box()
+{
+}
+
 Box::Box(const Vector3& center, const Vector3& halfDimensions):
    center(center), halfDimensions(halfDimensions)
 {
@@ -22,6 +26,12 @@ bool Box::contains(const Vector3& point) const
 bool Box::intersects(const Box& _box) const
 {
    return Box(_box.center, halfDimensions + _box.halfDimensions).contains(center);
+}
+
+real Box::radius() const
+{
+    return sqrt(halfDimensions.x * halfDimensions.x + 
+                halfDimensions.y * halfDimensions.y);
 }
 
 //

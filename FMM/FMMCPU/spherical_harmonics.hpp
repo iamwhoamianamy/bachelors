@@ -15,12 +15,22 @@ public:
    Harmonics(int n, const Vector3& point);
 
    const HarmonicSeries<real>& sphericalHarmonics() const;
+
+   static HarmonicSeries<real> calcRegularSolidHarmonics(size_t n,
+                                                         Vector3 point);
+   static HarmonicSeries<real> calcIrregularSolidHarmonics(size_t n,
+                                                           Vector3 point);
    static HarmonicSeries<real> calcSolidHarmonics(size_t n,
                                                   Vector3 point,
                                                   bool isRegular);
    template <class T>
    static T getHarmonic(int l, int m, const std::vector<std::vector<T>>& harmonics);
-   
+
+   static real getFactorial(size_t n)
+   {
+      return _factorials[n];
+   }
+
 private:
    void calcSphericalHarmonics(const Vector3& point);
    void fillWithLegendrePolynomials(real z);

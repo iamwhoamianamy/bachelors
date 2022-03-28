@@ -39,9 +39,6 @@
     <ClCompile Include="hexahedron.cpp">
       <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="fast_multipole_method_solver.cpp">
-      <Filter>Geometry\Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="basis_quadratures.cpp">
       <Filter>FMMSolver</Filter>
     </ClCompile>
@@ -69,6 +66,9 @@
     <ClCompile Include="quadrature.cpp">
       <Filter>FMMSolver</Filter>
     </ClCompile>
+    <ClCompile Include="multipole_solver.cpp">
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tetrahedron.hpp">
@@ -84,9 +84,6 @@
       <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="hexahedron.hpp">
-      <Filter>Geometry\Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="fast_multipole_method_solver.h">
       <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="basis_quadratures.hpp">
@@ -117,6 +114,9 @@
       <Filter>FMMSolver</Filter>
     </ClInclude>
     <ClInclude Include="quadrature.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="multipole_solver.hpp">
       <Filter>FMMSolver</Filter>
     </ClInclude>
   </ItemGroup>

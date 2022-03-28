@@ -1,12 +1,18 @@
 #include "octree.hpp"
+#include "math.hpp"
+#include "spherical_harmonics.hpp"
 
-Octree::Octree(const Box& _box, const size_t capacity) :
-   _box(_box), _capacity(capacity), _isSubdivided(false)
+Octree::Octree()
+{
+}
+
+Octree::Octree(const Box& box, const size_t capacity) :
+   _box(box), _capacity(capacity), _isSubdivided(false)
 {
 
 }
 
-void Octree::insert(std::vector<Vector3>& points)
+void Octree::insert(std::vector<Quadrature>& points)
 {
    for(auto& point : points)
    {
@@ -14,18 +20,18 @@ void Octree::insert(std::vector<Vector3>& points)
    }
 }
 
-void Octree::insert(Vector3& point)
+void Octree::insert(Quadrature& point)
 {
-   if(!_box.contains(point))
+   if(!_box.contains(point.coordinates))
    {
       return;
    }
 
-   if(_points.size() < _capacity)
+   if(_quadratures.size() < _capacity)
    {
       if(!_isSubdivided)
       {
-         _points.push_back(&point);
+         _quadratures.push_back(&point);
       }
       else
       {
@@ -40,9 +46,9 @@ void Octree::insert(Vector3& point)
       subdivide();
       _isSubdivided = true;
 
-      _points.push_back(&point);
+      _quadratures.push_back(&point);
 
-      for(auto p : _points)
+      for(auto p : _quadratures)
       {
          for(auto& child : _children)
          {
@@ -50,7 +56,7 @@ void Octree::insert(Vector3& point)
          }
       }
 
-      _points.clear();
+      _quadratures.clear();
    }
 }
 
@@ -79,7 +85,7 @@ void Octree::subdivide()
    _children.emplace_back(new Octree(Box({ x - w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity));
 }
 
-void Octree::quarry(const Box& range, std::vector<Vector3*>& found)
+void Octree::quarry(const Box& range, std::vector<Quadrature*>& found)
 {
    if(!this->_box.intersects(range))
    {
@@ -87,9 +93,9 @@ void Octree::quarry(const Box& range, std::vector<Vector3*>& found)
    }
    else
    {
-      for(auto point : _points)
+      for(auto point : _quadratures)
       {
-         if(range.contains(*point))
+         if(range.contains(point->coordinates))
          {
             found.push_back(point);
          }
@@ -105,6 +111,65 @@ void Octree::quarry(const Box& range, std::vector<Vector3*>& found)
    }
 }
 
+std::vector<Quadrature*> Octree::getAllQuadratures() const
+{
+   std::vector<Quadrature*> result;
+   result.insert(result.end(), _quadratures.begin(), _quadratures.end());
+
+   if(_isSubdivided)
+   {
+      for(auto child : _children)
+      {
+         auto childQudratures = child->getAllQuadratures();
+         result.insert(result.end(), childQudratures.begin(), childQudratures.end());
+      }
+   }
+
+   return result;
+}
+
+void Octree::calcLocalMultipolesWithoutTranslation(int n)
+{
+   _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center);
+
+   if(_isSubdivided)
+   {
+      for(auto& child : _children)
+      {
+         child->calcLocalMultipolesWithoutTranslation(n);
+      }
+   }
+}
+
+Vector3 Octree::calcA(const Vector3& point) const
+{
+   int n = _multipoleExpansion.data.size();
+
+   Vector3 res;
+
+   if(2 * _box.radius() < (point - _box.center).length())
+   {
+      auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center);
+
+      for(int l = 0; l < n; l++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            res += _multipoleExpansion.getHarmonic(l, m) * irregularHarmonic.getHarmonic(l, m);
+         }
+      }
+   }
+   else
+   {
+      for(auto child : _children)
+      {
+         res += child->calcA(point);
+      }
+   }
+
+   return res;
+}
+
 const Box& Octree::box() const
 {
    return this->_box;
@@ -118,6 +183,11 @@ const bool Octree::isSubdivided() const
 const std::vector<Octree*> Octree::children() const
 {
    return _children;
+}
+
+const HarmonicSeries<Vector3>& Octree::multipoleExpansion() const
+{
+   return _multipoleExpansion;
 }
 
 Octree::~Octree()

@@ -15,6 +15,16 @@ const HarmonicSeries<real>& Harmonics::sphericalHarmonics() const
    return _sphericalHarmonics;
 }
 
+HarmonicSeries<real> Harmonics::calcRegularSolidHarmonics(size_t n, Vector3 point)
+{
+   return calcSolidHarmonics(n, point, true);
+}
+
+HarmonicSeries<real> Harmonics::calcIrregularSolidHarmonics(size_t n, Vector3 point)
+{
+   return calcSolidHarmonics(n, point, false);
+}
+
 void Harmonics::calcSphericalHarmonics(const Vector3& point)
 {
    _sphericalHarmonics = HarmonicSeries<real>(_n);
@@ -130,3 +140,4 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
 
    return solidlHarmonics;
 }
+

@@ -144,10 +144,10 @@
     <ClCompile Include="box.cpp" />
     <ClCompile Include="exeptions.cpp" />
     <ClCompile Include="factorials.cpp" />
-    <ClCompile Include="fast_multipole_method_solver.cpp" />
     <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="multipole_solver.cpp" />
     <ClCompile Include="octree.cpp" />
     <ClCompile Include="quadrature.cpp" />
     <ClCompile Include="spherical_harmonics.cpp" />
@@ -161,10 +161,10 @@
     <ClInclude Include="box.hpp" />
     <ClInclude Include="exeptions.hpp" />
     <ClInclude Include="factorials.hpp" />
-    <ClInclude Include="fast_multipole_method_solver.h" />
     <ClInclude Include="harmonic_series.hpp" />
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="math.hpp" />
+    <ClInclude Include="multipole_solver.hpp" />
     <ClInclude Include="octree.hpp" />
     <ClInclude Include="quadrature.hpp" />
     <ClInclude Include="real.hpp" />

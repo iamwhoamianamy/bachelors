@@ -3,27 +3,37 @@
 
 #include "vector3.hpp"
 #include "box.hpp"
+#include "quadrature.hpp"
+#include "harmonic_series.hpp"
 
 class Octree
 {
 private:
-   bool _isSubdivided;
-   size_t _capacity;
+   bool _isSubdivided = false;
+   size_t _capacity = 0;
    Box _box;
-   std::vector<Vector3*> _points;
+   std::vector<Quadrature*> _quadratures;
    std::vector<Octree*> _children;
+   HarmonicSeries<Vector3> _multipoleExpansion;
 
 public:
-   Octree(const Box& _box, const size_t capacity);
 
-   void insert(Vector3& point);
-   void insert(std::vector<Vector3>& points);
+   Octree();
+   Octree(const Box& box, const size_t capacity);
+
+   void insert(Quadrature& point);
+   void insert(std::vector<Quadrature>& points);
    void subdivide();
-   void quarry(const Box& box, std::vector<Vector3*>& found);
+   void quarry(const Box& box, std::vector<Quadrature*>& found);
 
    const Box& box() const;
    const bool isSubdivided() const;
    const std::vector<Octree*> children() const;
+   const HarmonicSeries<Vector3>& multipoleExpansion() const;
+
+   std::vector<Quadrature*> getAllQuadratures() const;
+   void calcLocalMultipolesWithoutTranslation(int n);
+   Vector3 calcA(const Vector3& point) const;
 
    ~Octree();
 };
