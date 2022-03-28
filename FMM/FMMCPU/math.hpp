@@ -4,6 +4,7 @@
 #include "vector3.hpp"
 #include "tetrahedron.hpp"
 #include "basis_quadratures.hpp"
+#include "quadrature.hpp"
 
 namespace math
 {
@@ -34,5 +35,8 @@ namespace math
                                 const BasisQuadratures& basisQuadratures);
    Vector3 bioSavartLaplaceFunction(const Vector3& point,
                                     const Vector3& integr);
+
+   std::vector<Quadrature> tetrahedraToQuadratures(const std::vector<Tetrahedron>& mesh,
+                                                   const BasisQuadratures& basisQuadratures);
 }
 

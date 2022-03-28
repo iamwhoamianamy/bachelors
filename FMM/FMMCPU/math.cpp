@@ -67,7 +67,7 @@ namespace math
                                    const std::vector<Tetrahedron>& mesh,
                                    const BasisQuadratures& basisQuadratures, int n)
    {
-      auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
+      /*auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
       std::vector<std::vector<Vector3>> integrals(n);
 
       for(size_t l = 0; l < n; l++)
@@ -91,7 +91,7 @@ namespace math
                {
                   integrals[l][integrals[l].size() / 2 + m] += 
                      quadrature.perp().normalized() *
-                     Harmonics::getHarmonic(l, m, regularHarmonics) * volume * 
+                     regularHarmonics.getHarmonic(l, m) * volume *
                      basisQuadratures.w(i);
                }
             }
@@ -105,7 +105,39 @@ namespace math
          for(int m = -l; m <= l; m++)
          {
             res += integrals[l][integrals[l].size() / 2 + m] * 
-               Harmonics::getHarmonic(l, m, irregularHarmonics);
+               irregularHarmonics.getHarmonic(l, m);
+         }
+      }
+
+      return res / (4.0 * PI) * current;*/
+
+      auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
+      HarmonicSeries<Vector3> integrals(n);
+      auto quadratures = tetrahedraToQuadratures(mesh, basisQuadratures);
+
+      for(auto& quadrature : quadratures)
+      {
+         auto regularHarmonics = Harmonics::calcSolidHarmonics(n, quadrature.coordinates, true);
+
+         for(int l = 0; l < n; l++)
+         {
+            for(int m = -l; m <= l; m++)
+            {
+               integrals.getHarmonic(l, m) +=
+                  quadrature.coordinates.perp().normalized() *
+                  regularHarmonics.getHarmonic(l, m) * quadrature.weight;
+            }
+         }
+      }
+
+      Vector3 res;
+
+      for(int l = 0; l < n; l++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            res += integrals[l][integrals[l].size() / 2 + m] *
+               irregularHarmonics.getHarmonic(l, m);
          }
       }
 
@@ -125,6 +157,27 @@ namespace math
    {
       Vector3 diff = point - integr;
       return Vector3::cross(integr.perp().normalized(), (diff)) / pow(diff.length(), 3);
+   }
+
+   std::vector<Quadrature> tetrahedraToQuadratures(const std::vector<Tetrahedron>& mesh,
+                                                   const BasisQuadratures& basisQuadratures)
+   {
+      auto res = std::vector<Quadrature>(mesh.size() * basisQuadratures.order());
+      
+      for(size_t t = 0; t < mesh.size(); t++)
+      {
+         real volume = mesh[t].volume();
+
+         for(size_t i = 0; i < basisQuadratures.order(); i++)
+         {
+            Vector3 quadrature = pointFromBasisQuadrature(mesh[t],
+                                                          basisQuadratures.values(i));
+            res[t * basisQuadratures.order() + i] = Quadrature(quadrature, volume, 
+                                                               basisQuadratures.w(i));
+         }
+      }
+
+      return res;
    }
 }
 

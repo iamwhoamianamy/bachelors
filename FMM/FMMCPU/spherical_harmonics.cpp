@@ -10,29 +10,20 @@ Harmonics::Harmonics(int n, const Vector3& point) :
    calcSphericalHarmonics(point);
 }
 
-const std::vector<std::vector<real>>& Harmonics::sphericalHarmonics() const
+const HarmonicSeries<real>& Harmonics::sphericalHarmonics() const
 {
    return _sphericalHarmonics;
 }
 
 void Harmonics::calcSphericalHarmonics(const Vector3& point)
 {
-   initHarmonicArrays();
+   _sphericalHarmonics = HarmonicSeries<real>(_n);
    fillWithLegendrePolynomials(point.z);
    fillWithLegendrePolynomialDerivatives(point.z);
    mirrorLegendrePolynomialDerivatives(point.z);
    addComplex(point.x, point.y);
 }
 
-void Harmonics::initHarmonicArrays()
-{
-   _sphericalHarmonics = std::vector<std::vector<real>>(_n);
-
-   for(size_t i = 0; i < _n; i++)
-   {
-      _sphericalHarmonics[i] = std::vector<real>(2 * i + 1);
-   }
-}
 
 void Harmonics::fillWithLegendrePolynomials(real z)
 {
@@ -102,9 +93,9 @@ void Harmonics::addComplex(real x, real y)
    }
 }
 
-std::vector<std::vector<real>> Harmonics::calcSolidHarmonics(size_t n,
-                                                                      Vector3 point,
-                                                                      bool isRegular)
+HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
+                                                   Vector3 point,
+                                                   bool isRegular)
 {
 #if defined REAL_IS_DOUBLE
    real r = point.length() + std::numeric_limits<double>::epsilon();
@@ -138,9 +129,4 @@ std::vector<std::vector<real>> Harmonics::calcSolidHarmonics(size_t n,
    }
 
    return solidlHarmonics;
-}
-
-real Harmonics::getHarmonic(int l, int m, const std::vector<std::vector<real>>& harmonics)
-{
-   return harmonics[l][harmonics[l].size() / 2 + m];
 }

@@ -19,7 +19,7 @@ void runCalculations()
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
 
-   Torus torus(torusRadius, torusSectionWidth, 40, 8, 8);
+   Torus torus(torusRadius, torusSectionWidth, 40, 4, 4);
 
    BasisQuadratures bq;
    string bqDir = "basis_quadratures/";

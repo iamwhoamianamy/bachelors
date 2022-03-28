@@ -22,12 +22,6 @@
     <Filter Include="FMMSolver">
       <UniqueIdentifier>{f705a509-8433-4739-b1fe-c38368bbb8dd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FMMSolver\Исходные файлы">
-      <UniqueIdentifier>{e60e7060-83ad-49d7-8a93-9608b8b1e26e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FMMSolver\Файлы заголовков">
-      <UniqueIdentifier>{5286a02f-5aa9-42c7-9470-8951975e3dea}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vector3.cpp">
@@ -49,22 +43,31 @@
       <Filter>Geometry\Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="basis_quadratures.cpp">
-      <Filter>FMMSolver\Исходные файлы</Filter>
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="box.cpp">
+      <Filter>FMMSolver</Filter>
     </ClCompile>
     <ClCompile Include="exeptions.cpp">
-      <Filter>FMMSolver\Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="tetrahedron_transformer.cpp">
-      <Filter>FMMSolver\Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="math.cpp">
-      <Filter>FMMSolver\Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="spherical_harmonics.cpp">
-      <Filter>FMMSolver\Исходные файлы</Filter>
+      <Filter>FMMSolver</Filter>
     </ClCompile>
     <ClCompile Include="factorials.cpp">
-      <Filter>FMMSolver\Исходные файлы</Filter>
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="octree.cpp">
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="spherical_harmonics.cpp">
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="tetrahedron_transformer.cpp">
+      <Filter>FMMSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="quadrature.cpp">
+      <Filter>FMMSolver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,22 +90,34 @@
       <Filter>Geometry\Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="basis_quadratures.hpp">
-      <Filter>FMMSolver\Файлы заголовков</Filter>
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="box.hpp">
+      <Filter>FMMSolver</Filter>
     </ClInclude>
     <ClInclude Include="exeptions.hpp">
-      <Filter>FMMSolver\Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="tetrahedron_transformer.hpp">
-      <Filter>FMMSolver\Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="math.hpp">
-      <Filter>FMMSolver\Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="spherical_harmonics.hpp">
-      <Filter>FMMSolver\Файлы заголовков</Filter>
+      <Filter>FMMSolver</Filter>
     </ClInclude>
     <ClInclude Include="factorials.hpp">
-      <Filter>FMMSolver\Файлы заголовков</Filter>
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="harmonic_series.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="math.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="octree.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="spherical_harmonics.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="tetrahedron_transformer.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="quadrature.hpp">
+      <Filter>FMMSolver</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

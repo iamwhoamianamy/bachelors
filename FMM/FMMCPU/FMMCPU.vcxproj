@@ -141,12 +141,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="basis_quadratures.cpp" />
+    <ClCompile Include="box.cpp" />
     <ClCompile Include="exeptions.cpp" />
     <ClCompile Include="factorials.cpp" />
     <ClCompile Include="fast_multipole_method_solver.cpp" />
     <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="octree.cpp" />
+    <ClCompile Include="quadrature.cpp" />
     <ClCompile Include="spherical_harmonics.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="tetrahedron_transformer.cpp" />
@@ -155,11 +158,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="basis_quadratures.hpp" />
+    <ClInclude Include="box.hpp" />
     <ClInclude Include="exeptions.hpp" />
     <ClInclude Include="factorials.hpp" />
     <ClInclude Include="fast_multipole_method_solver.h" />
+    <ClInclude Include="harmonic_series.hpp" />
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="math.hpp" />
+    <ClInclude Include="octree.hpp" />
+    <ClInclude Include="quadrature.hpp" />
     <ClInclude Include="real.hpp" />
     <ClInclude Include="spherical_harmonics.hpp" />
     <ClInclude Include="tetrahedron.hpp" />
