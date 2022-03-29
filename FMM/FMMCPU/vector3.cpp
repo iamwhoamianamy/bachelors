@@ -1,5 +1,6 @@
-#include "vector3.hpp"
 #include <exception>
+#include <iomanip>
+#include "vector3.hpp"
 
 Vector3::Vector3(const Vector3& vector)
 {
@@ -234,6 +235,14 @@ Vector3 Vector3::yAxis()
 Vector3 Vector3::zAxis()
 {
    return Vector3(0, 0, 1);
+}
+
+void Vector3::printWithWidth(std::ostream& os, size_t width)
+{
+   os << "(";
+   os << std::setw(width) << x << ", ";
+   os << std::setw(width) << y << ", ";
+   os << std::setw(width) << z << ")";
 }
 
 Vector3 Vector3::leadingCos()

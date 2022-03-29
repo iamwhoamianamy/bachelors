@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 #include "vector3.hpp"
 #include "tetrahedron.hpp"
@@ -15,12 +16,34 @@
 using namespace std;
 using namespace math;
 
+vector<pair<Vector3, Vector3>> readTelmaResults(const string& filename)
+{
+   vector<pair<Vector3, Vector3>> res;
+   ifstream fin(filename);
+   size_t pointsCount;
+   string _;
+   fin >> _ >> _ >> _;
+   fin >> pointsCount;
+   res.resize(pointsCount);
+
+   for(size_t i = 0; i < pointsCount; i++)
+   {
+      real px, py, pz, hx, hy, hz;
+      
+      fin >> _ >> px >> py >> pz >> hx >> hy >> hz;
+
+      res[i] = pair<Vector3, Vector3>(Vector3(px, py, pz), Vector3(hx, hy, hz));
+   }
+
+   return res;
+}
+
 void runCalculations()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
 
-   Torus torus(torusRadius, torusSectionWidth, 20, 4, 4);
+   Torus torus(torusRadius, torusSectionWidth, 40, 4, 4);
 
    BasisQuadratures bq;
    string bqDir = "basis_quadratures/";
@@ -35,34 +58,37 @@ void runCalculations()
       cout << ex;
    }
 
-   int n = 10;
+   auto telmaResults = readTelmaResults("results/telma_results.txt");
    real current = 5;
-   Vector3 point(2, 1, 3);
-
    MultipoleSolver multipoleSolver(torus.tetrahedra, bq);
+   multipoleSolver.calcLocalMultipolesWithoutTranslation();
+   real sumErrorForIntegrals = 0;
+   real sumErrorForMultipoles = 0;
+   size_t n = telmaResults.size();
 
-   Vector3 aIntegrRes = calcAViaSimpleIntegration(current, point, torus.tetrahedra, bq);
-   Vector3 aMultRes = multipoleSolver.calcAWithoutMultipoleTranslation(current, point);
+   for(size_t i = 0; i < n; i++)
+   {
+      auto point = telmaResults[i].first;
+      auto telmaB = telmaResults[i].second * math::mu0;
 
-   cout << fixed;
-   cout << "A by simple integration:        " << aIntegrRes << endl;
-   cout << "A by multipole method:          " << aMultRes << endl;
+      Vector3 myBIntegrals = math::calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
+      Vector3 myBMultipoles = multipoleSolver.calcBWithoutMultipoleTranslation(current, point);
+      real errorForIntegrals = 100 * (myBIntegrals - telmaB).length() / telmaB.length();
+      real errorForMultipoles = 100 * (myBMultipoles - telmaB).length() / telmaB.length();
 
-   Vector3 hIntegrRes = calcBioSavartLaplace(current, point, torus.tetrahedra, bq) / math::mu0;
-   Vector3 hMultRes = multipoleSolver.calcBWithoutMultipoleTranslation(current, point) / math::mu0;
-   cout << endl;
-   cout << "H by simple integration:        " << hIntegrRes << endl;
-   cout << "H by multipole method:          " << hMultRes << endl;
-}
+      cout << fixed << setw(3) << i << " ";
+      point.printWithWidth(cout, 6);
+      cout << scientific << setw(16) << errorForIntegrals << " ";
+      cout << setw(16) << errorForMultipoles << endl;
 
-void runTest()
-{
-   real current = 5;
-   Vector3 point(1, 2, 3);
-   auto solidHarmonics = Harmonics::calcSolidHarmonics(15, point, false);
+      sumErrorForIntegrals += errorForIntegrals;
+      sumErrorForMultipoles += errorForMultipoles;
+   }
+
+   cout << sumErrorForIntegrals / n << " " << sumErrorForMultipoles / n << endl;
 }
 
 int main()
-{   
+{
    runCalculations();
 }

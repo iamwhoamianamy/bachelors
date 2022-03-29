@@ -8,7 +8,7 @@
 class Harmonics
 {
 private:
-   int _n;
+   int n;
    HarmonicSeries<real> _sphericalHarmonics;
    static Factorials _factorials;
 public:   

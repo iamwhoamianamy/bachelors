@@ -50,6 +50,8 @@ public:
    static Vector3 xAxis();
    static Vector3 yAxis();
    static Vector3 zAxis();
+
+   void printWithWidth(std::ostream& os, size_t width);
 };
 
 std::ostream& operator<<(std::ostream& os, const Vector3& vec);

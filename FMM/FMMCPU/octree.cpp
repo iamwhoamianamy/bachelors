@@ -198,26 +198,24 @@ Vector3 Octree::caclRot(const Vector3& point) const
       hy1.subtract(hy2);
       hz1.subtract(hz2);
 
-      real x = 0;
-      real y = 0;
-      real z = 0;
+      Vector3 tempRes;
 
       for(int l = 0; l < n; l++)
       {
          for(int m = -l; m <= l; m++)
          {
-            x += _multipoleExpansion.getHarmonic(l, m).z * hy1.getHarmonic(l, m) -
-                 _multipoleExpansion.getHarmonic(l, m).y * hz1.getHarmonic(l, m);
+            tempRes.x += _multipoleExpansion.getHarmonic(l, m).z * hy1.getHarmonic(l, m) -
+                         _multipoleExpansion.getHarmonic(l, m).y * hz1.getHarmonic(l, m);
 
-            y += _multipoleExpansion.getHarmonic(l, m).x * hz1.getHarmonic(l, m) -
-                 _multipoleExpansion.getHarmonic(l, m).z * hx1.getHarmonic(l, m);
+            tempRes.y += _multipoleExpansion.getHarmonic(l, m).x * hz1.getHarmonic(l, m) -
+                         _multipoleExpansion.getHarmonic(l, m).z * hx1.getHarmonic(l, m);
 
-            z += _multipoleExpansion.getHarmonic(l, m).y * hx1.getHarmonic(l, m) -
-                 _multipoleExpansion.getHarmonic(l, m).x * hy1.getHarmonic(l, m);
+            tempRes.z += _multipoleExpansion.getHarmonic(l, m).y * hx1.getHarmonic(l, m) -
+                         _multipoleExpansion.getHarmonic(l, m).x * hy1.getHarmonic(l, m);
          }
       }
 
-      res += Vector3(x, y, z) / (2 * eps);
+      res += tempRes / (2 * eps);
    }
    else
    {

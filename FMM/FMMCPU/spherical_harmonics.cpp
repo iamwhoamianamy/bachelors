@@ -5,7 +5,7 @@
 Factorials Harmonics::_factorials;
 
 Harmonics::Harmonics(int n, const Vector3& point) :
-   _n(n)
+   n(n)
 {
    calcSphericalHarmonics(point);
 }
@@ -27,7 +27,7 @@ HarmonicSeries<real> Harmonics::calcIrregularSolidHarmonics(size_t n, Vector3 po
 
 void Harmonics::calcSphericalHarmonics(const Vector3& point)
 {
-   _sphericalHarmonics = HarmonicSeries<real>(_n);
+   _sphericalHarmonics = HarmonicSeries<real>(n);
    fillWithLegendrePolynomials(point.z);
    fillWithLegendrePolynomialDerivatives(point.z);
    mirrorLegendrePolynomialDerivatives(point.z);
@@ -37,51 +37,46 @@ void Harmonics::calcSphericalHarmonics(const Vector3& point)
 
 void Harmonics::fillWithLegendrePolynomials(real z)
 {
-   _sphericalHarmonics[0][0] = 1;
-   _sphericalHarmonics[1][1] = z;
+   _sphericalHarmonics.getHarmonic(0, 0) = 1;
+   _sphericalHarmonics.getHarmonic(1, 0) = z;
 
-   for(size_t i = 2; i < _n; i++)
+   for(size_t l = 2; l < n; l++)
    {
-      _sphericalHarmonics[i][i] = calcLegendrePolynomial(i, z);
+      _sphericalHarmonics.getHarmonic(l, 0) = calcLegendrePolynomial(l, z);
    }
 }
 
 void Harmonics::fillWithLegendrePolynomialDerivatives(real z)
 {
-   _sphericalHarmonics[0][0] = 1;
-   _sphericalHarmonics[1][0] = 1;
-   _sphericalHarmonics[1][2] = 1;
+   _sphericalHarmonics.getHarmonic(0, 0) = 1;
+   _sphericalHarmonics.getHarmonic(1, -1) = 1;
+   _sphericalHarmonics.getHarmonic(1, 1) = 1;
 
-   for(size_t l = 2; l < _n; l++)
+   for(size_t l = 2; l < n; l++)
    {
-      for(size_t m = 1; m < l; m++)
+      for(size_t m = 1; m <= l; m++)
       {
-         size_t center = _sphericalHarmonics[l].size() / 2;
-         size_t prevCenter = _sphericalHarmonics[l - 1].size() / 2;
-         _sphericalHarmonics[l][center + m] = z * _sphericalHarmonics[l - 1][prevCenter + m] +
-            (l + m - 1) * _sphericalHarmonics[l - 1][prevCenter + m - 1];
+         _sphericalHarmonics.getHarmonic(l, m) = z * _sphericalHarmonics.getHarmonic(l - 1, m) +
+            (l + m - 1) * _sphericalHarmonics.getHarmonic(l - 1, m - 1);
       }
-
-      _sphericalHarmonics[l][_sphericalHarmonics[l].size() - 1] = (2 * l - 1) *
-         _sphericalHarmonics[l - 1][_sphericalHarmonics[l - 1].size() - 1];
    }
 }
 
 void Harmonics::mirrorLegendrePolynomialDerivatives(real z)
 {
-   for(size_t l = 2; l < _n; l++)
+   for(int l = 2; l < n; l++)
    {
-      for(size_t m = 0; m < _sphericalHarmonics[l].size() / 2; m++)
+      for(int m = -l; m <= l; m++)
       {
-         _sphericalHarmonics[l][m] = _sphericalHarmonics[l][_sphericalHarmonics[l].size() - 1 - m];
+         _sphericalHarmonics.getHarmonic(l, m) = _sphericalHarmonics.getHarmonic(l, -m);
       }
    }
 }
 
-real Harmonics::calcLegendrePolynomial(int i, real z)
+real Harmonics::calcLegendrePolynomial(int l, real z)
 {
-   return ((2 * i - 1) * z * _sphericalHarmonics[i - 1][i - 1] -
-           (i - 1) * _sphericalHarmonics[i - 2][i - 2]) / (i);
+   return ((2 * l - 1) * z * _sphericalHarmonics.getHarmonic(l - 1, 0) -
+           (l - 1) * _sphericalHarmonics.getHarmonic(l - 2, 0)) / (l);
 }
 
 void Harmonics::addComplex(real x, real y)
@@ -89,16 +84,14 @@ void Harmonics::addComplex(real x, real y)
    std::complex<real> ephi1m(sqrt(2.0));
    std::complex<real> mult(x, y);
 
-   for(size_t m = 1; m < _n; m++)
+   for(int m = 1; m < n; m++)
    {
       ephi1m *= mult;
 
-      for(size_t l = m; l < _n; l++)
+      for(int l = m; l < n; l++)
       {
-         size_t center = _sphericalHarmonics[l].size() / 2;
-
-         _sphericalHarmonics[l][center + m] *= ephi1m.real();
-         _sphericalHarmonics[l][center - m] *= ephi1m.imag();
+         _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.real();
+         _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.imag();
       }
    }
 }
@@ -121,18 +114,16 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
    real mult = isRegular ? r : 1 / r;
    real curr = isRegular ? 1 : mult;
 
-   for(size_t l = 0; l < n; l++)
+   for(int l = 0; l < n; l++)
    {
-      size_t center = solidlHarmonics[l].size() / 2;
-
-      for(size_t m = 0; m <= l; m++)
+      for(int m = 0; m <= l; m++)
       {
-         solidlHarmonics[l][center + m] *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
+         solidlHarmonics.getHarmonic(l, -m) *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
       }
 
-      for(size_t m = 1; m <= l; m++)
+      for(int m = 1; m <= l; m++)
       {
-         solidlHarmonics[l][center - m] *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
+         solidlHarmonics.getHarmonic(l, m) *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
       }
 
       curr *= -mult;

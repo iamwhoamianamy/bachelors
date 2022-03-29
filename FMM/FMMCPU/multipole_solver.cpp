@@ -13,15 +13,21 @@ MultipoleSolver::MultipoleSolver(const std::vector<Tetrahedron>& mesh,
    octreeRoot->insert(_quadratures);
 }
 
+void MultipoleSolver::calcLocalMultipolesWithoutTranslation()
+{
+   octreeRoot->calcLocalMultipolesWithoutTranslation(n);
+   _multipolesAreReady = true;
+}
+
 Vector3 MultipoleSolver::calcAFromRoot(real current, const Vector3& point)
 {
    HarmonicSeries<Vector3> integralContribution = 
-      math::calcIntegralContribution(_quadratures, _n);
+      math::calcIntegralContribution(_quadratures, n);
 
-   auto irregularHarmonics = Harmonics::calcSolidHarmonics(_n, point, false);
+   auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
    Vector3 res;
 
-   for(int l = 0; l < _n; l++)
+   for(int l = 0; l < n; l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -35,41 +41,39 @@ Vector3 MultipoleSolver::calcAFromRoot(real current, const Vector3& point)
 
 Vector3 MultipoleSolver::calcAWithoutMultipoleTranslation(real current, const Vector3& point)
 {
-   octreeRoot->calcLocalMultipolesWithoutTranslation(_n);
+   if(!_multipolesAreReady)
+      throw new std::exception("Multipoles are not ready!");
 
-   Vector3 res = octreeRoot->calcA(point);
-
-   return res / (4.0 * math::PI) * current;
+   return octreeRoot->calcA(point) / (4.0 * math::PI) * current;
 }
 
 Vector3 MultipoleSolver::calcBWithoutMultipoleTranslation(real current, const Vector3& point)
 {
-   octreeRoot->calcLocalMultipolesWithoutTranslation(_n);
+   if(!_multipolesAreReady)
+      throw new std::exception("Multipoles are not ready!");
 
-   Vector3 res = octreeRoot->caclRot(point);
-
-   return res / (4.0 * math::PI) * current * math::mu0;
+   return octreeRoot->caclRot(point) / (4.0 * math::PI) * current * math::mu0;
 }
 
 //Vector3 MultipoleSolver::calcAwithFastMultipoleMethod(real current, const Vector3& point)
 //{
 //   for(auto child : octreeRoot->children())
 //   {
-//      child->calcLocalMultipolesWithoutTranslation(_n);
+//      child->calcLocalMultipolesWithoutTranslation(n);
 //   }
 //
-//   HarmonicSeries<Vector3> integralContribution(_n);
+//   HarmonicSeries<Vector3> integralContribution(n);
 //
 //   //for(auto child : octreeRoot->children())
 //   //{
 //   //   Vector3 translation = child->box().center;
 //
-//   //   for(int j = 0; j < _n; j++)
+//   //   for(int j = 0; j < n; j++)
 //   //   {
 //   //      for(int k = -j; k <= j; k++)
 //   //      {
 //   //         Vector3 tempSum;
-//   //         auto R = Harmonics::calcSolidHarmonics(_n, translation, true);
+//   //         auto R = Harmonics::calcSolidHarmonics(n, translation, true);
 //
 //   //         for(int l = 0; l <= j; l++)
 //   //         {
@@ -100,10 +104,10 @@ Vector3 MultipoleSolver::calcBWithoutMultipoleTranslation(real current, const Ve
 //      integralContribution.add(child->multipoleExpansion());
 //   }
 //
-//   auto irregularHarmonics = Harmonics::calcSolidHarmonics(_n, point, false);
+//   auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
 //   Vector3 res;
 //
-//   for(int l = 0; l < _n; l++)
+//   for(int l = 0; l < n; l++)
 //   {
 //      for(int m = -l; m <= l; m++)
 //      {
