@@ -239,6 +239,7 @@ Vector3 Vector3::zAxis()
 
 void Vector3::printWithWidth(std::ostream& os, size_t width)
 {
+   os << std::fixed;
    os << "(";
    os << std::setw(width) << x << ", ";
    os << std::setw(width) << y << ", ";

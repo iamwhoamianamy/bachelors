@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
+#include "real.hpp"
 
 class Factorials
 {
 private:
-   std::vector<size_t> _factorials;
+   std::vector<real> _factorials;
 public:
    const size_t maxFactorialNum = 100;
    Factorials();

@@ -33,8 +33,12 @@ public:
 
    std::vector<Quadrature*> getAllQuadratures() const;
    void calcLocalMultipolesWithoutTranslation(int n);
+   void calcLocalMultipolesWithTranslation(int n);
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
 
    ~Octree();
+   
+private:
+   void accountChildContribution(Octree* child, int n);
 };

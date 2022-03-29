@@ -54,12 +54,16 @@ void Harmonics::fillWithLegendrePolynomialDerivatives(real z)
 
    for(size_t l = 2; l < n; l++)
    {
-      for(size_t m = 1; m <= l; m++)
+      for(size_t m = 1; m < l; m++)
       {
          _sphericalHarmonics.getHarmonic(l, m) = z * _sphericalHarmonics.getHarmonic(l - 1, m) +
             (l + m - 1) * _sphericalHarmonics.getHarmonic(l - 1, m - 1);
       }
+
+      _sphericalHarmonics.getHarmonic(l, l) = (2 * l - 1) *
+         _sphericalHarmonics.getHarmonic(l - 1, l - 1);
    }
+
 }
 
 void Harmonics::mirrorLegendrePolynomialDerivatives(real z)

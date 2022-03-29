@@ -1,6 +1,7 @@
 #include "octree.hpp"
 #include "math.hpp"
 #include "spherical_harmonics.hpp"
+#include <complex>
 
 Octree::Octree()
 {
@@ -137,6 +138,62 @@ void Octree::calcLocalMultipolesWithoutTranslation(int n)
       for(auto& child : _children)
       {
          child->calcLocalMultipolesWithoutTranslation(n);
+      }
+   }
+}
+
+void Octree::calcLocalMultipolesWithTranslation(int n)
+{
+   if(!_isSubdivided)
+   {
+      _multipoleExpansion = math::calcIntegralContribution(_quadratures, n, _box.center);
+   }
+   else
+   {
+      _multipoleExpansion = HarmonicSeries<Vector3>(n);
+
+      for(auto child : _children)
+      {
+         child->calcLocalMultipolesWithTranslation(n);
+      }
+
+      for(auto child : _children)
+      {
+         accountChildContribution(child, n);
+      }
+   }
+}
+
+void Octree::accountChildContribution(Octree* child, int n)
+{
+   Vector3 translation = child->box().center - _box.center;
+
+   for(int j = 0; j < n; j++)
+   {
+      for(int k = -j; k <= j; k++)
+      {
+         Vector3 tempSum;
+         auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
+
+         for(int l = 0; l <= j; l++)
+         {
+            for(int m = -l; m <= l; m++)
+            {
+               //if(l - j <= k - m && k - m <= j - l)
+               {
+                  Vector3 o = child->_multipoleExpansion.getHarmonic(j - l, k - m);
+                  real i = std::pow(std::complex<real>(0, 1),
+                                    abs(k) - abs(m) - abs(k - m)).real();
+                  real a0 = math::calcAlm(l, m);
+                  real a1 = math::calcAlm(j - l, k - m);
+                  real a2 = math::calcAlm(j, k);
+
+                  tempSum += o * i * a0 * a1 * R.getHarmonic(l, -m) / a2;
+               }
+            }
+         }
+
+         _multipoleExpansion.getHarmonic(j, k) += tempSum;
       }
    }
 }

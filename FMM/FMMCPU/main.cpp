@@ -38,13 +38,15 @@ vector<pair<Vector3, Vector3>> readTelmaResults(const string& filename)
    return res;
 }
 
-void runCalculations()
+Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
+   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
+}
 
-   Torus torus(torusRadius, torusSectionWidth, 40, 4, 4);
-
+BasisQuadratures readBasisQuadratures()
+{
    BasisQuadratures bq;
    string bqDir = "basis_quadratures/";
 
@@ -57,6 +59,14 @@ void runCalculations()
    {
       cout << ex;
    }
+
+   return bq;
+}
+
+void comparisonToTelmaWithoutTranslation()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
 
    auto telmaResults = readTelmaResults("results/telma_results.txt");
    real current = 5;
@@ -72,7 +82,7 @@ void runCalculations()
       auto telmaB = telmaResults[i].second * math::mu0;
 
       Vector3 myBIntegrals = math::calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
-      Vector3 myBMultipoles = multipoleSolver.calcBWithoutMultipoleTranslation(current, point);
+      Vector3 myBMultipoles = multipoleSolver.calcB(current, point);
       real errorForIntegrals = 100 * (myBIntegrals - telmaB).length() / telmaB.length();
       real errorForMultipoles = 100 * (myBMultipoles - telmaB).length() / telmaB.length();
 
@@ -88,7 +98,31 @@ void runCalculations()
    cout << sumErrorForIntegrals / n << " " << sumErrorForMultipoles / n << endl;
 }
 
+void comparisonBetweenMethods()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   MultipoleSolver multipoleSolver(torus.tetrahedra, bq);
+   real current = 5;
+   Vector3 point(3, 1, 2);
+
+   Vector3 byIntegration = math::calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
+   
+   //multipoleSolver.calcLocalMultipolesWithoutTranslation();
+   //Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
+
+   multipoleSolver.calcLocalMultipolesWithTranslation();
+   Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
+
+   cout << setw(20) << "point ";
+   point.printWithWidth(cout, 6);
+   cout << scientific << endl;
+   cout << setw(40) << "integration " << byIntegration << endl;
+   //cout << setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << endl;
+   cout << setw(40) << "multipoles with translation " << byMultipolesWithTranslation;
+}
+
 int main()
 {
-   runCalculations();
+   comparisonBetweenMethods();
 }
