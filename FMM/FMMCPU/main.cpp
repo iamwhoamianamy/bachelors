@@ -37,23 +37,22 @@ void runCalculations()
 
    int n = 10;
    real current = 5;
-   Vector3 point(2, 1.6, 0);
-
-
-   /*Vector3 H = calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
-   cout << endl;
-   cout << H / 1.256e-6 << endl;*/
+   Vector3 point(2, 1, 3);
 
    MultipoleSolver multipoleSolver(torus.tetrahedra, bq);
 
-   Vector3 integrRes = calcAViaSimpleIntegration(current, point, torus.tetrahedra, bq);
-   Vector3 multRes = calcAViaMultipoleMethod(current, point, torus.tetrahedra, bq, n);
-   Vector3 treeRes = multipoleSolver.calcAWithMultipoleMethod(current, point);
+   Vector3 aIntegrRes = calcAViaSimpleIntegration(current, point, torus.tetrahedra, bq);
+   Vector3 aMultRes = multipoleSolver.calcAWithoutMultipoleTranslation(current, point);
 
    cout << fixed;
-   cout << "Simple integration:        " << integrRes << endl;
-   cout << "Multipole method:          " << multRes << endl;
-   cout << "Multipole with tree:       " << treeRes << endl;
+   cout << "A by simple integration:        " << aIntegrRes << endl;
+   cout << "A by multipole method:          " << aMultRes << endl;
+
+   Vector3 hIntegrRes = calcBioSavartLaplace(current, point, torus.tetrahedra, bq) / math::mu0;
+   Vector3 hMultRes = multipoleSolver.calcBWithoutMultipoleTranslation(current, point) / math::mu0;
+   cout << endl;
+   cout << "H by simple integration:        " << hIntegrRes << endl;
+   cout << "H by multipole method:          " << hMultRes << endl;
 }
 
 void runTest()

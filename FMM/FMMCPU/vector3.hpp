@@ -46,6 +46,10 @@ public:
    static real distanceSquared(const Vector3& vec1, const Vector3& vec2);
    static double dot(const Vector3& vec1, const Vector3& vec2);
    static Vector3 cross(const Vector3& vec1, const Vector3& vec2);
+
+   static Vector3 xAxis();
+   static Vector3 yAxis();
+   static Vector3 zAxis();
 };
 
 std::ostream& operator<<(std::ostream& os, const Vector3& vec);

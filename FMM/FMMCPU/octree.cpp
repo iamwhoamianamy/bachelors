@@ -170,6 +170,68 @@ Vector3 Octree::calcA(const Vector3& point) const
    return res;
 }
 
+Vector3 Octree::caclRot(const Vector3& point) const
+{
+   int n = _multipoleExpansion.data.size();
+   real eps = 1e-6;
+
+   Vector3 res;
+
+   if(2 * _box.radius() < (point - _box.center).length())
+   {
+      auto hx1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center + 
+                                                        Vector3::xAxis() * eps);
+      auto hx2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center -
+                                                        Vector3::xAxis() * eps);
+
+      auto hy1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center +
+                                                        Vector3::yAxis() * eps);
+      auto hy2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center -
+                                                        Vector3::yAxis() * eps);
+
+      auto hz1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center +
+                                                        Vector3::zAxis() * eps);
+      auto hz2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center -
+                                                        Vector3::zAxis() * eps);
+
+      hx1.subtract(hx2);
+      hy1.subtract(hy2);
+      hz1.subtract(hz2);
+
+      real x = 0;
+      real y = 0;
+      real z = 0;
+
+      for(int l = 0; l < n; l++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            x += _multipoleExpansion.getHarmonic(l, m).z * hy1.getHarmonic(l, m) -
+                 _multipoleExpansion.getHarmonic(l, m).y * hz1.getHarmonic(l, m);
+
+            y += _multipoleExpansion.getHarmonic(l, m).x * hz1.getHarmonic(l, m) -
+                 _multipoleExpansion.getHarmonic(l, m).z * hx1.getHarmonic(l, m);
+
+            z += _multipoleExpansion.getHarmonic(l, m).y * hx1.getHarmonic(l, m) -
+                 _multipoleExpansion.getHarmonic(l, m).x * hy1.getHarmonic(l, m);
+         }
+      }
+
+      res += Vector3(x, y, z) / (2 * eps);
+   }
+   else
+   {
+      for(auto child : _children)
+      {
+         res += child->caclRot(point);
+      }
+   }
+
+   return res;
+}
+
+
+
 const Box& Octree::box() const
 {
    return this->_box;

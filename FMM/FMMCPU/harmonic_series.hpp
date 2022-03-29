@@ -15,6 +15,7 @@ struct HarmonicSeries
    HarmonicSeries<T>& operator=(HarmonicSeries<T>&& harmonicSeries) noexcept;
    HarmonicSeries<T>& operator=(const HarmonicSeries<T>& harmonicSeries);
    void add(const HarmonicSeries<T>& harmonicSeries);
+   void subtract(const HarmonicSeries<T>& harmonicSeries);
 };
 
 template<class T>
@@ -73,6 +74,18 @@ inline void HarmonicSeries<T>::add(const HarmonicSeries<T>& harmonicSeries)
       for(int m = -l; m <= l; m++)
       {
          getHarmonic(l, m) += harmonicSeries.getHarmonic(l, m);
+      }
+   }
+}
+
+template<class T>
+inline void HarmonicSeries<T>::subtract(const HarmonicSeries<T>& harmonicSeries)
+{
+   for(int l = 0; l < data.size(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         getHarmonic(l, m) -= harmonicSeries.getHarmonic(l, m);
       }
    }
 }

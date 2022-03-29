@@ -221,6 +221,21 @@ Vector3 Vector3::cross(const Vector3& vec1, const Vector3& vec2)
                   vec1.x * vec2.y - vec1.y * vec2.x);
 }
 
+Vector3 Vector3::xAxis()
+{
+    return Vector3(1);
+}
+
+Vector3 Vector3::yAxis()
+{
+   return Vector3(0, 1);
+}
+
+Vector3 Vector3::zAxis()
+{
+   return Vector3(0, 0, 1);
+}
+
 Vector3 Vector3::leadingCos()
 {
    real l = length();
