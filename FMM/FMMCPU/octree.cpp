@@ -173,8 +173,6 @@ void Octree::accountChildContribution(Octree* child, int n)
    {
       for(int k = -j; k <= j; k++)
       {
-         Vector3 tempSum;
-
          for(int l = 0; l <= j; l++)
          {
             for(int m = -l; m <= l; m++)
@@ -188,12 +186,10 @@ void Octree::accountChildContribution(Octree* child, int n)
                   real a1 = math::calcAlm(j - l, k - m);
                   real a2 = math::calcAlm(j, k);
 
-                  tempSum += o * i * a0 * a1 * R.getHarmonic(l, -m) / a2;
+                  _multipoleExpansion.getHarmonic(j, k) += o * i * a0 * a1 * R.getHarmonic(l, -m) / a2;
                }
             }
          }
-
-         _multipoleExpansion.getHarmonic(j, k) += tempSum;
       }
    }
 }
