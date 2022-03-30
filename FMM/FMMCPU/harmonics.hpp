@@ -51,8 +51,8 @@ private:
    void mirrorLegendrePolynomialDerivatives(real z);
    real calcLegendrePolynomial(int i, real z);
    void addComplex(real x, real y);
-   static void mult(int n, HarmonicSeries<std::complex<real>>& a,
-                    const std::complex<real>& lm, const std::complex<real>& mm);
+   static void mult(HarmonicSeries<std::complex<real>>& a,
+                    const std::complex<real>& mm);
 };
 
 template <class T>

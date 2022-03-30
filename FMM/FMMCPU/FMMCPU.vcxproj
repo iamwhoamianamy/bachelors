@@ -150,7 +150,7 @@
     <ClCompile Include="multipole_solver.cpp" />
     <ClCompile Include="octree.cpp" />
     <ClCompile Include="quadrature.cpp" />
-    <ClCompile Include="spherical_harmonics.cpp" />
+    <ClCompile Include="harmonics.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
@@ -168,7 +168,7 @@
     <ClInclude Include="octree.hpp" />
     <ClInclude Include="quadrature.hpp" />
     <ClInclude Include="real.hpp" />
-    <ClInclude Include="spherical_harmonics.hpp" />
+    <ClInclude Include="harmonics.hpp" />
     <ClInclude Include="tetrahedron.hpp" />
     <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />

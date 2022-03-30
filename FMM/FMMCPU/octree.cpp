@@ -1,6 +1,6 @@
 #include "octree.hpp"
 #include "math.hpp"
-#include "spherical_harmonics.hpp"
+#include "harmonics.hpp"
 #include <complex>
 
 Octree::Octree()
@@ -167,8 +167,8 @@ void Octree::calcLocalMultipolesWithTranslation(int n)
 void Octree::accountChildContribution(Octree* child, int n)
 {
    Vector3 translation = child->box().center - _box.center;
-
    auto R = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(n, translation));
+
    auto meAsCompX = Harmonics::realToComplex(Harmonics::separateX(child->_multipoleExpansion));
    auto meAsCompY = Harmonics::realToComplex(Harmonics::separateY(child->_multipoleExpansion));
    auto meAsCompZ = Harmonics::realToComplex(Harmonics::separateZ(child->_multipoleExpansion));

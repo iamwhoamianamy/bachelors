@@ -19,7 +19,8 @@ public:
    const size_t octreeLeafCapacity = 1000;
 
    MultipoleSolver(const std::vector<Tetrahedron>& mesh,
-                   const BasisQuadratures& basisQuadratures);
+                   const BasisQuadratures& basisQuadratures, 
+                   size_t octreeLeafCapacity = 1000);
 
    void calcLocalMultipolesWithoutTranslation();
    void calcLocalMultipolesWithTranslation();

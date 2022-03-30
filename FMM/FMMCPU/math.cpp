@@ -1,5 +1,5 @@
 #include "math.hpp"
-#include "spherical_harmonics.hpp"
+#include "harmonics.hpp"
 
 namespace math
 {
@@ -20,22 +20,13 @@ namespace math
 
    Vector3 calcVectorFunctionIntegral(Vector3(*f)(const Vector3&, const Vector3&),
                                       const Vector3& point,
-                                      const std::vector<Tetrahedron>& mesh,
-                                      const BasisQuadratures& basisQuadratures)
+                                      const std::vector<Quadrature>& quadratures)
    {
       Vector3 res = 0;
 
-      for(auto& tetrahedron : mesh)
+      for(auto& quadrature : quadratures)
       {
-         Vector3 tetrahedronRes = 0;
-
-         for(size_t i = 0; i < basisQuadratures.order(); i++)
-         {
-            Vector3 quadrature = pointFromBasisQuadrature(tetrahedron, basisQuadratures.values(i));
-            tetrahedronRes += f(point, quadrature) * basisQuadratures.w(i);
-         }
-
-         res += tetrahedronRes * tetrahedron.volume();
+         res += f(point, quadrature.coordinates) * quadrature.weight;
       }
 
       return res;
@@ -55,7 +46,7 @@ namespace math
                                      const BasisQuadratures& basisQuadratures)
    {
       return calcVectorFunctionIntegral(simpleIntegrationFunctionForA,
-                                        point, mesh, basisQuadratures) / (4 * PI) * current;
+                                        point, tetrahedraToQuadratures(mesh, basisQuadratures)) / (4 * PI) * current;
    }
 
    Vector3 simpleIntegrationFunctionForA(const Vector3& point, const Vector3& integr)
@@ -85,12 +76,10 @@ namespace math
       return res / (4.0 * PI) * current;
    }
 
-   Vector3 calcBioSavartLaplace(real current, const Vector3& point,
-                                const std::vector<Tetrahedron>& mesh,
-                                const BasisQuadratures& basisQuadratures)
+   Vector3 calcBioSavartLaplace(real current, const Vector3& point, std::vector<Quadrature>& quadratures)
    {
       return calcVectorFunctionIntegral(bioSavartLaplaceFunction,
-                                        point, mesh, basisQuadratures) *
+                                        point, quadratures) *
          mu0 / (4 * PI) * current;
    }
 

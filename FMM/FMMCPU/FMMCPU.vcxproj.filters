@@ -57,7 +57,7 @@
     <ClCompile Include="octree.cpp">
       <Filter>FMMSolver</Filter>
     </ClCompile>
-    <ClCompile Include="spherical_harmonics.cpp">
+    <ClCompile Include="harmonics.cpp">
       <Filter>FMMSolver</Filter>
     </ClCompile>
     <ClCompile Include="tetrahedron_transformer.cpp">
@@ -107,7 +107,7 @@
     <ClInclude Include="octree.hpp">
       <Filter>FMMSolver</Filter>
     </ClInclude>
-    <ClInclude Include="spherical_harmonics.hpp">
+    <ClInclude Include="harmonics.hpp">
       <Filter>FMMSolver</Filter>
     </ClInclude>
     <ClInclude Include="tetrahedron_transformer.hpp">

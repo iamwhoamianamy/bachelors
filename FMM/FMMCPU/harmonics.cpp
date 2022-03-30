@@ -1,6 +1,6 @@
 #include <complex>
 #include <limits>
-#include "spherical_harmonics.hpp"
+#include "harmonics.hpp"
 
 Factorials Harmonics::_factorials;
 
@@ -100,22 +100,19 @@ void Harmonics::addComplex(real x, real y)
    }
 }
 
-void Harmonics::mult(int n, HarmonicSeries<std::complex<real>>& a, 
-                     const std::complex<real>& lm, const std::complex<real>& mm)
+void Harmonics::mult(HarmonicSeries<std::complex<real>>& a,
+                     const std::complex<real>& mm)
 {
-   std::complex<real> s(1, 0);
-   for(size_t l = 0; l < n; l++)
+   for(size_t l = 0; l < a.data.size(); l++)
    {
       auto i = mm;
-      a.getHarmonic(l, 0) *= s;
 
       for(int m = 1; m <= l; m++)
       {
-         a.getHarmonic(l, m) *= i * s;
-         a.getHarmonic(l, -m) *= i * s;
+         a.getHarmonic(l, m) *= i;
+         a.getHarmonic(l, -m) *= i;
          i *= mm;
       }
-      s *= lm;
    }
 }
 
@@ -126,8 +123,8 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
    HarmonicSeries<std::complex<real>> res(n);
 
    std::complex<real> i(0, 1);
-   mult(n, a, 1.0, 1.0 / i);
-   mult(n, b, 1.0, 1.0 / i);
+   mult(a, 1.0 / i);
+   mult(b, 1.0 / i);
 
    for(int l = 0; l < n; l++)
    {
@@ -148,9 +145,9 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
       }
    }
 
-   mult(n, a, 1.0, i);
-   mult(n, b, 1.0, i);
-   mult(n, res, 1.0, i);
+   mult(a, i);
+   mult(b, i);
+   mult(res, i);
 
    return res;
 }

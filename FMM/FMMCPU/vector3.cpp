@@ -240,10 +240,10 @@ Vector3 Vector3::zAxis()
 void Vector3::printWithWidth(std::ostream& os, size_t width)
 {
    os << std::fixed;
-   os << "(";
+   os << "( ";
    os << std::setw(width) << x << ", ";
    os << std::setw(width) << y << ", ";
-   os << std::setw(width) << z << ")";
+   os << std::setw(width) << z << " )";
 }
 
 Vector3 Vector3::leadingCos()

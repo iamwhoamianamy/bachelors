@@ -1,11 +1,13 @@
 #include <iostream>
 #include "multipole_solver.hpp"
 #include "math.hpp"
-#include "spherical_harmonics.hpp"
+#include "harmonics.hpp"
 #include "math.hpp"
 
 MultipoleSolver::MultipoleSolver(const std::vector<Tetrahedron>& mesh, 
-                                 const BasisQuadratures& basisQuadratures)
+                                 const BasisQuadratures& basisQuadratures,
+                                 size_t octreeLeafCapacity) :
+   octreeLeafCapacity(octreeLeafCapacity)
 {
    _quadratures = math::tetrahedraToQuadratures(mesh, basisQuadratures);
    octreeRoot = new Octree(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
