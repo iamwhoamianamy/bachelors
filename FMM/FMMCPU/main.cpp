@@ -108,8 +108,8 @@ void comparisonBetweenMethods()
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, torus.tetrahedra, bq);
    
-   //multipoleSolver.calcLocalMultipolesWithoutTranslation();
-   //Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipolesWithoutTranslation();
+   Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
 
    multipoleSolver.calcLocalMultipolesWithTranslation();
    Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
@@ -118,7 +118,7 @@ void comparisonBetweenMethods()
    point.printWithWidth(cout, 6);
    cout << scientific << endl;
    cout << setw(40) << "integration " << byIntegration << endl;
-   //cout << setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << endl;
+   cout << setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << endl;
    cout << setw(40) << "multipoles with translation " << byMultipolesWithTranslation;
 }
 

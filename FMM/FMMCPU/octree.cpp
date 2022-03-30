@@ -167,19 +167,19 @@ void Octree::calcLocalMultipolesWithTranslation(int n)
 void Octree::accountChildContribution(Octree* child, int n)
 {
    Vector3 translation = child->box().center - _box.center;
+   auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
 
    for(int j = 0; j < n; j++)
    {
       for(int k = -j; k <= j; k++)
       {
          Vector3 tempSum;
-         auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
 
          for(int l = 0; l <= j; l++)
          {
             for(int m = -l; m <= l; m++)
             {
-               //if(l - j <= k - m && k - m <= j - l)
+               if(l - j <= k - m && k - m <= j - l)
                {
                   Vector3 o = child->_multipoleExpansion.getHarmonic(j - l, k - m);
                   real i = std::pow(std::complex<real>(0, 1),
