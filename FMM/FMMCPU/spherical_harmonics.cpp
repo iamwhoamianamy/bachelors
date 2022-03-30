@@ -94,10 +94,132 @@ void Harmonics::addComplex(real x, real y)
 
       for(int l = m; l < n; l++)
       {
-         _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.real();
-         _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.imag();
+         _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.real();
+         _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.imag();
       }
    }
+}
+
+void Harmonics::mult(int n, HarmonicSeries<std::complex<real>>& a, 
+                     const std::complex<real>& lm, const std::complex<real>& mm)
+{
+   std::complex<real> s(1, 0);
+   for(size_t l = 0; l < n; l++)
+   {
+      auto i = mm;
+      a.getHarmonic(l, 0) *= s;
+
+      for(int m = 1; m <= l; m++)
+      {
+         a.getHarmonic(l, m) *= i * s;
+         a.getHarmonic(l, -m) *= i * s;
+         i *= mm;
+      }
+      s *= lm;
+   }
+}
+
+HarmonicSeries<std::complex<real>> Harmonics::translate(
+   int n, HarmonicSeries<std::complex<real>>& a, 
+   HarmonicSeries<std::complex<real>>& b)
+{
+   HarmonicSeries<std::complex<real>> res(n);
+
+   std::complex<real> i(0, 1);
+   mult(n, a, 1.0, 1.0 / i);
+   mult(n, b, 1.0, 1.0 / i);
+
+   for(int l = 0; l < n; l++)
+   {
+      for(int lambda = 0; lambda <= l; lambda++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            for(int mu = -lambda; mu <= lambda; mu++)
+            {
+               int dl = l - lambda;
+               int dm = m - mu;
+               if(dm >= -dl && dm <= +dl)
+               {
+                  res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) * b.getHarmonic(dl, dm);
+               }
+            }
+         }
+      }
+   }
+
+   mult(n, a, 1.0, i);
+   mult(n, b, 1.0, i);
+   mult(n, res, 1.0, i);
+
+   return res;
+}
+
+real Harmonics::getFactorial(size_t n)
+{
+   return _factorials[n];
+}
+
+HarmonicSeries<real> Harmonics::separateX(const HarmonicSeries<Vector3>& harmonics)
+{
+   HarmonicSeries<real> res(harmonics.data.size());
+
+   for(int l = 0; l < harmonics.data.size(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = harmonics.getHarmonic(l, m).x;
+      }
+   }
+
+   return res;
+}
+
+HarmonicSeries<real> Harmonics::separateY(const HarmonicSeries<Vector3>& harmonics)
+{
+   HarmonicSeries<real> res(harmonics.data.size());
+
+   for(int l = 0; l < harmonics.data.size(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = harmonics.getHarmonic(l, m).y;
+      }
+   }
+
+   return res;
+}
+
+HarmonicSeries<real> Harmonics::separateZ(const HarmonicSeries<Vector3>& harmonics)
+{
+   HarmonicSeries<real> res(harmonics.data.size());
+
+   for(int l = 0; l < harmonics.data.size(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = harmonics.getHarmonic(l, m).z;
+      }
+   }
+
+   return res;
+}
+
+HarmonicSeries<Vector3> Harmonics::createFormXYZ(const HarmonicSeries<real>& xs,
+                                                 const HarmonicSeries<real>& ys,
+                                                 const HarmonicSeries<real>& zs)
+{
+   HarmonicSeries<Vector3> res(xs.data.size());
+
+   for(int l = 0; l < xs.data.size(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = Vector3(xs.getHarmonic(l, m), ys.getHarmonic(l, m), zs.getHarmonic(l, m));
+      }
+   }
+
+   return res;
 }
 
 HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
@@ -134,5 +256,44 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
    }
 
    return solidlHarmonics;
+}
+
+HarmonicSeries<std::complex<real>> Harmonics::realToComplex(
+   const HarmonicSeries<real>& harmonics)
+{
+   HarmonicSeries<std::complex<real>> res(harmonics.data.size());
+   
+   real c = 1.0 / sqrt(2);
+   for(int l = 0; l < harmonics.data.size(); l++)
+   {
+      res.getHarmonic(l, 0) = std::complex<real>(harmonics.getHarmonic(l, 0), 0);
+      for(int m = 1; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = c * std::complex<real>(harmonics.getHarmonic(l, m),
+                                                        harmonics.getHarmonic(l, -m));
+         res.getHarmonic(l, -m) = c * std::complex<real>(harmonics.getHarmonic(l, m),
+                                                        -harmonics.getHarmonic(l, -m));
+      }
+   }
+
+   return res;
+}
+
+HarmonicSeries<real> Harmonics::complexToReal(const HarmonicSeries<std::complex<real>>& harmonics)
+{
+   HarmonicSeries<real> res(harmonics.data.size());
+
+   real c = 1.0 / sqrt(2);
+   for(int l = 0; l < harmonics.data.size(); l++)
+   {
+      res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
+      for(int m = 1; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = c * (harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m)).real();
+         res.getHarmonic(l, -m) = c *(harmonics.getHarmonic(l, m) -harmonics.getHarmonic(l, -m)).imag();
+      }
+   }
+
+   return res;
 }
 

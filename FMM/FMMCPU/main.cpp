@@ -13,15 +13,14 @@
 #include "spherical_harmonics.hpp"
 #include "multipole_solver.hpp"
 
-using namespace std;
 using namespace math;
 
-vector<pair<Vector3, Vector3>> readTelmaResults(const string& filename)
+std::vector<std::pair<Vector3, Vector3>> readTelmaResults(const std::string& filename)
 {
-   vector<pair<Vector3, Vector3>> res;
-   ifstream fin(filename);
+   std::vector<std::pair<Vector3, Vector3>> res;
+   std::ifstream fin(filename);
    size_t pointsCount;
-   string _;
+   std::string _;
    fin >> _ >> _ >> _;
    fin >> pointsCount;
    res.resize(pointsCount);
@@ -32,7 +31,7 @@ vector<pair<Vector3, Vector3>> readTelmaResults(const string& filename)
       
       fin >> _ >> px >> py >> pz >> hx >> hy >> hz;
 
-      res[i] = pair<Vector3, Vector3>(Vector3(px, py, pz), Vector3(hx, hy, hz));
+      res[i] = std::pair<Vector3, Vector3>(Vector3(px, py, pz), Vector3(hx, hy, hz));
    }
 
    return res;
@@ -48,16 +47,16 @@ Torus createTorus()
 BasisQuadratures readBasisQuadratures()
 {
    BasisQuadratures bq;
-   string bqDir = "basis_quadratures/";
+   std::string bqDir = "basis_quadratures/";
 
    try
    {
       bq.InitFromTXT(bqDir + "keast 7 x.txt", bqDir + "keast 7 w.txt");
-      cout << "Quadratures were successfully read. Order = " << bq.order() << endl;
+      std::cout << "Quadratures were successfully read. Order = " << bq.order() << std::endl;
    }
    catch(Exeption ex)
    {
-      cout << ex;
+      std::cout << ex;
    }
 
    return bq;
@@ -86,16 +85,16 @@ void comparisonToTelmaWithoutTranslation()
       real errorForIntegrals = 100 * (myBIntegrals - telmaB).length() / telmaB.length();
       real errorForMultipoles = 100 * (myBMultipoles - telmaB).length() / telmaB.length();
 
-      cout << fixed << setw(3) << i << " ";
-      point.printWithWidth(cout, 6);
-      cout << scientific << setw(16) << errorForIntegrals << " ";
-      cout << setw(16) << errorForMultipoles << endl;
+      std::cout << std::fixed << std::setw(3) << i << " ";
+      point.printWithWidth(std::cout, 6);
+      std::cout << std::scientific << std::setw(16) << errorForIntegrals << " ";
+      std::cout << std::setw(16) << errorForMultipoles << std::endl;
 
       sumErrorForIntegrals += errorForIntegrals;
       sumErrorForMultipoles += errorForMultipoles;
    }
 
-   cout << sumErrorForIntegrals / n << " " << sumErrorForMultipoles / n << endl;
+   std::cout << sumErrorForIntegrals / n << " " << sumErrorForMultipoles / n << std::endl;
 }
 
 void comparisonBetweenMethods()
@@ -114,12 +113,25 @@ void comparisonBetweenMethods()
    multipoleSolver.calcLocalMultipolesWithTranslation();
    Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
 
-   cout << setw(20) << "point ";
-   point.printWithWidth(cout, 6);
-   cout << scientific << endl;
-   cout << setw(40) << "integration " << byIntegration << endl;
-   cout << setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << endl;
-   cout << setw(40) << "multipoles with translation " << byMultipolesWithTranslation;
+   std::cout << std::setw(20) << "point ";
+   point.printWithWidth(std::cout, 6);
+   std::cout << std::scientific << std::endl;
+   std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
+   std::cout << std::setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << std::endl;
+   std::cout << std::setw(40) << "multipoles with translation " << byMultipolesWithTranslation;
+}
+
+void test()
+{
+   Vector3 point1(3, 1, 2);
+   auto r1 = Harmonics::calcRegularSolidHarmonics(10, point1);
+   auto c1 = Harmonics::realToComplex(r1);
+
+   Vector3 point2(4, 5, 1);
+   auto r2 = Harmonics::calcRegularSolidHarmonics(10, point1);
+   auto c2 = Harmonics::realToComplex(r1);
+
+   auto t =  Harmonics::complexToReal(Harmonics::translate(10, c1, c2));
 }
 
 int main()

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <complex>
 #include "real.hpp"
 #include "vector3.hpp"
 #include "factorials.hpp"
@@ -23,13 +24,25 @@ public:
    static HarmonicSeries<real> calcSolidHarmonics(size_t n,
                                                   Vector3 point,
                                                   bool isRegular);
+
+   static HarmonicSeries<std::complex<real>> realToComplex(const HarmonicSeries<real>& harmonics);
+   static HarmonicSeries<real> complexToReal(const HarmonicSeries<std::complex<real>>& harmonics);
+
    template <class T>
    static T getHarmonic(int l, int m, const std::vector<std::vector<T>>& harmonics);
 
-   static real getFactorial(size_t n)
-   {
-      return _factorials[n];
-   }
+   static HarmonicSeries<std::complex<real>> translate(
+      int n, HarmonicSeries<std::complex<real>>& a,
+      HarmonicSeries<std::complex<real>>& b);
+
+   static real getFactorial(size_t n);
+   
+   static HarmonicSeries<real> separateX(const HarmonicSeries<Vector3>& harmonics);
+   static HarmonicSeries<real> separateY(const HarmonicSeries<Vector3>& harmonics);
+   static HarmonicSeries<real> separateZ(const HarmonicSeries<Vector3>& harmonics);
+   static HarmonicSeries<Vector3> createFormXYZ(const HarmonicSeries<real>& xs,
+                                                const HarmonicSeries<real>& ys,
+                                                const HarmonicSeries<real>& zs);
 
 private:
    void calcSphericalHarmonics(const Vector3& point);
@@ -38,6 +51,8 @@ private:
    void mirrorLegendrePolynomialDerivatives(real z);
    real calcLegendrePolynomial(int i, real z);
    void addComplex(real x, real y);
+   static void mult(int n, HarmonicSeries<std::complex<real>>& a,
+                    const std::complex<real>& lm, const std::complex<real>& mm);
 };
 
 template <class T>

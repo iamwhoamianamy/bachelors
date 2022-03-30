@@ -26,7 +26,6 @@ public:
    Vector3 calcAFromRoot(real current, const Vector3& point);
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
-   //Vector3 calcAwithFastMultipoleMethod(real current, const Vector3& point);
    ~MultipoleSolver();
 
 private:
