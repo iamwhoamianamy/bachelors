@@ -34,7 +34,6 @@ void Harmonics::calcSphericalHarmonics(const Vector3& point)
    addComplex(point.x, point.y);
 }
 
-
 void Harmonics::fillWithLegendrePolynomials(real z)
 {
    _sphericalHarmonics.getHarmonic(0, 0) = 1;

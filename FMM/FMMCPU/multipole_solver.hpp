@@ -9,22 +9,20 @@
 class MultipoleSolver
 {
 private:
-   std::vector<Quadrature> _quadratures;
+   std::vector<Quadrature>& _quadratures;
    Octree* octreeRoot;
    bool _multipolesAreReady = false;
 
 public:
    const int n = 10;
    const real eps = 1e-6;
-   const size_t octreeLeafCapacity = 1000;
+   const size_t octreeLeafCapacity;
 
-   MultipoleSolver(const std::vector<Tetrahedron>& mesh,
-                   const BasisQuadratures& basisQuadratures, 
+   MultipoleSolver(std::vector<Quadrature>& quadratures,
                    size_t octreeLeafCapacity = 1000);
 
    void calcLocalMultipolesWithoutTranslation();
    void calcLocalMultipolesWithTranslation();
-   Vector3 calcAFromRoot(real current, const Vector3& point);
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
    ~MultipoleSolver();

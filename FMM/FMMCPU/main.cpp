@@ -44,7 +44,7 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   return Torus(torusRadius, torusSectionWidth, 80, 4, 4);
+   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -55,7 +55,7 @@ BasisQuadratures readBasisQuadratures()
    try
    {
       bq.InitFromTXT(bqDir + "keast 7 x.txt", bqDir + "keast 7 w.txt");
-      std::cout << "Quadratures were successfully read. Order = " << bq.order() << std::endl;
+      //std::cout << "Quadratures were successfully read. Order = " << bq.order() << std::endl;
    }
    catch(Exeption ex)
    {
@@ -121,9 +121,10 @@ void comparisonToTelmaWithoutTranslation()
 {
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    auto telmaResults = readTelmaResults("results/telma_results.txt");
-   MultipoleSolver multipoleSolver(torus.tetrahedra, bq);
+   MultipoleSolver multipoleSolver(quadratures);
    multipoleSolver.calcLocalMultipolesWithoutTranslation();
    real sumError = 0;
    size_t n = telmaResults.size();
@@ -150,9 +151,10 @@ void comparisonToTelmaWithTranslation()
 {
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    auto telmaResults = readTelmaResults("results/telma_results.txt");
-   MultipoleSolver multipoleSolver(torus.tetrahedra, bq);
+   MultipoleSolver multipoleSolver(quadratures);
    multipoleSolver.calcLocalMultipolesWithTranslation();
    real sumError = 0;
    size_t n = telmaResults.size();
@@ -179,8 +181,8 @@ void comparisonBetweenMethodsOnPrecision()
 {
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
-   MultipoleSolver multipoleSolver(torus.tetrahedra, bq);
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   MultipoleSolver multipoleSolver(quadratures);
 
    Vector3 point(3, 1, 2);
 
@@ -213,26 +215,16 @@ void translationTest()
    auto t =  Harmonics::complexToReal(Harmonics::translate(10, c1, c2));
 }
 
-void integrationTimeResearchForMorePoints()
-{
-   auto torus = createTorus();
-   auto bq = readBasisQuadratures();
-
-   for(size_t i = 0; i < 100; i++)
-   {
-
-   }
-}
-
 void calculationTimeForLocalMultipoles()
 {
    auto torus = createTorus();
    auto bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    for(size_t i = 2; i < 15; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolver(torus.tetrahedra, bq, octreeLeafCapacity);
+      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
 
       auto start = std::chrono::steady_clock::now();
       multipoleSolver.calcLocalMultipolesWithoutTranslation();
@@ -248,9 +240,121 @@ void calculationTimeForLocalMultipoles()
    }
 }
 
+std::pair<double, Vector3> wholeTimeForIntegrals(const std::vector<Vector3>& points, 
+                           std::vector<Quadrature>& quadratures)
+{
+   Vector3 res;
+   auto start = std::chrono::steady_clock::now();
+
+   for(size_t p = 0; p < points.size(); p++)
+   {
+      res += math::calcBioSavartLaplace(current, points[p], quadratures);
+   }
+
+   auto stop = std::chrono::steady_clock::now();
+   
+   std::cout << res.x << " ";
+
+   return std::pair<double, Vector3>
+      (std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count() * 1e-9, res);
+}
+
+std::pair<double, Vector3>  timeForMultipolesWithoutTranslation(
+   const std::vector<Vector3>& points,
+   std::vector<Quadrature>& quadratures)
+{
+   Vector3 res;
+   MultipoleSolver multipoleSolver(quadratures);
+   multipoleSolver.calcLocalMultipolesWithoutTranslation();
+
+   auto start = std::chrono::steady_clock::now();
+
+   for(size_t p = 0; p < points.size(); p++)
+   {
+      res += multipoleSolver.calcB(current, points[p]);
+   }
+
+   auto stop = std::chrono::steady_clock::now();
+
+   return std::pair<double, Vector3>
+      (std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count() * 1e-9, res);
+}
+
+std::pair<double, Vector3>  timeForMultipolesWithTranslation(
+   const std::vector<Vector3>& points,
+   std::vector<Quadrature>& quadratures)
+{
+   Vector3 res;
+   MultipoleSolver multipoleSolver(quadratures);
+   multipoleSolver.calcLocalMultipolesWithTranslation();
+
+   auto start = std::chrono::steady_clock::now();
+
+   for(size_t p = 0; p < points.size(); p++)
+   {
+      res += multipoleSolver.calcB(current, points[p]);
+   }
+
+   auto stop = std::chrono::steady_clock::now();
+
+   return std::pair<double, Vector3>
+      (std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count() * 1e-9, res);
+}
+
+void timeResearchForMorePoints()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   
+   Vector3 begin(3, 1, 2);
+   Vector3 end(0, 0, 0);
+   
+   for(size_t i = 2; i < 14; i++)
+   {
+      int pointsCount = pow(2, i);
+      auto points = createPoints(begin, end, pointsCount);
+      
+      std::cout << std::fixed;
+      std::cout << std::setw(5) << pointsCount << " ";
+      std::cout << std::scientific;
+      std::cout << std::setw(8) << wholeTimeForIntegrals(points, quadratures).first << " ";
+      std::cout << std::setw(8) << timeForMultipolesWithoutTranslation(points, quadratures).first << " ";
+      std::cout << std::setw(8) << timeForMultipolesWithTranslation(points, quadratures).first << std::endl;
+   }
+}
+
+
+void NMResearch()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+   Vector3 begin(3, 1, 2);
+   Vector3 end(0, 0, 0);
+   BasisQuadratures bq = readBasisQuadratures();
+
+   for(size_t i = 5; i < 12; i++)
+   {
+      Torus torus(torusRadius, torusSectionWidth, pow(2, i + 1), 4, 4);
+      auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+      int pointsCount = 4 * pow(2, i);
+      auto points = createPoints(begin, end, pointsCount);
+
+      std::cout << std::fixed;
+      std::cout << std::setw(5) << pointsCount * quadratures.size() << " ";
+      std::cout << std::scientific;
+      std::cout << std::setw(8) << wholeTimeForIntegrals(points, quadratures).first << " ";
+      std::cout << std::setw(8) << timeForMultipolesWithoutTranslation(points, quadratures).first << " ";
+      std::cout << std::setw(8) << timeForMultipolesWithTranslation(points, quadratures).first << std::endl;
+   }
+}
+
 int main()
 {
+   NMResearch();
+   //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   comparisonBetweenMethodsOnPrecision();
+   //comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipoles();
 }
