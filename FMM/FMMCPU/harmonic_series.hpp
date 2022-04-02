@@ -43,7 +43,7 @@ inline T& HarmonicSeries<T>::getHarmonic(int l, int m)
 template<class T>
 inline const T& HarmonicSeries<T>::getHarmonic(int l, int m) const
 {
-   return data[l][data[l].size() / 2 + m];
+   return data[l][l + m];
 }
 
 template<class T>
