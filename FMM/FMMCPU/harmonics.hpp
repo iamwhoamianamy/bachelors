@@ -28,9 +28,6 @@ public:
    static HarmonicSeries<std::complex<real>> realToComplex(const HarmonicSeries<real>& harmonics);
    static HarmonicSeries<real> complexToReal(const HarmonicSeries<std::complex<real>>& harmonics);
 
-   template <class T>
-   static T getHarmonic(int l, int m, const std::vector<std::vector<T>>& harmonics);
-
    static HarmonicSeries<std::complex<real>> translate(
       int n, HarmonicSeries<std::complex<real>>& a,
       HarmonicSeries<std::complex<real>>& b);
@@ -54,9 +51,3 @@ private:
    static void mult(HarmonicSeries<std::complex<real>>& a,
                     const std::complex<real>& mm);
 };
-
-template <class T>
-T Harmonics::getHarmonic(int l, int m, const std::vector<std::vector<T>>& harmonics)
-{
-   return harmonics[l][harmonics[l].size() / 2 + m];
-}
