@@ -144,7 +144,7 @@ void Octree::calcLocalMultipolesWithoutTranslation(int n)
 
 void Octree::calcLocalMultipolesWithTranslation(int n)
 {
-   if(!_isSubdivided)
+   if(!_isSubdivided && !_quadratures.empty())
    {
       _multipoleExpansion = math::calcIntegralContribution(_quadratures, n, _box.center);
    }
@@ -159,7 +159,9 @@ void Octree::calcLocalMultipolesWithTranslation(int n)
 
       for(auto child : _children)
       {
-         accountChildContribution(child, n);
+         if(!child->_quadratures.empty() && !child->_isSubdivided ||
+             child->_quadratures.empty() && child->_isSubdivided)
+            accountChildContribution(child, n);
       }
    }
 }
