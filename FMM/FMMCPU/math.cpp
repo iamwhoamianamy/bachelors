@@ -68,8 +68,7 @@ namespace math
       {
          for(int m = -l; m <= l; m++)
          {
-            res += integrals[l][integrals[l].size() / 2 + m] *
-               irregularHarmonics.getHarmonic(l, m);
+            res += integrals.getHarmonic(l, m) * irregularHarmonics.getHarmonic(l, m);
          }
       }
 

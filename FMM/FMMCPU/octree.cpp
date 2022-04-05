@@ -197,7 +197,7 @@ void Octree::accountChildContribution(Octree* child, int n)
 
 Vector3 Octree::calcA(const Vector3& point) const
 {
-   int n = _multipoleExpansion.data.size();
+   int n = _multipoleExpansion.size();
 
    Vector3 res;
 
@@ -226,7 +226,7 @@ Vector3 Octree::calcA(const Vector3& point) const
 
 Vector3 Octree::caclRot(const Vector3& point) const
 {
-   int n = _multipoleExpansion.data.size();
+   int n = _multipoleExpansion.size();
    real eps = 1e-6;
 
    Vector3 res;
