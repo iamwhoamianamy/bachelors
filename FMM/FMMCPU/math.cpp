@@ -153,5 +153,10 @@ namespace math
 
       return res;
    }
+   real calcBinomial(int k, int n)
+   {
+       return Harmonics::getFactorial(n) / (Harmonics::getFactorial(k) * 
+                                            Harmonics::getFactorial(n - k));
+   }
 }
 

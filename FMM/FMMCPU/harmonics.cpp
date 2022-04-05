@@ -1,6 +1,7 @@
 #include <complex>
 #include <limits>
 #include "harmonics.hpp"
+#include "math.hpp"
 
 Factorials Harmonics::_factorials;
 
@@ -99,37 +100,18 @@ void Harmonics::addComplex(real x, real y)
    }
 }
 
-void Harmonics::mult(HarmonicSeries<std::complex<real>>& a,
-                     const std::complex<real>& mm)
-{
-   for(size_t l = 0; l < a.data.size(); l++)
-   {
-      auto i = mm;
-
-      for(int m = 1; m <= l; m++)
-      {
-         a.getHarmonic(l, m) *= i;
-         a.getHarmonic(l, -m) *= i;
-         i *= mm;
-      }
-   }
-}
-
 HarmonicSeries<std::complex<real>> Harmonics::translate(
-   int n, HarmonicSeries<std::complex<real>>& a, 
-   HarmonicSeries<std::complex<real>>& b)
+   int n,
+   const HarmonicSeries<std::complex<real>>& regular,
+   const HarmonicSeries<std::complex<real>>& child)
 {
    HarmonicSeries<std::complex<real>> res(n);
 
-   std::complex<real> i(0, 1);
-   mult(a, 1.0 / i);
-   mult(b, 1.0 / i);
-
    for(int l = 0; l < n; l++)
    {
-      for(int lambda = 0; lambda <= l; lambda++)
+      for(int m = -l; m <= l; m++)
       {
-         for(int m = -l; m <= l; m++)
+         for(int lambda = 0; lambda <= l; lambda++)
          {
             for(int mu = -lambda; mu <= lambda; mu++)
             {
@@ -137,16 +119,47 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
                int dm = m - mu;
                if(dm >= -dl && dm <= +dl)
                {
-                  res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) * b.getHarmonic(dl, dm);
+                  int power = abs(m) - abs(mu) - abs(dm);
+                  real iPowReal = std::pow(-1, power * -0.5);
+                  res.getHarmonic(l, m) += regular.getHarmonic(lambda, mu) *
+                     child.getHarmonic(dl, dm) * iPowReal;
                }
             }
          }
       }
    }
 
-   mult(a, i);
-   mult(b, i);
-   mult(res, i);
+   //for(int l = 0; l < n; l++)
+   //{
+   //   for(int lambda = 0; lambda <= l; lambda++)
+   //   {
+   //      for(int m = -l; m <= l; m++)
+   //      {
+   //         for(int mu = -lambda; mu <= lambda; mu++)
+   //         {
+   //            int dl = l - lambda;
+   //            int dm = m - mu;
+   //
+   //            if(dm >= -dl && dm <= +dl)
+   //            {
+   //               res.getHarmonic(l, m) += pow(-1, lambda) * pow(-1, dm) *
+   //                  regular.getHarmonic(dl, -dm) *
+   //                  child.getHarmonic(lambda, mu);
+   //            }
+   //         }
+   //      }
+   //   }
+   //}
+
+   return res;
+}
+
+HarmonicSeries<real> Harmonics::translate(
+   int n,
+   const HarmonicSeries<real>& regular,
+   const HarmonicSeries<real>& child)
+{
+   HarmonicSeries<real> res(n);
 
    return res;
 }
@@ -240,12 +253,14 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
    {
       for(int m = 0; m <= l; m++)
       {
-         solidlHarmonics.getHarmonic(l, -m) *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
+         solidlHarmonics.getHarmonic(l, -m) *= curr * 
+            (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
       }
 
       for(int m = 1; m <= l; m++)
       {
-         solidlHarmonics.getHarmonic(l, m) *= curr * (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
+         solidlHarmonics.getHarmonic(l, m) *= curr * 
+            (isRegular ? 1.0 / _factorials[l + m] : _factorials[l - m]);
       }
 
       curr *= -mult;
@@ -265,8 +280,8 @@ HarmonicSeries<std::complex<real>> Harmonics::realToComplex(
       res.getHarmonic(l, 0) = std::complex<real>(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
       {
-         res.getHarmonic(l, m) = c * std::complex<real>(harmonics.getHarmonic(l, m),
-                                                        harmonics.getHarmonic(l, -m));
+         res.getHarmonic(l, m) =  c * std::complex<real>(harmonics.getHarmonic(l, m),
+                                                         harmonics.getHarmonic(l, -m));
          res.getHarmonic(l, -m) = c * std::complex<real>(harmonics.getHarmonic(l, m),
                                                         -harmonics.getHarmonic(l, -m));
       }
@@ -285,8 +300,8 @@ HarmonicSeries<real> Harmonics::complexToReal(const HarmonicSeries<std::complex<
       res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
       for(int m = 1; m <= l; m++)
       {
-         res.getHarmonic(l, m) = c * (harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m)).real();
-         res.getHarmonic(l, -m) = c *(harmonics.getHarmonic(l, m) -harmonics.getHarmonic(l, -m)).imag();
+         res.getHarmonic(l, m) = c *  (harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m)).real();
+         res.getHarmonic(l, -m) = c * (harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m)).imag();
       }
    }
 

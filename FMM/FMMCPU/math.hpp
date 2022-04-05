@@ -47,5 +47,7 @@ namespace math
    std::vector<Quadrature> tetrahedraToQuadratures(
       const std::vector<Tetrahedron>& mesh,
       const BasisQuadratures& basisQuadratures);
+
+   real calcBinomial(int k, int n);
 }
 

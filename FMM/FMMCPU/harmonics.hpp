@@ -25,12 +25,20 @@ public:
                                                   Vector3 point,
                                                   bool isRegular);
 
-   static HarmonicSeries<std::complex<real>> realToComplex(const HarmonicSeries<real>& harmonics);
-   static HarmonicSeries<real> complexToReal(const HarmonicSeries<std::complex<real>>& harmonics);
+   static HarmonicSeries<std::complex<real>> realToComplex(
+      const HarmonicSeries<real>& harmonics);
+   static HarmonicSeries<real> complexToReal(
+      const HarmonicSeries<std::complex<real>>& harmonics);
 
    static HarmonicSeries<std::complex<real>> translate(
-      int n, HarmonicSeries<std::complex<real>>& a,
-      HarmonicSeries<std::complex<real>>& b);
+      int n,
+      const HarmonicSeries<std::complex<real>>& regular,
+      const HarmonicSeries<std::complex<real>>& child);
+
+   static HarmonicSeries<real> translate(
+      int n,
+      const HarmonicSeries<real>& regular,
+      const HarmonicSeries<real>& child);
 
    static real getFactorial(size_t n);
    
@@ -48,6 +56,4 @@ private:
    void mirrorLegendrePolynomialDerivatives(real z);
    real calcLegendrePolynomial(int i, real z);
    void addComplex(real x, real y);
-   static void mult(HarmonicSeries<std::complex<real>>& a,
-                    const std::complex<real>& mm);
 };

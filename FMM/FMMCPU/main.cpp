@@ -44,7 +44,7 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -209,8 +209,8 @@ void translationTest()
    auto c1 = Harmonics::realToComplex(r1);
 
    Vector3 point2(4, 5, 1);
-   auto r2 = Harmonics::calcRegularSolidHarmonics(10, point1);
-   auto c2 = Harmonics::realToComplex(r1);
+   auto r2 = Harmonics::calcRegularSolidHarmonics(10, point2);
+   auto c2 = Harmonics::realToComplex(r2);
 
    auto t =  Harmonics::complexToReal(Harmonics::translate(10, c1, c2));
 }
@@ -221,7 +221,7 @@ void calculationTimeForLocalMultipoles()
    auto bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-   for(size_t i = 2; i < 15; i++)
+   for(size_t i = 5; i < 15; i++)
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
@@ -352,9 +352,21 @@ void NMResearch()
 
 int main()
 {
-   NMResearch();
+   //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   //comparisonBetweenMethodsOnPrecision();
+   comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipoles();
+   //translationTest();
+
+   /*Vector3 point(3, 1, 2);
+   auto a = Harmonics::calcRegularSolidHarmonics(10, point);
+   auto b = Harmonics::calcRegularSolidHarmonics(10, point);
+
+   auto ac = Harmonics::realToComplex(a);
+   auto bc = Harmonics::realToComplex(b);
+
+   Harmonics::mult(ac, 1.0 / std::complex<real>(0, 1));
+   Harmonics::multToIDiv(bc);*/
+
 }
