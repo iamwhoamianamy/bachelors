@@ -8,7 +8,7 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
                                  size_t octreeLeafCapacity) :
    _quadratures(quadratures), octreeLeafCapacity(octreeLeafCapacity)
 {
-   octreeRoot = new Octree(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
+   octreeRoot = new OctreeNode(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
    octreeRoot->insert(_quadratures);
 }
 

@@ -6,20 +6,21 @@
 #include "quadrature.hpp"
 #include "harmonic_series.hpp"
 
-class Octree
+class OctreeNode
 {
 private:
    bool _isSubdivided = false;
    size_t _capacity = 0;
    Box _box;
    std::vector<Quadrature*> _quadratures;
-   std::vector<Octree*> _children;
+   std::vector<OctreeNode*> _children;
    HarmonicSeries<Vector3> _multipoleExpansion;
+   const OctreeNode* _parent;
 
 public:
 
-   Octree();
-   Octree(const Box& box, const size_t capacity);
+   OctreeNode();
+   OctreeNode(const Box& box, const size_t capacity, const OctreeNode* parent = nullptr);
 
    void insert(Quadrature& point);
    void insert(std::vector<Quadrature>& points);
@@ -28,7 +29,7 @@ public:
 
    const Box& box() const;
    const bool isSubdivided() const;
-   const std::vector<Octree*> children() const;
+   const std::vector<OctreeNode*> children() const;
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
 
    std::vector<Quadrature*> getAllQuadratures() const;
@@ -38,9 +39,9 @@ public:
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
 
-   ~Octree();
+   ~OctreeNode();
    
 private:
-   void accountChildRealContribution(Octree* child, int n);
-   void accountChildComplexContribution(Octree* child, int n);
+   void accountChildRealContribution(OctreeNode* child, int n);
+   void accountChildComplexContribution(OctreeNode* child, int n);
 };

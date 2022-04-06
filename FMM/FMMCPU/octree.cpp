@@ -4,17 +4,18 @@
 #include "harmonics.hpp"
 #include <complex>
 
-Octree::Octree()
+OctreeNode::OctreeNode() : 
+   _parent(nullptr)
 {
 }
 
-Octree::Octree(const Box& box, const size_t capacity) :
-   _box(box), _capacity(capacity), _isSubdivided(false)
+OctreeNode::OctreeNode(const Box& box, const size_t capacity, const OctreeNode* parent) :
+   _parent(parent), _box(box), _capacity(capacity), _isSubdivided(false)
 {
 
 }
 
-void Octree::insert(std::vector<Quadrature>& points)
+void OctreeNode::insert(std::vector<Quadrature>& points)
 {
    for(auto& point : points)
    {
@@ -22,7 +23,7 @@ void Octree::insert(std::vector<Quadrature>& points)
    }
 }
 
-void Octree::insert(Quadrature& point)
+void OctreeNode::insert(Quadrature& point)
 {
    if(!_box.contains(point.coordinates))
    {
@@ -62,7 +63,7 @@ void Octree::insert(Quadrature& point)
    }
 }
 
-void Octree::subdivide()
+void OctreeNode::subdivide()
 {
    float x = _box.center.x;
    float y = _box.center.y;
@@ -76,18 +77,18 @@ void Octree::subdivide()
 
    _children.reserve(8);
 
-   _children.emplace_back(new Octree(Box({ x - w / 2, y - h / 2, z - d / 2 }, childrenHalfDimensions), _capacity));
-   _children.emplace_back(new Octree(Box({ x + w / 2, y - h / 2, z - d / 2 }, childrenHalfDimensions), _capacity));
-   _children.emplace_back(new Octree(Box({ x + w / 2, y + h / 2, z - d / 2 }, childrenHalfDimensions), _capacity));
-   _children.emplace_back(new Octree(Box({ x - w / 2, y + h / 2, z - d / 2 }, childrenHalfDimensions), _capacity));
+   _children.emplace_back(new OctreeNode(Box({ x - w / 2, y - h / 2, z - d / 2 }, childrenHalfDimensions), _capacity, this));
+   _children.emplace_back(new OctreeNode(Box({ x + w / 2, y - h / 2, z - d / 2 }, childrenHalfDimensions), _capacity, this));
+   _children.emplace_back(new OctreeNode(Box({ x + w / 2, y + h / 2, z - d / 2 }, childrenHalfDimensions), _capacity, this));
+   _children.emplace_back(new OctreeNode(Box({ x - w / 2, y + h / 2, z - d / 2 }, childrenHalfDimensions), _capacity, this));
 
-   _children.emplace_back(new Octree(Box({ x - w / 2, y - h / 2, z + d / 2 }, childrenHalfDimensions), _capacity));
-   _children.emplace_back(new Octree(Box({ x + w / 2, y - h / 2, z + d / 2 }, childrenHalfDimensions), _capacity));
-   _children.emplace_back(new Octree(Box({ x + w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity));
-   _children.emplace_back(new Octree(Box({ x - w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity));
+   _children.emplace_back(new OctreeNode(Box({ x - w / 2, y - h / 2, z + d / 2 }, childrenHalfDimensions), _capacity, this));
+   _children.emplace_back(new OctreeNode(Box({ x + w / 2, y - h / 2, z + d / 2 }, childrenHalfDimensions), _capacity, this));
+   _children.emplace_back(new OctreeNode(Box({ x + w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity, this));
+   _children.emplace_back(new OctreeNode(Box({ x - w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity, this));
 }
 
-void Octree::quarry(const Box& range, std::vector<Quadrature*>& found)
+void OctreeNode::quarry(const Box& range, std::vector<Quadrature*>& found)
 {
    if(!this->_box.intersects(range))
    {
@@ -113,7 +114,7 @@ void Octree::quarry(const Box& range, std::vector<Quadrature*>& found)
    }
 }
 
-std::vector<Quadrature*> Octree::getAllQuadratures() const
+std::vector<Quadrature*> OctreeNode::getAllQuadratures() const
 {
    std::vector<Quadrature*> result;
    result.insert(result.end(), _quadratures.begin(), _quadratures.end());
@@ -130,7 +131,7 @@ std::vector<Quadrature*> Octree::getAllQuadratures() const
    return result;
 }
 
-void Octree::calcLocalMultipolesWithoutTranslation(int n)
+void OctreeNode::calcLocalMultipolesWithoutTranslation(int n)
 {
    _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center);
 
@@ -143,7 +144,7 @@ void Octree::calcLocalMultipolesWithoutTranslation(int n)
    }
 }
 
-void Octree::calcLocalMultipolesWithRealTranslation(int n)
+void OctreeNode::calcLocalMultipolesWithRealTranslation(int n)
 {
    if(!_isSubdivided && !_quadratures.empty())
    {
@@ -167,7 +168,7 @@ void Octree::calcLocalMultipolesWithRealTranslation(int n)
    }
 }
 
-void Octree::calcLocalMultipolesWithComplexTranslation(int n)
+void OctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
 {
    if(!_isSubdivided && !_quadratures.empty())
    {
@@ -191,7 +192,7 @@ void Octree::calcLocalMultipolesWithComplexTranslation(int n)
    }
 }
 
-void Octree::accountChildComplexContribution(Octree* child, int n)
+void OctreeNode::accountChildComplexContribution(OctreeNode* child, int n)
 {
    Vector3 translation = child->box().center - _box.center;
    auto R = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(n, translation));
@@ -207,7 +208,7 @@ void Octree::accountChildComplexContribution(Octree* child, int n)
    _multipoleExpansion.add(contribution);
 }
 
-void Octree::accountChildRealContribution(Octree* child, int n)
+void OctreeNode::accountChildRealContribution(OctreeNode* child, int n)
 {
    Vector3 translation = child->box().center - _box.center;
    auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
@@ -223,7 +224,7 @@ void Octree::accountChildRealContribution(Octree* child, int n)
    _multipoleExpansion.add(contribution);
 }
 
-Vector3 Octree::calcA(const Vector3& point) const
+Vector3 OctreeNode::calcA(const Vector3& point) const
 {
    int n = _multipoleExpansion.size();
 
@@ -252,7 +253,7 @@ Vector3 Octree::calcA(const Vector3& point) const
    return res;
 }
 
-Vector3 Octree::caclRot(const Vector3& point) const
+Vector3 OctreeNode::caclRot(const Vector3& point) const
 {
    int n = _multipoleExpansion.size();
    real eps = 1e-6;
@@ -310,27 +311,27 @@ Vector3 Octree::caclRot(const Vector3& point) const
    return res;
 }
 
-const Box& Octree::box() const
+const Box& OctreeNode::box() const
 {
    return this->_box;
 }
 
-const bool Octree::isSubdivided() const
+const bool OctreeNode::isSubdivided() const
 {
    return _isSubdivided;
 }
 
-const std::vector<Octree*> Octree::children() const
+const std::vector<OctreeNode*> OctreeNode::children() const
 {
    return _children;
 }
 
-const HarmonicSeries<Vector3>& Octree::multipoleExpansion() const
+const HarmonicSeries<Vector3>& OctreeNode::multipoleExpansion() const
 {
    return _multipoleExpansion;
 }
 
-Octree::~Octree()
+OctreeNode::~OctreeNode()
 {
    if(_isSubdivided)
    {

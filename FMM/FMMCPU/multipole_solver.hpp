@@ -10,7 +10,8 @@ class MultipoleSolver
 {
 private:
    std::vector<Quadrature>& _quadratures;
-   Octree* octreeRoot;
+   OctreeNode* octreeRoot;
+
    bool _multipolesAreReady = false;
 
 public:
