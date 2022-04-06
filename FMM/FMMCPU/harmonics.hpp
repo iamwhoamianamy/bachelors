@@ -31,12 +31,10 @@ public:
       const HarmonicSeries<std::complex<real>>& harmonics);
 
    static HarmonicSeries<std::complex<real>> translate(
-      int n,
       const HarmonicSeries<std::complex<real>>& regular,
       const HarmonicSeries<std::complex<real>>& child);
 
    static HarmonicSeries<real> translate(
-      int n,
       const HarmonicSeries<real>& regular,
       const HarmonicSeries<real>& child);
 

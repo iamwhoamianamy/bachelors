@@ -200,9 +200,9 @@ void Octree::accountChildComplexContribution(Octree* child, int n)
    auto meAsCompY = Harmonics::realToComplex(Harmonics::separateY(child->_multipoleExpansion));
    auto meAsCompZ = Harmonics::realToComplex(Harmonics::separateZ(child->_multipoleExpansion));
 
-   auto contribution = Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompX)),
-                                                Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompY)),
-                                                Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompZ)));
+   auto contribution = Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(R, meAsCompX)),
+                                                Harmonics::complexToReal(Harmonics::translate(R, meAsCompY)),
+                                                Harmonics::complexToReal(Harmonics::translate(R, meAsCompZ)));
 
    _multipoleExpansion.add(contribution);
 }
@@ -216,9 +216,9 @@ void Octree::accountChildRealContribution(Octree* child, int n)
    auto meAsCompY = Harmonics::separateY(child->_multipoleExpansion);
    auto meAsCompZ = Harmonics::separateZ(child->_multipoleExpansion);
 
-   auto contribution = Harmonics::createFormXYZ(Harmonics::translate(n, R, meAsCompX),
-                                                Harmonics::translate(n, R, meAsCompY),
-                                                Harmonics::translate(n, R, meAsCompZ));
+   auto contribution = Harmonics::createFormXYZ(Harmonics::translate(R, meAsCompX),
+                                                Harmonics::translate(R, meAsCompY),
+                                                Harmonics::translate(R, meAsCompZ));
 
    _multipoleExpansion.add(contribution);
 }

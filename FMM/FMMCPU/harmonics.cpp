@@ -144,13 +144,12 @@ real Harmonics::strangeFactor(int m, int mu)
 }
 
 HarmonicSeries<std::complex<real>> Harmonics::translate(
-   int n,
    const HarmonicSeries<std::complex<real>>& regular,
    const HarmonicSeries<std::complex<real>>& child)
 {
-   HarmonicSeries<std::complex<real>> res(n);
+   HarmonicSeries<std::complex<real>> res(regular.size());
 
-   for(int l = 0; l < n; l++)
+   for(int l = 0; l < regular.size(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -176,13 +175,12 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
 }
 
 HarmonicSeries<real> Harmonics::translate(
-   int n,
    const HarmonicSeries<real>& regular,
    const HarmonicSeries<real>& child)
 {
-   HarmonicSeries<real> res(n);
+   HarmonicSeries<real> res(regular.size());
 
-   for(int l = 0; l < n; l++)
+   for(int l = 0; l < regular.size(); l++)
    {
       real zeroRes = 0;
 

@@ -219,7 +219,7 @@ void translationTest()
    auto r2 = Harmonics::calcRegularSolidHarmonics(10, point2);
    auto c2 = Harmonics::realToComplex(r2);
 
-   auto t =  Harmonics::complexToReal(Harmonics::translate(10, c1, c2));
+   auto t =  Harmonics::complexToReal(Harmonics::translate(c1, c2));
 }
 
 void calculationTimeForLocalMultipoles()
