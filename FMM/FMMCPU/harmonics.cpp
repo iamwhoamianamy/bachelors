@@ -209,9 +209,10 @@ HarmonicSeries<real> Harmonics::translate(
 
          for(int lambda = 0; lambda <= l; lambda++)
          {
+            int dl = l - lambda;
+
             for(int mu = -lambda; mu <= lambda; mu++)
             {
-               int dl = l - lambda;
                int dm = m - mu;
                int dnm = -m - mu;
 
@@ -224,7 +225,7 @@ HarmonicSeries<real> Harmonics::translate(
                real RnM = 0;
                real InM = 0;
 
-               if(-dl <= m - mu && m - mu <= dl)
+               if(-dl <= dm && dm <= dl)
                {
                   RM = child.getReal(dl, dm);
                   IM = child.getImag(dl, dm);

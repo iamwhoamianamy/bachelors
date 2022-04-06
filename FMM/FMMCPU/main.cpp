@@ -369,9 +369,9 @@ int main()
 {
    //NMResearch();
    //timeResearchForMorePoints();
-   //comparisonToTelmaWithTranslation();
+   comparisonToTelmaWithTranslation();
    //comparisonBetweenMethodsOnPrecision();
-   calculationTimeForLocalMultipoles();
+   //calculationTimeForLocalMultipoles();
    //translationTest();
 
    /*Vector3 point(3, 1, 2);
