@@ -36,33 +36,46 @@ void MultipoleSolver::calcLocalMultipolesWithLayers()
 {
    std::vector<std::vector<OctreeNode*>> layers;
    enumerateNodes(octreeRoot, layers, 0);
-   calcMultipolesAtZeroLayer(layers);
+   calcMultipolesAtLeaves(layers);
+   octreeRoot->initAllMultipoleExpansions(n);
 
    for(int i = layers.size() - 1; i >= 1; i--)
    {
-      auto contribution = calcContributionToHigherLevel(layers[i]);
+      auto contributions = calcContributionsToHigherLevel(layers[i]);
+
+      for(size_t c = 0; c < contributions.size(); c++)
+      {
+         layers[i][c]->parent()->multipoleExpansion().add(contributions[c]);
+      }
    }
+
+   _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcMultipolesAtZeroLayer(
+void MultipoleSolver::calcMultipolesAtLeaves(
    const  std::vector<std::vector<OctreeNode*>>& layers)
 {
-   for(auto leaf : layers[layers.size() - 1])
+   for(auto layer : layers)
    {
-      leaf->multipoleExpansion() = math::calcIntegralContribution(leaf->quadratures(), n,
-                                                                  leaf->box().center);
+      for(auto node : layer)
+      {
+         if(!node->quadratures().empty())
+            node->multipoleExpansion() = math::calcIntegralContribution(
+               node->quadratures(), n, node->box().center);
+      }
    }
 }
 
-
-std::vector<HarmonicSeries<Vector3>> MultipoleSolver::calcContributionToHigherLevel(
+std::vector<HarmonicSeries<Vector3>> MultipoleSolver::calcContributionsToHigherLevel(
    const std::vector<OctreeNode*>& layer)
 {
    std::vector<HarmonicSeries<Vector3>> res;
 
    for(auto node : layer)
    {
-      //res.push_back(node->parent().ge);
+      res.push_back(Harmonics::translateWithReal(
+         node->multipoleExpansion(),
+         node->box().center - node->parent()->box().center));
    }
 
    return res;
@@ -72,14 +85,17 @@ void MultipoleSolver::enumerateNodes(OctreeNode* node,
                                      std::vector<std::vector<OctreeNode*>>& layers, 
                                      size_t currentLayerId)
 {
-   if(layers.size() <= currentLayerId)
-      layers.push_back(std::vector<OctreeNode*>());
-   
-   layers[currentLayerId].push_back(node);
-
-   for(auto child : node->children())
+   if(!node->quadratures().empty() || node->isSubdivided())
    {
-      enumerateNodes(child, layers, currentLayerId + 1);
+      if(layers.size() <= currentLayerId)
+         layers.push_back(std::vector<OctreeNode*>());
+
+      layers[currentLayerId].push_back(node);
+
+      for(auto child : node->children())
+      {
+         enumerateNodes(child, layers, currentLayerId + 1);
+      }
    }
 }
 

@@ -51,7 +51,7 @@ Torus createTorus()
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
    //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
+   return Torus(torusRadius, torusSectionWidth, 80, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -204,6 +204,9 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.calcLocalMultipolesWithRealTranslation();
    Vector3 byMultipolesWithRealTranslation = multipoleSolver.calcB(current, point);
 
+   multipoleSolver.calcLocalMultipolesWithLayers();
+   Vector3 byMultipolesWithLayers = multipoleSolver.calcB(current, point);
+
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
@@ -211,6 +214,7 @@ void comparisonBetweenMethodsOnPrecision()
    std::cout << std::setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << std::endl;
    std::cout << std::setw(40) << "multipoles with c translation " << byMultipolesWithComplexTranslation << std::endl;
    std::cout << std::setw(40) << "multipoles with r translation " << byMultipolesWithRealTranslation << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers " << byMultipolesWithLayers << std::endl;
 }
 
 void translationTest()
@@ -236,8 +240,9 @@ void calculationTimeForLocalMultipoles()
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverWithoutT(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverWithRealT(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverWithComplexT(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithRealT(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithLayers(quadratures, octreeLeafCapacity);
 
       auto start = std::chrono::steady_clock::now();
       multipoleSolverWithoutT.calcLocalMultipolesWithoutTranslation();
@@ -245,7 +250,7 @@ void calculationTimeForLocalMultipoles()
       double timeWithoutTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverWithRealT.calcLocalMultipolesWithComplexTranslation();
+      multipoleSolverWithComplexT.calcLocalMultipolesWithComplexTranslation();
       stop = std::chrono::steady_clock::now();
       double timeWithComplexTranslation = getTime(start, stop);
 
@@ -254,8 +259,14 @@ void calculationTimeForLocalMultipoles()
       stop = std::chrono::steady_clock::now();
       double timeWithRealTranslation = getTime(start, stop);
 
+      start = std::chrono::steady_clock::now();
+      multipoleSolverWithLayers.calcLocalMultipolesWithLayers();
+      stop = std::chrono::steady_clock::now();
+      double timeWithLayers = getTime(start, stop);
+
       std::cout << octreeLeafCapacity << " " << timeWithoutTranslation << " ";
-      std::cout << timeWithComplexTranslation << " " << timeWithRealTranslation << std::endl;
+      std::cout << timeWithComplexTranslation << " " << timeWithRealTranslation << " ";
+      std::cout << timeWithLayers << std::endl;
    }
 }
 
@@ -374,18 +385,19 @@ void layerCalculationsPrecision()
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    MultipoleSolver multipoleSolver(quadratures);
-   multipoleSolver.calcLocalMultipolesWithLayers();
-   /*Vector3 point(3, 1, 2);
 
-   multipoleSolver.calcLocalMultipolesWithRealTranslation();
-   Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
+   Vector3 point(3, 1, 2);
+
+   Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
+
+   multipoleSolver.calcLocalMultipolesWithLayers();
+   Vector3 byMultipolesWithLayers = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
-   std::cout << std::setw(40) << "multipoles with translation " << byMultipolesWithTranslation << std::endl;*/
-
-
+   std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers " << byMultipolesWithLayers << std::endl;
 }
 
 int main()
@@ -393,8 +405,8 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   comparisonBetweenMethodsOnPrecision();
-   //calculationTimeForLocalMultipoles();
+   //comparisonBetweenMethodsOnPrecision();
+   calculationTimeForLocalMultipoles();
    //translationTest();
    //layerCalculationsPrecision();
 

@@ -9,7 +9,7 @@ OctreeNode::OctreeNode() :
 {
 }
 
-OctreeNode::OctreeNode(const Box& box, const size_t capacity, const OctreeNode* parent) :
+OctreeNode::OctreeNode(const Box& box, const size_t capacity, OctreeNode* parent) :
    _parent(parent), _box(box), _capacity(capacity), _isSubdivided(false)
 {
 
@@ -163,8 +163,8 @@ void OctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
       {
          if(!child->_quadratures.empty() && !child->_isSubdivided ||
             child->_quadratures.empty() && child->_isSubdivided)
-            _multipoleExpansion.add(Harmonics::translateWithComplex(child->multipoleExpansion(),
-                                    child->box().center - _box.center));
+            _multipoleExpansion.add(Harmonics::translateWithComplex(
+               child->multipoleExpansion(), child->box().center - _box.center));
       }
    }
 }
@@ -188,8 +188,21 @@ void OctreeNode::calcLocalMultipolesWithRealTranslation(int n)
       {
          if(!child->_quadratures.empty() && !child->_isSubdivided ||
              child->_quadratures.empty() && child->_isSubdivided)
-            _multipoleExpansion.add(Harmonics::translateWithReal(child->multipoleExpansion(),
-                                    child->box().center - _box.center));
+            _multipoleExpansion.add(Harmonics::translateWithReal(
+               child->multipoleExpansion(), child->box().center - _box.center));
+      }
+   }
+}
+
+void OctreeNode::initAllMultipoleExpansions(size_t n)
+{
+   if(_isSubdivided || _quadratures.empty())
+   {
+      _multipoleExpansion = HarmonicSeries<Vector3>(n);
+
+      for(auto child : _children)
+      {
+         child->initAllMultipoleExpansions(n);
       }
    }
 }
@@ -289,6 +302,11 @@ const Box& OctreeNode::box() const
 const bool OctreeNode::isSubdivided() const
 {
    return _isSubdivided;
+}
+
+OctreeNode* OctreeNode::parent()
+{
+   return _parent;
 }
 
 const OctreeNode* OctreeNode::parent() const

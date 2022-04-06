@@ -281,58 +281,6 @@ HarmonicSeries<Vector3> Harmonics::translateWithReal(
                                    Harmonics::translate(regular, zComponent));
 }
 
-real Harmonics::getRealChildContribution(int l, int m,
-                                         const HarmonicSeries<real>& regular,
-                                         const HarmonicSeries<real>& child)
-{
-   real res = 0;
-
-   for(int lambda = 0; lambda <= l; lambda++)
-   {
-      int dl = l - lambda;
-
-      for(int mu = -lambda; mu <= lambda; mu++)
-      {
-         int dm = m - mu;
-
-         if(dm >= -dl && dm <= +dl)
-         {
-            res += (regular.getReal(lambda, mu) * child.getReal(dl, dm) -
-                    regular.getImag(lambda, mu) * child.getImag(dl, dm)) * 
-                    strangeFactor(m, mu);
-         }
-      }
-   }
-
-   return res;
-}
-
-real Harmonics::getImagChildContribution(int l, int m,
-                                         const HarmonicSeries<real>& regular,
-                                         const HarmonicSeries<real>& child)
-{
-   real res = 0;
-
-   for(int lambda = 0; lambda <= l; lambda++)
-   {
-      int dl = l - lambda;
-
-      for(int mu = -lambda; mu <= lambda; mu++)
-      {
-         int dm = m - mu;
-
-         if(dm >= -dl && dm <= +dl)
-         {
-            res += (regular.getReal(lambda, mu) * child.getImag(dl, dm) +
-                    regular.getImag(lambda, mu) * child.getReal(dl, dm)) * 
-                    strangeFactor(m, mu);
-         }
-      }
-   }
-
-   return res;
-}
-
 real Harmonics::getFactorial(size_t n)
 {
    return _factorials[n];

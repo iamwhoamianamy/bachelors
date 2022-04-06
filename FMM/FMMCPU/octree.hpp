@@ -15,11 +15,11 @@ private:
    std::vector<Quadrature*> _quadratures;
    std::vector<OctreeNode*> _children;
    HarmonicSeries<Vector3> _multipoleExpansion;
-   const OctreeNode* _parent;
+   OctreeNode* _parent;
 
 public:
    OctreeNode();
-   OctreeNode(const Box& box, const size_t capacity, const OctreeNode* parent = nullptr);
+   OctreeNode(const Box& box, const size_t capacity, OctreeNode* parent = nullptr);
 
    void insert(Quadrature& point);
    void insert(std::vector<Quadrature>& points);
@@ -28,6 +28,7 @@ public:
 
    const Box& box() const;
    const bool isSubdivided() const;
+   OctreeNode* parent();
    const OctreeNode* parent() const;
    const std::vector<OctreeNode*> children() const;
    const std::vector<Quadrature*> quadratures() const;
@@ -38,6 +39,7 @@ public:
    void calcLocalMultipolesWithoutTranslation(int n);
    void calcLocalMultipolesWithComplexTranslation(int n);
    void calcLocalMultipolesWithRealTranslation(int n);
+   void initAllMultipoleExpansions(size_t n);
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
 

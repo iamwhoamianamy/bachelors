@@ -33,8 +33,8 @@ private:
    void enumerateNodes(OctreeNode* node,
                        std::vector<std::vector<OctreeNode*>>& layers, 
                        size_t currentLayerId);
-   std::vector<HarmonicSeries<Vector3>> calcContributionToHigherLevel(
+   std::vector<HarmonicSeries<Vector3>> calcContributionsToHigherLevel(
       const std::vector<OctreeNode*>& layer);
-   void calcMultipolesAtZeroLayer(
+   void calcMultipolesAtLeaves(
       const  std::vector<std::vector<OctreeNode*>>& layers);
 };

@@ -45,13 +45,6 @@ public:
       const HarmonicSeries<Vector3>& expansion,
       const Vector3& translation);
 
-   static real getRealChildContribution(int l, int m,
-                                        const HarmonicSeries<real>& regular,
-                                        const HarmonicSeries<real>& child);
-   static real getImagChildContribution(int l, int m,
-                                        const HarmonicSeries<real>& regular,
-                                        const HarmonicSeries<real>& child);
-
    static real getFactorial(size_t n);
    
    static HarmonicSeries<real> separateX(const HarmonicSeries<Vector3>& harmonics);
