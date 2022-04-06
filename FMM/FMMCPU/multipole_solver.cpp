@@ -1,6 +1,8 @@
 #include <iostream>
+#include <queue>
 #include "multipole_solver.hpp"
 #include "math.hpp"
+#include "integration.hpp"
 #include "harmonics.hpp"
 #include "math.hpp"
 
@@ -28,6 +30,57 @@ void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
 {
    octreeRoot->calcLocalMultipolesWithRealTranslation(n);
    _multipolesAreReady = true;
+}
+
+void MultipoleSolver::calcLocalMultipolesWithLayers()
+{
+   std::vector<std::vector<OctreeNode*>> layers;
+   enumerateNodes(octreeRoot, layers, 0);
+   calcMultipolesAtZeroLayer(layers);
+
+   for(int i = layers.size() - 1; i >= 1; i--)
+   {
+      auto contribution = calcContributionToHigherLevel(layers[i]);
+   }
+}
+
+void MultipoleSolver::calcMultipolesAtZeroLayer(
+   const  std::vector<std::vector<OctreeNode*>>& layers)
+{
+   for(auto leaf : layers[layers.size() - 1])
+   {
+      leaf->multipoleExpansion() = math::calcIntegralContribution(leaf->quadratures(), n,
+                                                                  leaf->box().center);
+   }
+}
+
+
+std::vector<HarmonicSeries<Vector3>> MultipoleSolver::calcContributionToHigherLevel(
+   const std::vector<OctreeNode*>& layer)
+{
+   std::vector<HarmonicSeries<Vector3>> res;
+
+   for(auto node : layer)
+   {
+      //res.push_back(node->parent().ge);
+   }
+
+   return res;
+}
+
+void MultipoleSolver::enumerateNodes(OctreeNode* node,
+                                     std::vector<std::vector<OctreeNode*>>& layers, 
+                                     size_t currentLayerId)
+{
+   if(layers.size() <= currentLayerId)
+      layers.push_back(std::vector<OctreeNode*>());
+   
+   layers[currentLayerId].push_back(node);
+
+   for(auto child : node->children())
+   {
+      enumerateNodes(child, layers, currentLayerId + 1);
+   }
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)

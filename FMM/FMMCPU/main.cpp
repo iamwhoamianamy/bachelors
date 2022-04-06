@@ -50,8 +50,8 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   //return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
+   //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -198,15 +198,19 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.calcLocalMultipolesWithoutTranslation();
    Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
 
+   multipoleSolver.calcLocalMultipolesWithComplexTranslation();
+   Vector3 byMultipolesWithComplexTranslation = multipoleSolver.calcB(current, point);
+
    multipoleSolver.calcLocalMultipolesWithRealTranslation();
-   Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
+   Vector3 byMultipolesWithRealTranslation = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
    std::cout << std::setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << std::endl;
-   std::cout << std::setw(40) << "multipoles with translation " << byMultipolesWithTranslation << std::endl;
+   std::cout << std::setw(40) << "multipoles with c translation " << byMultipolesWithComplexTranslation << std::endl;
+   std::cout << std::setw(40) << "multipoles with r translation " << byMultipolesWithRealTranslation << std::endl;
 }
 
 void translationTest()
@@ -339,7 +343,6 @@ void timeResearchForMorePoints()
    }
 }
 
-
 void NMResearch()
 {
    const double torusRadius = 2;
@@ -365,14 +368,35 @@ void NMResearch()
    }
 }
 
+void layerCalculationsPrecision()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   MultipoleSolver multipoleSolver(quadratures);
+   multipoleSolver.calcLocalMultipolesWithLayers();
+   /*Vector3 point(3, 1, 2);
+
+   multipoleSolver.calcLocalMultipolesWithRealTranslation();
+   Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
+
+   std::cout << std::setw(20) << "point ";
+   point.printWithWidth(std::cout, 6);
+   std::cout << std::scientific << std::endl;
+   std::cout << std::setw(40) << "multipoles with translation " << byMultipolesWithTranslation << std::endl;*/
+
+
+}
+
 int main()
 {
    //NMResearch();
    //timeResearchForMorePoints();
-   comparisonToTelmaWithTranslation();
-   //comparisonBetweenMethodsOnPrecision();
+   //comparisonToTelmaWithTranslation();
+   comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipoles();
    //translationTest();
+   //layerCalculationsPrecision();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

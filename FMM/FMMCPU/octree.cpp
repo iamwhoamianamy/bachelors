@@ -144,30 +144,6 @@ void OctreeNode::calcLocalMultipolesWithoutTranslation(int n)
    }
 }
 
-void OctreeNode::calcLocalMultipolesWithRealTranslation(int n)
-{
-   if(!_isSubdivided && !_quadratures.empty())
-   {
-      _multipoleExpansion = math::calcIntegralContribution(_quadratures, n, _box.center);
-   }
-   else
-   {
-      _multipoleExpansion = HarmonicSeries<Vector3>(n);
-
-      for(auto child : _children)
-      {
-         child->calcLocalMultipolesWithRealTranslation(n);
-      }
-
-      for(auto child : _children)
-      {
-         if(!child->_quadratures.empty() && !child->_isSubdivided ||
-             child->_quadratures.empty() && child->_isSubdivided)
-            accountChildRealContribution(child, n);
-      }
-   }
-}
-
 void OctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
 {
    if(!_isSubdivided && !_quadratures.empty())
@@ -187,41 +163,35 @@ void OctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
       {
          if(!child->_quadratures.empty() && !child->_isSubdivided ||
             child->_quadratures.empty() && child->_isSubdivided)
-            accountChildComplexContribution(child, n);
+            _multipoleExpansion.add(Harmonics::translateWithComplex(child->multipoleExpansion(),
+                                    child->box().center - _box.center));
       }
    }
 }
 
-void OctreeNode::accountChildComplexContribution(OctreeNode* child, int n)
+void OctreeNode::calcLocalMultipolesWithRealTranslation(int n)
 {
-   Vector3 translation = child->box().center - _box.center;
-   auto R = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(n, translation));
+   if(!_isSubdivided && !_quadratures.empty())
+   {
+      _multipoleExpansion = math::calcIntegralContribution(_quadratures, n, _box.center);
+   }
+   else
+   {
+      _multipoleExpansion = HarmonicSeries<Vector3>(n);
 
-   auto meAsCompX = Harmonics::realToComplex(Harmonics::separateX(child->_multipoleExpansion));
-   auto meAsCompY = Harmonics::realToComplex(Harmonics::separateY(child->_multipoleExpansion));
-   auto meAsCompZ = Harmonics::realToComplex(Harmonics::separateZ(child->_multipoleExpansion));
+      for(auto child : _children)
+      {
+         child->calcLocalMultipolesWithRealTranslation(n);
+      }
 
-   auto contribution = Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(R, meAsCompX)),
-                                                Harmonics::complexToReal(Harmonics::translate(R, meAsCompY)),
-                                                Harmonics::complexToReal(Harmonics::translate(R, meAsCompZ)));
-
-   _multipoleExpansion.add(contribution);
-}
-
-void OctreeNode::accountChildRealContribution(OctreeNode* child, int n)
-{
-   Vector3 translation = child->box().center - _box.center;
-   auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
-
-   auto meAsCompX = Harmonics::separateX(child->_multipoleExpansion);
-   auto meAsCompY = Harmonics::separateY(child->_multipoleExpansion);
-   auto meAsCompZ = Harmonics::separateZ(child->_multipoleExpansion);
-
-   auto contribution = Harmonics::createFormXYZ(Harmonics::translate(R, meAsCompX),
-                                                Harmonics::translate(R, meAsCompY),
-                                                Harmonics::translate(R, meAsCompZ));
-
-   _multipoleExpansion.add(contribution);
+      for(auto child : _children)
+      {
+         if(!child->_quadratures.empty() && !child->_isSubdivided ||
+             child->_quadratures.empty() && child->_isSubdivided)
+            _multipoleExpansion.add(Harmonics::translateWithReal(child->multipoleExpansion(),
+                                    child->box().center - _box.center));
+      }
+   }
 }
 
 Vector3 OctreeNode::calcA(const Vector3& point) const
@@ -321,9 +291,24 @@ const bool OctreeNode::isSubdivided() const
    return _isSubdivided;
 }
 
+const OctreeNode* OctreeNode::parent() const
+{
+   return _parent;
+}
+
 const std::vector<OctreeNode*> OctreeNode::children() const
 {
    return _children;
+}
+
+const std::vector<Quadrature*> OctreeNode::quadratures() const
+{
+   return _quadratures;
+}
+
+HarmonicSeries<Vector3>& OctreeNode::multipoleExpansion()
+{
+   return _multipoleExpansion;
 }
 
 const HarmonicSeries<Vector3>& OctreeNode::multipoleExpansion() const

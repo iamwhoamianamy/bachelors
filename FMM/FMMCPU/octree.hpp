@@ -18,7 +18,6 @@ private:
    const OctreeNode* _parent;
 
 public:
-
    OctreeNode();
    OctreeNode(const Box& box, const size_t capacity, const OctreeNode* parent = nullptr);
 
@@ -29,7 +28,10 @@ public:
 
    const Box& box() const;
    const bool isSubdivided() const;
+   const OctreeNode* parent() const;
    const std::vector<OctreeNode*> children() const;
+   const std::vector<Quadrature*> quadratures() const;
+   HarmonicSeries<Vector3>& multipoleExpansion();
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
 
    std::vector<Quadrature*> getAllQuadratures() const;
@@ -40,8 +42,5 @@ public:
    Vector3 caclRot(const Vector3& point) const;
 
    ~OctreeNode();
-   
 private:
-   void accountChildRealContribution(OctreeNode* child, int n);
-   void accountChildComplexContribution(OctreeNode* child, int n);
 };

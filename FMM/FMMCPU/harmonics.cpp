@@ -144,12 +144,12 @@ real Harmonics::strangeFactor(int m, int mu)
 }
 
 HarmonicSeries<std::complex<real>> Harmonics::translate(
-   const HarmonicSeries<std::complex<real>>& regular,
-   const HarmonicSeries<std::complex<real>>& child)
+   const HarmonicSeries<std::complex<real>>& a,
+   const HarmonicSeries<std::complex<real>>& b)
 {
-   HarmonicSeries<std::complex<real>> res(regular.size());
+   HarmonicSeries<std::complex<real>> res(a.size());
 
-   for(int l = 0; l < regular.size(); l++)
+   for(int l = 0; l < a.size(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -163,8 +163,8 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
 
                if(dm >= -dl && dm <= +dl)
                {
-                  res.getHarmonic(l, m) += regular.getHarmonic(lambda, mu) *
-                     child.getHarmonic(dl, dm) * strangeFactor(m, mu);
+                  res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) *
+                     b.getHarmonic(dl, dm) * strangeFactor(m, mu);
                }
             }
          }
@@ -175,12 +175,12 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
 }
 
 HarmonicSeries<real> Harmonics::translate(
-   const HarmonicSeries<real>& regular,
-   const HarmonicSeries<real>& child)
+   const HarmonicSeries<real>& a,
+   const HarmonicSeries<real>& b)
 {
-   HarmonicSeries<real> res(regular.size());
+   HarmonicSeries<real> res(b.size());
 
-   for(int l = 0; l < regular.size(); l++)
+   for(int l = 0; l < b.size(); l++)
    {
       real zeroRes = 0;
 
@@ -192,7 +192,7 @@ HarmonicSeries<real> Harmonics::translate(
          {
             if(-dl <= mu && mu <= +dl)
             {
-               zeroRes += regular.getHarmonic(lambda, mu) * child.getHarmonic(dl, mu) *
+               zeroRes += b.getHarmonic(lambda, mu) * a.getHarmonic(dl, mu) *
                            strangeFactor(0, mu);
             }
          }
@@ -214,8 +214,8 @@ HarmonicSeries<real> Harmonics::translate(
                int dm = m - mu;
                int dnm = -m - mu;
 
-               real RR = regular.getReal(lambda, mu);
-               real IR = regular.getImag(lambda, mu);
+               real RR = b.getReal(lambda, mu);
+               real IR = b.getImag(lambda, mu);
 
                real RM = 0;
                real IM = 0;
@@ -225,8 +225,8 @@ HarmonicSeries<real> Harmonics::translate(
 
                if(-dl <= dm && dm <= dl)
                {
-                  RM = child.getReal(dl, dm);
-                  IM = child.getImag(dl, dm);
+                  RM = a.getReal(dl, dm);
+                  IM = a.getImag(dl, dm);
 
                   realRes += (RR * RM - IR * IM) * strangeFactor(m, mu);
                   imagRes += (RR * IM + IR * RM) * strangeFactor(m, mu);
@@ -234,8 +234,8 @@ HarmonicSeries<real> Harmonics::translate(
 
                if(-dl <= dnm && dnm <= dl)
                {
-                  RnM = child.getReal(dl, dnm);
-                  InM = child.getImag(dl, dnm);
+                  RnM = a.getReal(dl, dnm);
+                  InM = a.getImag(dl, dnm);
 
                   realRes += (RR * RnM - IR * InM) * strangeFactor(-m, mu);
                   imagRes -= (RR * InM + IR * RnM) * strangeFactor(-m, mu);
@@ -249,6 +249,36 @@ HarmonicSeries<real> Harmonics::translate(
    }
 
    return res;
+}
+
+HarmonicSeries<Vector3> Harmonics::translateWithComplex(
+   const HarmonicSeries<Vector3>& expansion,
+   const Vector3& translation)
+{
+   auto regular = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(expansion.size(), translation));
+
+   auto xComponent = Harmonics::realToComplex(Harmonics::separateX(expansion));
+   auto yComponent = Harmonics::realToComplex(Harmonics::separateY(expansion));
+   auto zComponent = Harmonics::realToComplex(Harmonics::separateZ(expansion));
+
+   return Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(regular, xComponent)),
+                                   Harmonics::complexToReal(Harmonics::translate(regular, yComponent)),
+                                   Harmonics::complexToReal(Harmonics::translate(regular, zComponent)));
+}
+
+HarmonicSeries<Vector3> Harmonics::translateWithReal(
+   const HarmonicSeries<Vector3>& expansion,
+   const Vector3& translation)
+{
+   auto regular = Harmonics::calcRegularSolidHarmonics(expansion.size(), translation);
+
+   auto xComponent = Harmonics::separateX(expansion);
+   auto yComponent = Harmonics::separateY(expansion);
+   auto zComponent = Harmonics::separateZ(expansion);
+
+   return Harmonics::createFormXYZ(Harmonics::translate(regular, xComponent),
+                                   Harmonics::translate(regular, yComponent),
+                                   Harmonics::translate(regular, zComponent));
 }
 
 real Harmonics::getRealChildContribution(int l, int m,

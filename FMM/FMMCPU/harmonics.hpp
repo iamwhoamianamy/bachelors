@@ -17,13 +17,12 @@ public:
 
    const HarmonicSeries<real>& sphericalHarmonics() const;
 
-   static HarmonicSeries<real> calcSolidHarmonics(size_t n,
-                                                  Vector3 point,
-                                                  bool isRegular);
-   static HarmonicSeries<real> calcRegularSolidHarmonics(size_t n,
-                                                         Vector3 point);
-   static HarmonicSeries<real> calcIrregularSolidHarmonics(size_t n,
-                                                           Vector3 point);
+   static HarmonicSeries<real> calcSolidHarmonics(
+      size_t n,Vector3 point, bool isRegular);
+   static HarmonicSeries<real> calcRegularSolidHarmonics(
+      size_t n, Vector3 point);
+   static HarmonicSeries<real> calcIrregularSolidHarmonics(
+      size_t n, Vector3 point);
 
    static HarmonicSeries<std::complex<real>> realToComplex(
       const HarmonicSeries<real>& harmonics);
@@ -37,6 +36,14 @@ public:
    static HarmonicSeries<real> translate(
       const HarmonicSeries<real>& regular,
       const HarmonicSeries<real>& child);
+
+   static HarmonicSeries<Vector3> translateWithComplex(
+      const HarmonicSeries<Vector3>& expansion,
+      const Vector3& translation);
+
+   static HarmonicSeries<Vector3> translateWithReal(
+      const HarmonicSeries<Vector3>& expansion,
+      const Vector3& translation);
 
    static real getRealChildContribution(int l, int m,
                                         const HarmonicSeries<real>& regular,
