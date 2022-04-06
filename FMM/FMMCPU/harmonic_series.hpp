@@ -7,7 +7,6 @@ template <class T>
 struct HarmonicSeries
 {
 private:
-   real R_SQRT_2 = 1.0 / sqrt(2.0);
    std::vector<std::vector<T>> _data;
 public:
    HarmonicSeries();
@@ -67,14 +66,14 @@ template<class T>
 inline const T& HarmonicSeries<T>::getReal(int l, int m) const
 {
    if(m == 0) return getHarmonic(l, 0);
-   return getHarmonic(l, abs(m)) * R_SQRT_2;
+   return getHarmonic(l, abs(m)) * math::R_SQRT_2;
 }
 
 template<class T>
 inline const T& HarmonicSeries<T>::getImag(int l, int m) const
 {
    if(m == 0) return T(0);
-   return math::sign(m) * getHarmonic(l, -abs(m)) * R_SQRT_2;
+   return math::sign(m) * getHarmonic(l, -abs(m)) * math::R_SQRT_2;
 }
 
 template<class T>

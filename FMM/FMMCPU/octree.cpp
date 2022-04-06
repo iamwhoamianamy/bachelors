@@ -191,35 +191,6 @@ void Octree::calcLocalMultipolesWithComplexTranslation(int n)
    }
 }
 
-void Octree::accountChildRealContribution(Octree* child, int n)
-{
-   //Vector3 translation = child->box().center - _box.center;
-   //auto R = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(n, translation));
-
-   //auto meAsCompX = Harmonics::realToComplex(Harmonics::separateX(child->_multipoleExpansion));
-   //auto meAsCompY = Harmonics::realToComplex(Harmonics::separateY(child->_multipoleExpansion));
-   //auto meAsCompZ = Harmonics::realToComplex(Harmonics::separateZ(child->_multipoleExpansion));
-
-   //auto contribution = Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompX)),
-   //                                             Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompY)),
-   //                                             Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompZ)));
-
-   //_multipoleExpansion.add(contribution);
-
-   Vector3 translation = child->box().center - _box.center;
-   auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
-
-   auto meAsCompX = Harmonics::separateX(child->_multipoleExpansion);
-   auto meAsCompY = Harmonics::separateY(child->_multipoleExpansion);
-   auto meAsCompZ = Harmonics::separateZ(child->_multipoleExpansion);
-
-   auto contribution = Harmonics::createFormXYZ(Harmonics::translate(n, R, meAsCompX),
-                                                Harmonics::translate(n, R, meAsCompY),
-                                                Harmonics::translate(n, R, meAsCompZ));
-
-   _multipoleExpansion.add(contribution);
-}
-
 void Octree::accountChildComplexContribution(Octree* child, int n)
 {
    Vector3 translation = child->box().center - _box.center;
@@ -232,6 +203,22 @@ void Octree::accountChildComplexContribution(Octree* child, int n)
    auto contribution = Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompX)),
                                                 Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompY)),
                                                 Harmonics::complexToReal(Harmonics::translate(n, R, meAsCompZ)));
+
+   _multipoleExpansion.add(contribution);
+}
+
+void Octree::accountChildRealContribution(Octree* child, int n)
+{
+   Vector3 translation = child->box().center - _box.center;
+   auto R = Harmonics::calcRegularSolidHarmonics(n, translation);
+
+   auto meAsCompX = Harmonics::separateX(child->_multipoleExpansion);
+   auto meAsCompY = Harmonics::separateY(child->_multipoleExpansion);
+   auto meAsCompZ = Harmonics::separateZ(child->_multipoleExpansion);
+
+   auto contribution = Harmonics::createFormXYZ(Harmonics::translate(n, R, meAsCompX),
+                                                Harmonics::translate(n, R, meAsCompY),
+                                                Harmonics::translate(n, R, meAsCompZ));
 
    _multipoleExpansion.add(contribution);
 }
@@ -322,8 +309,6 @@ Vector3 Octree::caclRot(const Vector3& point) const
 
    return res;
 }
-
-
 
 const Box& Octree::box() const
 {

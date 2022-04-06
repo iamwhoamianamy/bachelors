@@ -17,13 +17,13 @@ public:
 
    const HarmonicSeries<real>& sphericalHarmonics() const;
 
+   static HarmonicSeries<real> calcSolidHarmonics(size_t n,
+                                                  Vector3 point,
+                                                  bool isRegular);
    static HarmonicSeries<real> calcRegularSolidHarmonics(size_t n,
                                                          Vector3 point);
    static HarmonicSeries<real> calcIrregularSolidHarmonics(size_t n,
                                                            Vector3 point);
-   static HarmonicSeries<real> calcSolidHarmonics(size_t n,
-                                                  Vector3 point,
-                                                  bool isRegular);
 
    static HarmonicSeries<std::complex<real>> realToComplex(
       const HarmonicSeries<real>& harmonics);
