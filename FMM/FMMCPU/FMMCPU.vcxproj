@@ -145,6 +145,7 @@
     <ClCompile Include="exeptions.cpp" />
     <ClCompile Include="factorials.cpp" />
     <ClCompile Include="hexahedron.cpp" />
+    <ClCompile Include="integration.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="multipole_solver.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="factorials.hpp" />
     <ClInclude Include="harmonic_series.hpp" />
     <ClInclude Include="hexahedron.hpp" />
+    <ClInclude Include="integration.hpp" />
     <ClInclude Include="math.hpp" />
     <ClInclude Include="multipole_solver.hpp" />
     <ClInclude Include="octree.hpp" />

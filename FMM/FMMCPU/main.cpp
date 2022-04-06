@@ -11,12 +11,18 @@
 #include "basis_quadratures.hpp"
 #include "exeptions.hpp"
 #include "math.hpp"
+#include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_solver.hpp"
 
-
 using namespace math;
 const real current = 5;
+
+double getTime(const std::chrono::steady_clock::time_point& start,
+               const std::chrono::steady_clock::time_point& stop)
+{
+   return std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+}
 
 std::vector<std::pair<Vector3, Vector3>> readTelmaResults(const std::string& filename)
 {
@@ -44,7 +50,8 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
+   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+   //return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -155,7 +162,7 @@ void comparisonToTelmaWithTranslation()
 
    auto telmaResults = readTelmaResults("results/telma_results.txt");
    MultipoleSolver multipoleSolver(quadratures);
-   multipoleSolver.calcLocalMultipolesWithTranslation();
+   multipoleSolver.calcLocalMultipolesWithRealTranslation();
    real sumError = 0;
    size_t n = telmaResults.size();
 
@@ -191,7 +198,7 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.calcLocalMultipolesWithoutTranslation();
    Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
 
-   multipoleSolver.calcLocalMultipolesWithTranslation();
+   multipoleSolver.calcLocalMultipolesWithRealTranslation();
    Vector3 byMultipolesWithTranslation = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
@@ -224,19 +231,27 @@ void calculationTimeForLocalMultipoles()
    for(size_t i = 5; i < 15; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithoutT(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithRealT(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithComplexT(quadratures, octreeLeafCapacity);
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolver.calcLocalMultipolesWithoutTranslation();
+      multipoleSolverWithoutT.calcLocalMultipolesWithoutTranslation();
       auto stop = std::chrono::steady_clock::now();
-      auto timeWithoutTranslation = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+      double timeWithoutTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calcLocalMultipolesWithTranslation();
+      multipoleSolverWithRealT.calcLocalMultipolesWithComplexTranslation();
       stop = std::chrono::steady_clock::now();
-      auto timeWithTranslation = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+      double timeWithComplexTranslation = getTime(start, stop);
 
-      std::cout << octreeLeafCapacity << " " << timeWithoutTranslation << " " << timeWithTranslation << std::endl;
+      start = std::chrono::steady_clock::now();
+      multipoleSolverWithRealT.calcLocalMultipolesWithRealTranslation();
+      stop = std::chrono::steady_clock::now();
+      double timeWithRealTranslation = getTime(start, stop);
+
+      std::cout << octreeLeafCapacity << " " << timeWithoutTranslation << " ";
+      std::cout << timeWithComplexTranslation << " " << timeWithRealTranslation << std::endl;
    }
 }
 
@@ -286,7 +301,7 @@ std::pair<double, Vector3>  timeForMultipolesWithTranslation(
 {
    Vector3 res;
    MultipoleSolver multipoleSolver(quadratures);
-   multipoleSolver.calcLocalMultipolesWithTranslation();
+   multipoleSolver.calcLocalMultipolesWithRealTranslation();
 
    auto start = std::chrono::steady_clock::now();
 
@@ -355,8 +370,8 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   comparisonBetweenMethodsOnPrecision();
-   //calculationTimeForLocalMultipoles();
+   //comparisonBetweenMethodsOnPrecision();
+   calculationTimeForLocalMultipoles();
    //translationTest();
 
    /*Vector3 point(3, 1, 2);

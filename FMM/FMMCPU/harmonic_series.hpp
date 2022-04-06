@@ -1,10 +1,13 @@
 #pragma once
 #include <vector>
+#include "real.hpp"
+#include "math.hpp"
 
 template <class T>
 struct HarmonicSeries
 {
 private:
+   real R_SQRT_2 = 1.0 / sqrt(2.0);
    std::vector<std::vector<T>> _data;
 public:
    HarmonicSeries();
@@ -13,6 +16,9 @@ public:
    T& getHarmonic(int l, int m);
    const T& getHarmonic(int l, int m) const;
    size_t size() const;
+
+   const T& getReal(int l, int m) const;
+   const T& getImag(int l, int m) const;
 
    HarmonicSeries<T>(HarmonicSeries<T>&& harmonicSeries) noexcept;
    HarmonicSeries<T>(const HarmonicSeries<T>& harmonicSeries) noexcept;
@@ -55,6 +61,20 @@ template<class T>
 inline size_t HarmonicSeries<T>::size() const
 {
    return _data.size();
+}
+
+template<class T>
+inline const T& HarmonicSeries<T>::getReal(int l, int m) const
+{
+   if(m == 0) return getHarmonic(l, 0);
+   return getHarmonic(l, abs(m)) * R_SQRT_2;
+}
+
+template<class T>
+inline const T& HarmonicSeries<T>::getImag(int l, int m) const
+{
+   if(m == 0) return T(0);
+   return math::sign(m) * getHarmonic(l, -abs(m)) * R_SQRT_2;
 }
 
 template<class T>

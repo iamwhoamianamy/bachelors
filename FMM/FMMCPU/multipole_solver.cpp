@@ -18,9 +18,15 @@ void MultipoleSolver::calcLocalMultipolesWithoutTranslation()
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcLocalMultipolesWithTranslation()
+void MultipoleSolver::calcLocalMultipolesWithComplexTranslation()
 {
-   octreeRoot->calcLocalMultipolesWithTranslation(n);
+   octreeRoot->calcLocalMultipolesWithComplexTranslation(n);
+   _multipolesAreReady = true;
+}
+
+void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
+{
+   octreeRoot->calcLocalMultipolesWithRealTranslation(n);
    _multipolesAreReady = true;
 }
 

@@ -100,6 +100,11 @@ void Harmonics::addComplex(real x, real y)
    }
 }
 
+real Harmonics::strangeFactor(int m, int mu)
+{
+   return pow(-1, -0.5 * (abs(m) - abs(mu) - abs(m - mu)));
+}
+
 HarmonicSeries<std::complex<real>> Harmonics::translate(
    int n,
    const HarmonicSeries<std::complex<real>>& regular,
@@ -117,12 +122,11 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
             {
                int dl = l - lambda;
                int dm = m - mu;
+
                if(dm >= -dl && dm <= +dl)
                {
-                  int power = abs(m) - abs(mu) - abs(dm);
-                  real iPowReal = std::pow(-1, power * -0.5);
                   res.getHarmonic(l, m) += regular.getHarmonic(lambda, mu) *
-                     child.getHarmonic(dl, dm) * iPowReal;
+                     child.getHarmonic(dl, dm) *strangeFactor(m, mu);
                }
             }
          }
@@ -160,6 +164,68 @@ HarmonicSeries<real> Harmonics::translate(
    const HarmonicSeries<real>& child)
 {
    HarmonicSeries<real> res(n);
+
+   for(int l = 0; l < n; l++)
+   {
+      res.getHarmonic(l, 0) = getRealChildContribution(l, 0, regular, child);
+
+      for(int m = 1; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = (getRealChildContribution(l, m, regular, child) +
+                                  getRealChildContribution(l, -m, regular, child)) * math::R_SQRT_2;
+
+         res.getHarmonic(l, -m) = (getImagChildContribution(l, abs(m), regular, child) -
+                                   getImagChildContribution(l, -abs(m), regular, child)) * math::R_SQRT_2;
+      }
+   }
+
+   return res;
+}
+
+real Harmonics::getRealChildContribution(int l, int m,
+                                         const HarmonicSeries<real>& regular,
+                                         const HarmonicSeries<real>& child)
+{
+   real res = 0;
+
+   for(int lambda = 0; lambda <= l; lambda++)
+   {
+      for(int mu = -lambda; mu <= lambda; mu++)
+      {
+         int dl = l - lambda;
+         int dm = m - mu;
+
+         if(dm >= -dl && dm <= +dl)
+         {
+            res += (regular.getReal(lambda, mu) * child.getReal(dl, dm) -
+                    regular.getImag(lambda, mu) * child.getImag(dl, dm)) * strangeFactor(m, mu);
+         }
+      }
+   }
+
+   return res;
+}
+
+real Harmonics::getImagChildContribution(int l, int m,
+                                         const HarmonicSeries<real>& regular,
+                                         const HarmonicSeries<real>& child)
+{
+   real res = 0;
+
+   for(int lambda = 0; lambda <= l; lambda++)
+   {
+      for(int mu = -lambda; mu <= lambda; mu++)
+      {
+         int dl = l - lambda;
+         int dm = m - mu;
+
+         if(dm >= -dl && dm <= +dl)
+         {
+            res += (regular.getReal(lambda, mu) * child.getImag(dl, dm) +
+                    regular.getImag(lambda, mu) * child.getReal(dl, dm)) * strangeFactor(m, mu);
+         }
+      }
+   }
 
    return res;
 }

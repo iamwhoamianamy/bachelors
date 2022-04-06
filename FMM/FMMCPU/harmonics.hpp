@@ -40,6 +40,13 @@ public:
       const HarmonicSeries<real>& regular,
       const HarmonicSeries<real>& child);
 
+   static real getRealChildContribution(int l, int m,
+                                        const HarmonicSeries<real>& regular,
+                                        const HarmonicSeries<real>& child);
+   static real getImagChildContribution(int l, int m,
+                                        const HarmonicSeries<real>& regular,
+                                        const HarmonicSeries<real>& child);
+
    static real getFactorial(size_t n);
    
    static HarmonicSeries<real> separateX(const HarmonicSeries<Vector3>& harmonics);
@@ -56,4 +63,6 @@ private:
    void mirrorLegendrePolynomialDerivatives(real z);
    real calcLegendrePolynomial(int i, real z);
    void addComplex(real x, real y);
+
+   static real strangeFactor(int m, int mu);
 };

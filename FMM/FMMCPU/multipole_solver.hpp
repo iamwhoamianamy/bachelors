@@ -22,7 +22,8 @@ public:
                    size_t octreeLeafCapacity = 1000);
 
    void calcLocalMultipolesWithoutTranslation();
-   void calcLocalMultipolesWithTranslation();
+   void calcLocalMultipolesWithRealTranslation();
+   void calcLocalMultipolesWithComplexTranslation();
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
    ~MultipoleSolver();

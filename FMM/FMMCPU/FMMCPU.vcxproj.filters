@@ -69,6 +69,9 @@
     <ClCompile Include="multipole_solver.cpp">
       <Filter>FMMSolver</Filter>
     </ClCompile>
+    <ClCompile Include="integration.cpp">
+      <Filter>Geometry\Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tetrahedron.hpp">
@@ -117,6 +120,9 @@
       <Filter>FMMSolver</Filter>
     </ClInclude>
     <ClInclude Include="multipole_solver.hpp">
+      <Filter>FMMSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="integration.hpp">
       <Filter>FMMSolver</Filter>
     </ClInclude>
   </ItemGroup>
