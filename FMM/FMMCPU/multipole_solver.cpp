@@ -1,5 +1,4 @@
 #include <iostream>
-#include <queue>
 #include "multipole_solver.hpp"
 #include "math.hpp"
 #include "integration.hpp"
@@ -52,6 +51,24 @@ void MultipoleSolver::calcLocalMultipolesWithLayers()
    _multipolesAreReady = true;
 }
 
+void MultipoleSolver::enumerateNodes(OctreeNode* node,
+                                     std::vector<std::vector<OctreeNode*>>& layers,
+                                     size_t currentLayerId)
+{
+   if(!node->quadratures().empty() || node->isSubdivided())
+   {
+      if(layers.size() <= currentLayerId)
+         layers.push_back(std::vector<OctreeNode*>());
+
+      layers[currentLayerId].push_back(node);
+
+      for(auto child : node->children())
+      {
+         enumerateNodes(child, layers, currentLayerId + 1);
+      }
+   }
+}
+
 void MultipoleSolver::calcMultipolesAtLeaves(
    const  std::vector<std::vector<OctreeNode*>>& layers)
 {
@@ -79,24 +96,6 @@ std::vector<HarmonicSeries<Vector3>> MultipoleSolver::calcContributionsToHigherL
    }
 
    return res;
-}
-
-void MultipoleSolver::enumerateNodes(OctreeNode* node,
-                                     std::vector<std::vector<OctreeNode*>>& layers, 
-                                     size_t currentLayerId)
-{
-   if(!node->quadratures().empty() || node->isSubdivided())
-   {
-      if(layers.size() <= currentLayerId)
-         layers.push_back(std::vector<OctreeNode*>());
-
-      layers[currentLayerId].push_back(node);
-
-      for(auto child : node->children())
-      {
-         enumerateNodes(child, layers, currentLayerId + 1);
-      }
-   }
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)

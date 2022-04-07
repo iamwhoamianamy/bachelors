@@ -50,8 +50,8 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   return Torus(torusRadius, torusSectionWidth, 80, 4, 4);
+   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+   //return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -405,8 +405,8 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   //comparisonBetweenMethodsOnPrecision();
-   calculationTimeForLocalMultipoles();
+   comparisonBetweenMethodsOnPrecision();
+   //calculationTimeForLocalMultipoles();
    //translationTest();
    //layerCalculationsPrecision();
 
