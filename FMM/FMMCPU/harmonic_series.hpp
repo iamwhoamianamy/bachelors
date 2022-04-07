@@ -7,7 +7,8 @@ template <class T>
 struct HarmonicSeries
 {
 private:
-   std::vector<std::vector<T>> _data;
+   std::vector<T> _data;
+   size_t _n;
 public:
    HarmonicSeries();
    HarmonicSeries(int n);
@@ -36,30 +37,26 @@ inline HarmonicSeries<T>::HarmonicSeries()
 template<class T>
 inline HarmonicSeries<T>::HarmonicSeries(int n)
 {
-   _data = std::vector<std::vector<T>>(n);
-
-   for(size_t i = 0; i < n; i++)
-   {
-      _data[i] = std::vector<T>(2 * i + 1);
-   }
+   _n = n;
+   _data = std::vector<T>((n + 1) * (n + 1));
 }
 
 template<class T>
 inline T& HarmonicSeries<T>::getHarmonic(int l, int m)
 {
-   return _data[l][l + m];
+   return _data[l * l + l + m];
 }
 
 template<class T>
 inline const T& HarmonicSeries<T>::getHarmonic(int l, int m) const
 {
-   return _data[l][l + m];
+   return _data[l * l + l + m];
 }
 
 template<class T>
 inline size_t HarmonicSeries<T>::size() const
 {
-   return _data.size();
+   return _n;
 }
 
 template<class T>
@@ -79,6 +76,7 @@ template<class T>
 inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(HarmonicSeries<T>&& harmonicSeries) noexcept
 {
    _data = std::move(harmonicSeries._data);
+   _n = harmonicSeries._n;
    return *this;
 }
 
@@ -86,30 +84,25 @@ template<class T>
 inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(const HarmonicSeries<T>& harmonicSeries)
 {
    _data = harmonicSeries._data;
+   _n = harmonicSeries._n;
    return *this;
 }
 
 template<class T>
 inline void HarmonicSeries<T>::add(const HarmonicSeries<T>& harmonicSeries)
 {
-   for(int l = 0; l < _data.size(); l++)
+   for(size_t i = 0; i < _data.size(); i++)
    {
-      for(int m = -l; m <= l; m++)
-      {
-         getHarmonic(l, m) += harmonicSeries.getHarmonic(l, m);
-      }
+      _data[i] += harmonicSeries._data[i];
    }
 }
 
 template<class T>
 inline void HarmonicSeries<T>::subtract(const HarmonicSeries<T>& harmonicSeries)
 {
-   for(int l = 0; l < _data.size(); l++)
+   for(size_t i = 0; i < _data.size(); i++)
    {
-      for(int m = -l; m <= l; m++)
-      {
-         getHarmonic(l, m) -= harmonicSeries.getHarmonic(l, m);
-      }
+      _data[i] -= harmonicSeries._data[i];
    }
 }
 
@@ -117,10 +110,12 @@ template<class T>
 inline HarmonicSeries<T>::HarmonicSeries(HarmonicSeries<T>&& harmonicSeries) noexcept
 {
    _data = std::move(harmonicSeries._data);
+   _n = harmonicSeries._n;
 }
 
 template<class T>
 inline HarmonicSeries<T>::HarmonicSeries(const HarmonicSeries<T>& harmonicSeries) noexcept
 {
    _data = harmonicSeries._data;
+   _n = harmonicSeries._n;
 }
