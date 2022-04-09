@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Code">
+      <UniqueIdentifier>{6890b7f1-e4ec-418f-b762-4874bbe84b19}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="kernels.cu">
+      <Filter>Code</Filter>
+    </CudaCompile>
+    <CudaCompile Include="kernel_callers.cu">
+      <Filter>Code</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="kernels.cuh">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_helper.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="dev_ptr.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel_callers.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="multipole_solver.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="octree.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="quadrature.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="real.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="tetrahedron.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="tetrahedron_transformer.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="torus.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="basis_quadratures.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="box.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="exeptions.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="factorials.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="harmonic_series.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="harmonics.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="hexahedron.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="integration.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="math.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cuda_helper.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="octree.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="quadrature.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="tetrahedron.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="tetrahedron_transformer.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="torus.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="vector3.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="basis_quadratures.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="box.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="exeptions.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="factorials.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="harmonics.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="hexahedron.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="integration.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="multipole_solver.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

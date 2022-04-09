@@ -11,8 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ACF4384A-A159-4543-8390-D6DDDEE7340F}</ProjectGuid>
-    <RootNamespace>FMMGPU</RootNamespace>
+    <ProjectGuid>{E1BFAF2C-338F-4C17-A3BF-A6B3DB1D9686}</ProjectGuid>
+    <RootNamespace>FMMCUDADLL</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -22,7 +23,7 @@
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -41,27 +42,20 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <SourcePath>E:\Мнё\Биба\bachelors\FMM\FMMCPU;$(SourcePath)</SourcePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <SourcePath>E:\Мнё\Биба\bachelors\FMM\FMMCPU;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>E:\Мнё\Биба\bachelors\FMM\FMMCPU;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\Мнё\Биба\bachelors\FMM\FMMCPU;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -78,60 +72,23 @@
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\Мнё\Биба\bachelors\FMM\FMMCPU\x64\Release;E:\Мнё\Биба\bachelors\FMM\FMMCPU;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="kernels.cu" />
+    <CudaCompile Include="kernel_callers.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="basis_quadratures.hpp" />
-    <ClInclude Include="box.hpp" />
     <ClInclude Include="cuda_helper.hpp" />
     <ClInclude Include="dev_ptr.hpp" />
-    <ClInclude Include="exeptions.hpp" />
-    <ClInclude Include="factorials.hpp" />
-    <ClInclude Include="harmonics.hpp" />
-    <ClInclude Include="harmonic_series.hpp" />
-    <ClInclude Include="hexahedron.hpp" />
-    <ClInclude Include="integration.hpp" />
     <ClInclude Include="kernels.cuh" />
     <ClInclude Include="kernel_callers.hpp" />
-    <ClInclude Include="math.hpp" />
-    <ClInclude Include="multipole_solver.hpp" />
-    <ClInclude Include="octree.hpp" />
-    <ClInclude Include="quadrature.hpp" />
-    <ClInclude Include="real.hpp" />
-    <ClInclude Include="tetrahedron.hpp" />
-    <ClInclude Include="tetrahedron_transformer.hpp" />
-    <ClInclude Include="torus.hpp" />
-    <ClInclude Include="vector3.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="basis_quadratures.cpp" />
-    <ClCompile Include="box.cpp" />
     <ClCompile Include="cuda_helper.cpp" />
-    <ClCompile Include="exeptions.cpp" />
-    <ClCompile Include="factorials.cpp" />
-    <ClCompile Include="harmonics.cpp" />
-    <ClCompile Include="hexahedron.cpp" />
-    <ClCompile Include="integration.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="math.cpp" />
-    <ClCompile Include="multipole_solver.cpp" />
-    <ClCompile Include="octree.cpp" />
-    <ClCompile Include="quadrature.cpp" />
-    <ClCompile Include="tetrahedron.cpp" />
-    <ClCompile Include="tetrahedron_transformer.cpp" />
-    <ClCompile Include="torus.cpp" />
-    <ClCompile Include="vector3.cpp" />
-    <CudaCompile Include="kernel_callers.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,7 @@
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_solver.hpp"
+#include "kernel_callers.hpp"
 
 using namespace math;
 const real current = 5;
@@ -400,9 +401,15 @@ void layerCalculationsPrecision()
    std::cout << std::setw(40) << "multipoles with layers " << byMultipolesWithLayers << std::endl;
 }
 
+void cudaAddingTest()
+{
+   std::vector<real> a = { 1, 2, 3, 4 };
+   std::vector<real> b = { 10, 20, 30, 100 };
+   std::cout << kernels::addVectors(a, b);
+}
+
 int main()
 {
-   cudaAddingTest();
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
@@ -410,6 +417,8 @@ int main()
    //calculationTimeForLocalMultipoles();
    //translationTest();
    //layerCalculationsPrecision();
+
+   cudaAddingTest();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);
