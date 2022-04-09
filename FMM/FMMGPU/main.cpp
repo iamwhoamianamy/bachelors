@@ -206,7 +206,10 @@ void comparisonBetweenMethodsOnPrecision()
    Vector3 byMultipolesWithRealTranslation = multipoleSolver.calcB(current, point);
 
    multipoleSolver.calcLocalMultipolesWithLayers(false);
-   Vector3 byMultipolesWithLayers = multipoleSolver.calcB(current, point);
+   Vector3 byMultipolesWithLayersCPU = multipoleSolver.calcB(current, point);
+
+   multipoleSolver.calcLocalMultipolesWithLayers(true);
+   Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
@@ -215,7 +218,8 @@ void comparisonBetweenMethodsOnPrecision()
    std::cout << std::setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << std::endl;
    std::cout << std::setw(40) << "multipoles with c translation " << byMultipolesWithComplexTranslation << std::endl;
    std::cout << std::setw(40) << "multipoles with r translation " << byMultipolesWithRealTranslation << std::endl;
-   std::cout << std::setw(40) << "multipoles with layers " << byMultipolesWithLayers << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
 }
 
 void translationTest()
@@ -249,7 +253,7 @@ void calculationTimeForLocalMultipoles()
 
    std::cout << std::fixed;
 
-   for(size_t i = 5; i < 15; i++)
+   for(size_t i = 1; i < 3; i++)
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverWithoutT(quadratures, octreeLeafCapacity);
@@ -259,17 +263,17 @@ void calculationTimeForLocalMultipoles()
       MultipoleSolver multipoleSolverWithLayersGPU(quadratures, octreeLeafCapacity);
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolverWithoutT.calcLocalMultipolesWithoutTranslation();
+      //multipoleSolverWithoutT.calcLocalMultipolesWithoutTranslation();
       auto stop = std::chrono::steady_clock::now();
       double timeWithoutTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverWithComplexT.calcLocalMultipolesWithComplexTranslation();
+      //multipoleSolverWithComplexT.calcLocalMultipolesWithComplexTranslation();
       stop = std::chrono::steady_clock::now();
       double timeWithComplexTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverWithRealT.calcLocalMultipolesWithRealTranslation();
+      //multipoleSolverWithRealT.calcLocalMultipolesWithRealTranslation();
       stop = std::chrono::steady_clock::now();
       double timeWithRealTranslation = getTime(start, stop);
 
@@ -441,7 +445,7 @@ int main()
    //comparisonToTelmaWithTranslation();
    //comparisonBetweenMethodsOnPrecision();
    //translationTest();
-   layerCalculationsPrecision();
+   //layerCalculationsPrecision();
    calculationTimeForLocalMultipoles();
 
    //cudaAddingTest();
