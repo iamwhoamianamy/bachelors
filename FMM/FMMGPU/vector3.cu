@@ -209,7 +209,7 @@ real Vector3::distanceSquared(const Vector3& vec1, const Vector3& vec2)
    return (vec1 - vec2).lengthSquared();
 }
 
-double Vector3::dot(const Vector3& vec1, const Vector3& vec2)
+real Vector3::dot(const Vector3& vec1, const Vector3& vec2)
 {
    return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
 }

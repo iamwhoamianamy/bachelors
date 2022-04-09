@@ -46,7 +46,7 @@ public:
 
    __all__ static Vector3 direction(const Vector3& from, const Vector3& to);
    __all__ static real distanceSquared(const Vector3& vec1, const Vector3& vec2);
-   __all__ static double dot(const Vector3& vec1, const Vector3& vec2);
+   __all__ static real dot(const Vector3& vec1, const Vector3& vec2);
    __all__ static Vector3 cross(const Vector3& vec1, const Vector3& vec2);
 
    __all__ static Vector3 xAxis();
