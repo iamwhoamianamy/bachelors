@@ -1,6 +1,6 @@
 #include <exception>
 #include <iomanip>
-#include "vector3.cuh"
+#include "vector3.hpp"
 
 Vector3::Vector3(const Vector3& vector)
 {

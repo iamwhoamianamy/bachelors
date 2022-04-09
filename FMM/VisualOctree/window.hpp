@@ -5,7 +5,7 @@
 #include "GL/freeglut.h"
 
 #include "../FMMCPU/real.hpp"
-#include "../FMMCPU/vector3.cuh"
+#include "../FMMCPU/vector3.hpp"
 #include "octree.hpp"
 
 class Window

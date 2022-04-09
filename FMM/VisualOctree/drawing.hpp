@@ -1,6 +1,6 @@
 #pragma once
 #include "GL/freeglut.h"
-#include "../FMMCPU/vector3.cuh"
+#include "../FMMCPU/vector3.hpp"
 #include "octree.hpp"
 
 namespace drawing
