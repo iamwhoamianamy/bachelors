@@ -51,22 +51,14 @@ namespace kernels
                {
                   if(-dl <= mu && mu <= +dl)
                   {
-                     zeroRes.x += getHarmonic(b, harmonicBegin, lambda, mu)->x *
-                        *getHarmonic(a, harmonicBegin, dl, mu) *
-                        Harmonics::strangeFactor(0, mu);
-                     zeroRes.y += getHarmonic(b, harmonicBegin, lambda, mu)->y *
-                        *getHarmonic(a, harmonicBegin, dl, mu) *
-                        Harmonics::strangeFactor(0, mu);
-                     zeroRes.z += getHarmonic(b, harmonicBegin, lambda, mu)->z *
-                        *getHarmonic(a, harmonicBegin, dl, mu) *
+                     zeroRes += getHarmonic(b, harmonicBegin, lambda, mu) *
+                        getHarmonic(a, harmonicBegin, dl, mu) *
                         Harmonics::strangeFactor(0, mu);
                   }
                }
             }
 
-            getHarmonic(result, harmonicBegin, l, 0)->x = zeroRes.x;
-            getHarmonic(result, harmonicBegin, l, 0)->y = zeroRes.y;
-            getHarmonic(result, harmonicBegin, l, 0)->z = zeroRes.z;
+            result[lmToIndex(harmonicBegin, l, 0)] = zeroRes;
 
             for(int m = 1; m <= l; m++)
             {
@@ -96,13 +88,8 @@ namespace kernels
                         RM = getReal(a, harmonicBegin, dl, dm);
                         IM = getImag(a, harmonicBegin, dl, dm);
 
-                        realRes.x += (RR.x * RM - IR.x * IM) * Harmonics::strangeFactor(m, mu);
-                        realRes.y += (RR.y * RM - IR.y * IM) * Harmonics::strangeFactor(m, mu);
-                        realRes.z += (RR.z * RM - IR.z * IM) * Harmonics::strangeFactor(m, mu);
-
-                        imagRes.x += (RR.x * IM + IR.x * RM) * Harmonics::strangeFactor(m, mu);
-                        imagRes.y += (RR.y * IM + IR.y * RM) * Harmonics::strangeFactor(m, mu);
-                        imagRes.z += (RR.z * IM + IR.z * RM) * Harmonics::strangeFactor(m, mu);
+                        realRes += (RR * RM - IR * IM) * Harmonics::strangeFactor(m, mu);
+                        imagRes += (RR * IM + IR * RM) * Harmonics::strangeFactor(m, mu);
                      }
 
                      if(-dl <= dnm && dnm <= dl)
@@ -110,24 +97,48 @@ namespace kernels
                         RnM = getReal(a, harmonicBegin, dl, dnm);
                         InM = getImag(a, harmonicBegin, dl, dnm);
 
-                        realRes.x += (RR.x * RnM - IR.x * InM) * Harmonics::strangeFactor(-m, mu);
-                        realRes.y += (RR.y * RnM - IR.y * InM) * Harmonics::strangeFactor(-m, mu);
-                        realRes.z += (RR.z * RnM - IR.z * InM) * Harmonics::strangeFactor(-m, mu);
-
-                        imagRes.x -= (RR.x * InM + IR.x * RnM) * Harmonics::strangeFactor(-m, mu);
-                        imagRes.y -= (RR.y * InM + IR.y * RnM) * Harmonics::strangeFactor(-m, mu);
-                        imagRes.z -= (RR.z * InM + IR.z * RnM) * Harmonics::strangeFactor(-m, mu);
+                        realRes += (RR * RnM - IR * InM) * Harmonics::strangeFactor(-m, mu);
+                        imagRes -= (RR * InM + IR * RnM) * Harmonics::strangeFactor(-m, mu);
                      }
                   }
                }
 
-               getHarmonic(result, harmonicBegin, l, m)->x = realRes.x * math::R_SQRT_2;
-
-               getHarmonic(result, harmonicBegin, l, -m)->x = imagRes.x * math::R_SQRT_2;
-               getHarmonic(result, harmonicBegin, l, -m)->y = imagRes.y * math::R_SQRT_2;
-               getHarmonic(result, harmonicBegin, l, -m)->z = imagRes.z * math::R_SQRT_2;
+               result[lmToIndex(harmonicBegin, l, m)] = realRes * math::R_SQRT_2;
+               result[lmToIndex(harmonicBegin, l, -m)] = imagRes * math::R_SQRT_2;
             }
          }
       }
+   }
+
+   void translateAllGPU(Vector3* result,
+                        const real* a,
+                        const Vector3* b,
+                        size_t count, size_t order)
+   {
+      uint BLOCK_COUNT = (count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
+      size_t harmonicLength = (order + 1) * (order + 1);
+
+      cuda::DevPtr<Vector3> result_dev(count * harmonicLength);
+      cuda::DevPtr<real> a_dev(a, count * harmonicLength, 0);
+      cuda::DevPtr<Vector3> b_dev(b, count * harmonicLength, 0);
+
+      kernels::translateAllGPUKernel<<<BLOCK_COUNT, THREADS_PER_BLOCK>>>
+         (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+
+      cuda::tryKernelLaunch();
+      cuda::tryKernelSynchronize();
+
+      result_dev.copyToHost(result);
+   }
+
+   size_t lmToIndex(int harmonicBegin,
+                    int l, int m)
+   {
+      return harmonicBegin + l * l + l + m;
+   }
+
+   __all__ real strangeFactor(int m, int mu)
+   {
+      return pow(-1, -0.5 * (abs(m) - abs(mu) - abs(m - mu)));
    }
 }

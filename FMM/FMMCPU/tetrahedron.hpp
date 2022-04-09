@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "vector3.hpp"
+#include "vector3.cuh"
 
 class Tetrahedron
 {

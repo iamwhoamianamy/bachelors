@@ -1,6 +1,6 @@
 #include <exception>
 #include <iomanip>
-#include "vector3.hpp"
+#include "vector3.cuh"
 
 Vector3::Vector3(const Vector3& vector)
 {
@@ -26,7 +26,6 @@ real& Vector3::operator[](int i)
       case 0: return x;
       case 1: return y;
       case 2: return z;
-      default: throw std::exception();
    }
 }
 

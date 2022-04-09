@@ -2,7 +2,7 @@
 #include <vector>
 #include <complex>
 #include "real.hpp"
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include "factorials.hpp"
 #include "harmonic_series.hpp"
 

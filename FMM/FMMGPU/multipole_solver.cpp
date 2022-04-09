@@ -32,7 +32,7 @@ void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcLocalMultipolesWithLayers()
+void MultipoleSolver::calcLocalMultipolesWithLayers(bool useGPU)
 {
    std::vector<std::vector<OctreeNode*>> layers;
    enumerateNodes(octreeRoot, layers, 0);
@@ -41,11 +41,16 @@ void MultipoleSolver::calcLocalMultipolesWithLayers()
 
    for(int i = layers.size() - 1; i >= 1; i--)
    {
-      auto contributions = calcContributionsToHigherLevel(layers[i]);
+      std::vector<Vector3> contributions =
+         calcContributionsToHigherLevel(layers[i], useGPU);
 
-      for(size_t c = 0; c < contributions.size(); c++)
+      for(size_t c = 0; c < layers[i].size(); c++)
       {
-         layers[i][c]->parent()->multipoleExpansion().add(contributions[c]);
+         for(size_t j = 0; j < harmonicLength; j++)
+         {
+            layers[i][c]->parent()->multipoleExpansion().getHarmonic(j) +=
+               contributions[c * harmonicLength + j];
+         }
       }
    }
 
@@ -84,52 +89,11 @@ void MultipoleSolver::calcMultipolesAtLeaves(
    }
 }
 
-std::vector<HarmonicSeries<Vector3>> MultipoleSolver::calcContributionsToHigherLevel(
-   const std::vector<OctreeNode*>& layer)
+std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevel(
+   const std::vector<OctreeNode*>& layer, bool useGPU)
 {
-   std::vector<HarmonicSeries<Vector3>> res;
-
-   for(auto node : layer)
-   {
-      res.push_back(Harmonics::translateWithReal(
-         node->multipoleExpansion(),
-         node->box().center - node->parent()->box().center));
-   }
-
-   return res;
-}
-
-void MultipoleSolver::calcLocalMultipolesWithLayersCPU()
-{
-   std::vector<std::vector<OctreeNode*>> layers;
-   enumerateNodes(octreeRoot, layers, 0);
-   calcMultipolesAtLeaves(layers);
-   octreeRoot->initAllMultipoleExpansions(n);
-
-   for(int i = layers.size() - 1; i >= 1; i--)
-   {
-
-      std::vector<Vector3> contributions = 
-         calcContributionsToHigherLevelCPU(layers[i]);
-     
-      for(size_t c = 0; c < layers[i].size(); c++)
-      {
-         for(size_t j = 0; j < harmonicLength; j++)
-         {
-            layers[i][c]->parent()->multipoleExpansion().getHarmonic(j) += 
-               contributions[c * harmonicLength + j];
-         }
-      }
-   }
-
-   _multipolesAreReady = true;
-}
-
-std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevelCPU(
-   const std::vector<OctreeNode*>& layer)
-{
-   Vector3* harmonics = new Vector3[layer.size() * harmonicLength];
-   real* regulars = new real[layer.size() * harmonicLength];
+   std::vector<Vector3> harmonics(layer.size() * harmonicLength);
+   std::vector<real> regulars(layer.size() * harmonicLength);
 
    for(size_t i = 0; i < layer.size(); i++)
    {
@@ -144,7 +108,11 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevelCPU(
    }
 
    std::vector<Vector3> result(layer.size() * harmonicLength);
-   kernels::translateAllCPU(result.data(), regulars, harmonics, layer.size(), n);
+
+   if(useGPU)
+      kernels::translateAllGPU(result.data(), regulars.data(), harmonics.data(), layer.size(), n);
+   else
+      kernels::translateAllCPU(result.data(), regulars.data(), harmonics.data(), layer.size(), n);
 
    return result;
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "real.hpp"
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include <vector>
 #include <string>
 

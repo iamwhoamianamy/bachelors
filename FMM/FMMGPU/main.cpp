@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <chrono>
 
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include "tetrahedron.hpp"
 #include "hexahedron.hpp"
 #include "torus.hpp"
@@ -52,7 +52,7 @@ Torus createTorus()
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
    return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   //return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
+   //return Torus(torusRadius, torusSectionWidth, 80, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -205,7 +205,7 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.calcLocalMultipolesWithRealTranslation();
    Vector3 byMultipolesWithRealTranslation = multipoleSolver.calcB(current, point);
 
-   multipoleSolver.calcLocalMultipolesWithLayers();
+   multipoleSolver.calcLocalMultipolesWithLayers(false);
    Vector3 byMultipolesWithLayers = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
@@ -243,8 +243,8 @@ void calculationTimeForLocalMultipoles()
    std::cout << std::setw(w) << "w/t";
    std::cout << std::setw(w) << "complex";
    std::cout << std::setw(w) << "real";
-   std::cout << std::setw(w) << "layers";
    std::cout << std::setw(w) << "layersCPU";
+   std::cout << std::setw(w) << "layersGPU";
    std::cout << std::endl;
 
    std::cout << std::fixed;
@@ -255,8 +255,8 @@ void calculationTimeForLocalMultipoles()
       MultipoleSolver multipoleSolverWithoutT(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverWithComplexT(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverWithRealT(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverWithLayers(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverWithLayersCPU(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithLayersGPU(quadratures, octreeLeafCapacity);
 
       auto start = std::chrono::steady_clock::now();
       multipoleSolverWithoutT.calcLocalMultipolesWithoutTranslation();
@@ -274,21 +274,21 @@ void calculationTimeForLocalMultipoles()
       double timeWithRealTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverWithLayers.calcLocalMultipolesWithLayers();
-      stop = std::chrono::steady_clock::now();
-      double timeWithLayers = getTime(start, stop);
-
-      start = std::chrono::steady_clock::now();
-      multipoleSolverWithLayersCPU.calcLocalMultipolesWithLayersCPU();
+      multipoleSolverWithLayersCPU.calcLocalMultipolesWithLayers(false);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersCPU = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      multipoleSolverWithLayersGPU.calcLocalMultipolesWithLayers(true);
+      stop = std::chrono::steady_clock::now();
+      double timeWithLayersGPU = getTime(start, stop);
 
       std::cout << std::setw(w) << octreeLeafCapacity;
       std::cout << std::setw(w) << timeWithoutTranslation;
       std::cout << std::setw(w) << timeWithComplexTranslation;
       std::cout << std::setw(w) << timeWithRealTranslation;
-      std::cout << std::setw(w) << timeWithLayers;
-      std::cout << std::setw(w) << timeWithLayersCPU << std::endl;
+      std::cout << std::setw(w) << timeWithLayersCPU;
+      std::cout << std::setw(w) << timeWithLayersGPU << std::endl;
    }
 }
 
@@ -406,20 +406,25 @@ void layerCalculationsPrecision()
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-   MultipoleSolver multipoleSolver(quadratures);
+   MultipoleSolver multipoleSolverCPU(quadratures);
+   MultipoleSolver multipoleSolverGPU(quadratures);
 
    Vector3 point(3, 1, 2);
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
 
-   multipoleSolver.calcLocalMultipolesWithLayersCPU();
-   Vector3 byMultipolesWithLayers = multipoleSolver.calcB(current, point);
+   multipoleSolverCPU.calcLocalMultipolesWithLayers(false);
+   Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
+
+   multipoleSolverGPU.calcLocalMultipolesWithLayers(true);
+   Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
-   std::cout << std::setw(40) << "multipoles with layers " << byMultipolesWithLayers << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
 }
 
 void cudaAddingTest()

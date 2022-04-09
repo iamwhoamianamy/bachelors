@@ -1,5 +1,5 @@
 #pragma once
-#include "../FMMCPU/vector3.hpp"
+#include "../FMMCPU/vector3.cuh"
 
 struct Box
 {

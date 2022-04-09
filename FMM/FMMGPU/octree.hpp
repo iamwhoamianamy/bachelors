@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include "box.hpp"
 #include "quadrature.hpp"
 #include "harmonic_series.hpp"

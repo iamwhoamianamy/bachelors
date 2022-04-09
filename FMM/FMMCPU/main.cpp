@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <chrono>
 
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include "tetrahedron.hpp"
 #include "hexahedron.hpp"
 #include "torus.hpp"

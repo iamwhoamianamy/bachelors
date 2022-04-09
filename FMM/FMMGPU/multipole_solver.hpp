@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include "tetrahedron.hpp"
 #include "basis_quadratures.hpp"
 #include "quadrature.hpp"
@@ -25,8 +25,7 @@ public:
    void calcLocalMultipolesWithoutTranslation();
    void calcLocalMultipolesWithComplexTranslation();
    void calcLocalMultipolesWithRealTranslation();
-   void calcLocalMultipolesWithLayers();
-   void calcLocalMultipolesWithLayersCPU();
+   void calcLocalMultipolesWithLayers(bool useGPU);
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
    ~MultipoleSolver();
@@ -35,10 +34,8 @@ private:
    void enumerateNodes(OctreeNode* node,
                        std::vector<std::vector<OctreeNode*>>& layers, 
                        size_t currentLayerId);
-   std::vector<HarmonicSeries<Vector3>> calcContributionsToHigherLevel(
-      const std::vector<OctreeNode*>& layer);
-   std::vector<Vector3> calcContributionsToHigherLevelCPU(
-      const std::vector<OctreeNode*>& layer);
+   std::vector<Vector3> calcContributionsToHigherLevel(
+      const std::vector<OctreeNode*>& layer, bool useGPU);
    void calcMultipolesAtLeaves(
       const  std::vector<std::vector<OctreeNode*>>& layers);
 };

@@ -12,6 +12,9 @@
     <CudaCompile Include="kernel_callers.cu">
       <Filter>Code</Filter>
     </CudaCompile>
+    <CudaCompile Include="vector3.cu">
+      <Filter>Code</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernels.cuh">
@@ -47,7 +50,7 @@
     <ClInclude Include="torus.hpp">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="vector3.hpp">
+    <ClInclude Include="vector3.cuh">
       <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="basis_quadratures.hpp">
@@ -95,9 +98,6 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="torus.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="vector3.cpp">
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="basis_quadratures.cpp">

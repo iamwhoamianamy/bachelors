@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "vector3.hpp"
+#include "vector3.cuh"
 #include "tetrahedron.hpp"
 #include "basis_quadratures.hpp"
 #include "quadrature.hpp"

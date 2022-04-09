@@ -109,7 +109,7 @@
     <ClInclude Include="tetrahedron.hpp" />
     <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />
-    <ClInclude Include="vector3.hpp" />
+    <ClInclude Include="vector3.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="basis_quadratures.cpp" />
@@ -128,7 +128,9 @@
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
-    <ClCompile Include="vector3.cpp" />
+    <CudaCompile Include="vector3.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <CudaCompile Include="kernel_callers.cu">
       <FileType>Document</FileType>
     </CudaCompile>

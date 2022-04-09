@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "../FMMCPU/vector3.hpp"
+#include "../FMMCPU/vector3.cuh"
 #include "box.hpp"
 
 class Octree
