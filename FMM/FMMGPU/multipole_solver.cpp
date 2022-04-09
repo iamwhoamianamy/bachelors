@@ -4,6 +4,7 @@
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "math.hpp"
+#include "kernel_callers.hpp"
 
 MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
                                  size_t octreeLeafCapacity) :
@@ -96,6 +97,55 @@ std::vector<HarmonicSeries<Vector3>> MultipoleSolver::calcContributionsToHigherL
    }
 
    return res;
+}
+
+void MultipoleSolver::calcLocalMultipolesWithLayersCPU()
+{
+   std::vector<std::vector<OctreeNode*>> layers;
+   enumerateNodes(octreeRoot, layers, 0);
+   calcMultipolesAtLeaves(layers);
+   octreeRoot->initAllMultipoleExpansions(n);
+
+   for(int i = layers.size() - 1; i >= 1; i--)
+   {
+      Vector3* contributions = new Vector3[layers[i].size() * (n + 1) * (n + 1)];
+      calcContributionsToHigherLevelCPU(contributions, layers[i]);
+
+      for(size_t c = 0; c < layers[i].size(); c++)
+      {
+         for(size_t j = 0; j < harmonicLength; j++)
+         {
+            layers[i][c]->parent()->multipoleExpansion().getHarmonic(j) += 
+               contributions[c * harmonicLength + j];
+         }
+      }
+
+      delete[] contributions;
+   }
+
+   _multipolesAreReady = true;
+}
+
+void MultipoleSolver::calcContributionsToHigherLevelCPU(
+   Vector3* result,
+   const std::vector<OctreeNode*>& layer)
+{
+   Vector3* harmonics = new Vector3[layer.size() * harmonicLength];
+   real* regulars = new real[layer.size() * harmonicLength];
+
+   for(size_t i = 0; i < layer.size(); i++)
+   {
+      Vector3 translation = layer[i]->box().center - layer[i]->parent()->box().center;
+      auto regular = Harmonics::calcRegularSolidHarmonics(n, translation);
+
+      for(size_t j = 0; j < harmonicLength; j++)
+      {
+         regulars[i * harmonicLength + j] = regular.getHarmonic(j);
+         harmonics[i * harmonicLength + j] = layer[i]->multipoleExpansion().getHarmonic(j);
+      }
+   }
+
+   kernels::translateAllCPU(result, regulars, harmonics, layer.size(), n);
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)

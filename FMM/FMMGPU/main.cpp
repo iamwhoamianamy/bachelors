@@ -51,8 +51,8 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   //return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
+   //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -244,6 +244,7 @@ void calculationTimeForLocalMultipoles()
       MultipoleSolver multipoleSolverWithComplexT(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverWithRealT(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverWithLayers(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverWithLayersCPU(quadratures, octreeLeafCapacity);
 
       auto start = std::chrono::steady_clock::now();
       multipoleSolverWithoutT.calcLocalMultipolesWithoutTranslation();
@@ -265,9 +266,14 @@ void calculationTimeForLocalMultipoles()
       stop = std::chrono::steady_clock::now();
       double timeWithLayers = getTime(start, stop);
 
+      start = std::chrono::steady_clock::now();
+      multipoleSolverWithLayersCPU.calcLocalMultipolesWithLayersCPU();
+      stop = std::chrono::steady_clock::now();
+      double timeWithLayersCPU = getTime(start, stop);
+
       std::cout << octreeLeafCapacity << " " << timeWithoutTranslation << " ";
       std::cout << timeWithComplexTranslation << " " << timeWithRealTranslation << " ";
-      std::cout << timeWithLayers << std::endl;
+      std::cout << timeWithLayers << " " << timeWithLayersCPU << std::endl;
    }
 }
 
@@ -391,7 +397,7 @@ void layerCalculationsPrecision()
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
 
-   multipoleSolver.calcLocalMultipolesWithLayers();
+   multipoleSolver.calcLocalMultipolesWithLayersCPU();
    Vector3 byMultipolesWithLayers = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
@@ -416,9 +422,9 @@ int main()
    //comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipoles();
    //translationTest();
-   //layerCalculationsPrecision();
+   layerCalculationsPrecision();
 
-   cudaAddingTest();
+   //cudaAddingTest();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

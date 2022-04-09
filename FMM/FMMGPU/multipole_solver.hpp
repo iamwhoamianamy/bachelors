@@ -15,6 +15,7 @@ private:
 
 public:
    const int n = 10;
+   const int harmonicLength = (n + 1) * (n + 1);
    const real eps = 1e-6;
    const size_t octreeLeafCapacity;
 
@@ -25,6 +26,7 @@ public:
    void calcLocalMultipolesWithComplexTranslation();
    void calcLocalMultipolesWithRealTranslation();
    void calcLocalMultipolesWithLayers();
+   void calcLocalMultipolesWithLayersCPU();
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
    ~MultipoleSolver();
@@ -34,6 +36,9 @@ private:
                        std::vector<std::vector<OctreeNode*>>& layers, 
                        size_t currentLayerId);
    std::vector<HarmonicSeries<Vector3>> calcContributionsToHigherLevel(
+      const std::vector<OctreeNode*>& layer);
+   void calcContributionsToHigherLevelCPU(
+      Vector3* result,
       const std::vector<OctreeNode*>& layer);
    void calcMultipolesAtLeaves(
       const  std::vector<std::vector<OctreeNode*>>& layers);

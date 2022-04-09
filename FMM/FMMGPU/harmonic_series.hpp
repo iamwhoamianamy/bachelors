@@ -13,6 +13,9 @@ public:
    HarmonicSeries();
    HarmonicSeries(int n);
 
+   T& getHarmonic(int n);
+   const T& getHarmonic(int n) const;
+
    T& getHarmonic(int l, int m);
    const T& getHarmonic(int l, int m) const;
    size_t size() const;
@@ -39,6 +42,18 @@ inline HarmonicSeries<T>::HarmonicSeries(int n)
 {
    _n = n;
    _data = std::vector<T>((n + 1) * (n + 1));
+}
+
+template<class T>
+inline T& HarmonicSeries<T>::getHarmonic(int n)
+{
+   return _data[n];
+}
+
+template<class T>
+inline const T& HarmonicSeries<T>::getHarmonic(int n) const
+{
+   return _data[n];
 }
 
 template<class T>

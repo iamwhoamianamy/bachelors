@@ -30,12 +30,12 @@ public:
       const HarmonicSeries<std::complex<real>>& harmonics);
 
    static HarmonicSeries<std::complex<real>> translate(
-      const HarmonicSeries<std::complex<real>>& regular,
-      const HarmonicSeries<std::complex<real>>& child);
+      const HarmonicSeries<std::complex<real>>& a,
+      const HarmonicSeries<std::complex<real>>& b);
 
    static HarmonicSeries<real> translate(
-      const HarmonicSeries<real>& regular,
-      const HarmonicSeries<real>& child);
+      const HarmonicSeries<real>& a,
+      const HarmonicSeries<real>& b);
 
    static HarmonicSeries<Vector3> translateWithComplex(
       const HarmonicSeries<Vector3>& expansion,
@@ -54,6 +54,7 @@ public:
                                                 const HarmonicSeries<real>& ys,
                                                 const HarmonicSeries<real>& zs);
 
+   static real strangeFactor(int m, int mu);
 private:
    void calcSphericalHarmonics(const Vector3& point);
    void fillWithLegendrePolynomials(real z);
@@ -61,6 +62,4 @@ private:
    void mirrorLegendrePolynomialDerivatives(real z);
    real calcLegendrePolynomial(int i, real z);
    void addComplex(real x, real y);
-
-   static real strangeFactor(int m, int mu);
 };

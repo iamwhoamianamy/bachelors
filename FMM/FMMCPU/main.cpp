@@ -402,7 +402,6 @@ void layerCalculationsPrecision()
 
 int main()
 {
-   cudaAddingTest();
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
