@@ -239,7 +239,7 @@ Vector3 OctreeNode::calcA(const Vector3& point) const
 Vector3 OctreeNode::caclRot(const Vector3& point) const
 {
    int n = _multipoleExpansion.size();
-   real eps = 1e-6;
+   real eps = 1e-3;
 
    Vector3 res;
 
