@@ -37,8 +37,7 @@ private:
                        size_t currentLayerId);
    std::vector<HarmonicSeries<Vector3>> calcContributionsToHigherLevel(
       const std::vector<OctreeNode*>& layer);
-   void calcContributionsToHigherLevelCPU(
-      Vector3* result,
+   std::vector<Vector3> calcContributionsToHigherLevelCPU(
       const std::vector<OctreeNode*>& layer);
    void calcMultipolesAtLeaves(
       const  std::vector<std::vector<OctreeNode*>>& layers);

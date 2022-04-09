@@ -108,9 +108,10 @@ void MultipoleSolver::calcLocalMultipolesWithLayersCPU()
 
    for(int i = layers.size() - 1; i >= 1; i--)
    {
-      Vector3* contributions = new Vector3[layers[i].size() * (n + 1) * (n + 1)];
-      calcContributionsToHigherLevelCPU(contributions, layers[i]);
 
+      std::vector<Vector3> contributions = 
+         calcContributionsToHigherLevelCPU(layers[i]);
+     
       for(size_t c = 0; c < layers[i].size(); c++)
       {
          for(size_t j = 0; j < harmonicLength; j++)
@@ -119,15 +120,12 @@ void MultipoleSolver::calcLocalMultipolesWithLayersCPU()
                contributions[c * harmonicLength + j];
          }
       }
-
-      delete[] contributions;
    }
 
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcContributionsToHigherLevelCPU(
-   Vector3* result,
+std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevelCPU(
    const std::vector<OctreeNode*>& layer)
 {
    Vector3* harmonics = new Vector3[layer.size() * harmonicLength];
@@ -145,7 +143,10 @@ void MultipoleSolver::calcContributionsToHigherLevelCPU(
       }
    }
 
-   kernels::translateAllCPU(result, regulars, harmonics, layer.size(), n);
+   std::vector<Vector3> result(layer.size() * harmonicLength);
+   kernels::translateAllCPU(result.data(), regulars, harmonics, layer.size(), n);
+
+   return result;
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)

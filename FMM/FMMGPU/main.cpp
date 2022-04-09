@@ -51,8 +51,8 @@ Torus createTorus()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
+   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+   //return Torus(torusRadius, torusSectionWidth, 40, 4, 4);
 }
 
 BasisQuadratures readBasisQuadratures()
@@ -237,6 +237,18 @@ void calculationTimeForLocalMultipoles()
    auto bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
+   size_t w = 15;
+
+   std::cout << std::setw(w) << "leaf capacity";
+   std::cout << std::setw(w) << "w/t";
+   std::cout << std::setw(w) << "complex";
+   std::cout << std::setw(w) << "real";
+   std::cout << std::setw(w) << "layers";
+   std::cout << std::setw(w) << "layersCPU";
+   std::cout << std::endl;
+
+   std::cout << std::fixed;
+
    for(size_t i = 5; i < 15; i++)
    {
       int octreeLeafCapacity = pow(2, i);
@@ -271,9 +283,12 @@ void calculationTimeForLocalMultipoles()
       stop = std::chrono::steady_clock::now();
       double timeWithLayersCPU = getTime(start, stop);
 
-      std::cout << octreeLeafCapacity << " " << timeWithoutTranslation << " ";
-      std::cout << timeWithComplexTranslation << " " << timeWithRealTranslation << " ";
-      std::cout << timeWithLayers << " " << timeWithLayersCPU << std::endl;
+      std::cout << std::setw(w) << octreeLeafCapacity;
+      std::cout << std::setw(w) << timeWithoutTranslation;
+      std::cout << std::setw(w) << timeWithComplexTranslation;
+      std::cout << std::setw(w) << timeWithRealTranslation;
+      std::cout << std::setw(w) << timeWithLayers;
+      std::cout << std::setw(w) << timeWithLayersCPU << std::endl;
    }
 }
 
@@ -420,9 +435,9 @@ int main()
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
    //comparisonBetweenMethodsOnPrecision();
-   //calculationTimeForLocalMultipoles();
    //translationTest();
    layerCalculationsPrecision();
+   calculationTimeForLocalMultipoles();
 
    //cudaAddingTest();
 

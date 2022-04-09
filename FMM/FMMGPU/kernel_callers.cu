@@ -41,9 +41,7 @@ namespace kernels
 
          for(int l = 0; l < order; l++)
          {
-            real zeroResX = 0;
-            real zeroResY = 0;
-            real zeroResZ = 0;
+            Vector3 zeroRes = 0;
 
             for(int lambda = 0; lambda <= l; lambda++)
             {
@@ -53,32 +51,27 @@ namespace kernels
                {
                   if(-dl <= mu && mu <= +dl)
                   {
-                     zeroResX += getHarmonic(b, harmonicBegin, lambda, mu)->x *
+                     zeroRes.x += getHarmonic(b, harmonicBegin, lambda, mu)->x *
                         *getHarmonic(a, harmonicBegin, dl, mu) *
                         Harmonics::strangeFactor(0, mu);
-                     zeroResY += getHarmonic(b, harmonicBegin, lambda, mu)->y *
+                     zeroRes.y += getHarmonic(b, harmonicBegin, lambda, mu)->y *
                         *getHarmonic(a, harmonicBegin, dl, mu) *
                         Harmonics::strangeFactor(0, mu);
-                     zeroResZ += getHarmonic(b, harmonicBegin, lambda, mu)->z *
+                     zeroRes.z += getHarmonic(b, harmonicBegin, lambda, mu)->z *
                         *getHarmonic(a, harmonicBegin, dl, mu) *
                         Harmonics::strangeFactor(0, mu);
                   }
                }
             }
 
-            getHarmonic(result, harmonicBegin, l, 0)->x =zeroResX;
-            getHarmonic(result, harmonicBegin, l, 0)->y =zeroResY;
-            getHarmonic(result, harmonicBegin, l, 0)->z =zeroResZ;
+            getHarmonic(result, harmonicBegin, l, 0)->x = zeroRes.x;
+            getHarmonic(result, harmonicBegin, l, 0)->y = zeroRes.y;
+            getHarmonic(result, harmonicBegin, l, 0)->z = zeroRes.z;
 
             for(int m = 1; m <= l; m++)
             {
-               real realResX = 0;
-               real realResY = 0;
-               real realResZ = 0;
-
-               real imagResX = 0;
-               real imagResY = 0;
-               real imagResZ = 0;
+               Vector3 realRes = 0;
+               Vector3 imagRes = 0;
 
                for(int lambda = 0; lambda <= l; lambda++)
                {
@@ -89,13 +82,8 @@ namespace kernels
                      int dm = m - mu;
                      int dnm = -m - mu;
 
-                     real RRx = getReal(b, harmonicBegin, lambda, mu).x;
-                     real RRy = getReal(b, harmonicBegin, lambda, mu).y;
-                     real RRz = getReal(b, harmonicBegin, lambda, mu).z;
-
-                     real IRx = getImag(b, harmonicBegin, lambda, mu).x;
-                     real IRy = getImag(b, harmonicBegin, lambda, mu).y;
-                     real IRz = getImag(b, harmonicBegin, lambda, mu).z;
+                     Vector3 RR = getReal(b, harmonicBegin, lambda, mu);
+                     Vector3 IR = getImag(b, harmonicBegin, lambda, mu);
 
                      real RM = 0;
                      real IM = 0;
@@ -108,13 +96,13 @@ namespace kernels
                         RM = getReal(a, harmonicBegin, dl, dm);
                         IM = getImag(a, harmonicBegin, dl, dm);
 
-                        realResX += (RRx * RM - IRx * IM) * Harmonics::strangeFactor(m, mu);
-                        realResY += (RRy * RM - IRy * IM) * Harmonics::strangeFactor(m, mu);
-                        realResZ += (RRz * RM - IRz * IM) * Harmonics::strangeFactor(m, mu);
+                        realRes.x += (RR.x * RM - IR.x * IM) * Harmonics::strangeFactor(m, mu);
+                        realRes.y += (RR.y * RM - IR.y * IM) * Harmonics::strangeFactor(m, mu);
+                        realRes.z += (RR.z * RM - IR.z * IM) * Harmonics::strangeFactor(m, mu);
 
-                        imagResX += (RRx * IM + IRx * RM) * Harmonics::strangeFactor(m, mu);
-                        imagResY += (RRy * IM + IRy * RM) * Harmonics::strangeFactor(m, mu);
-                        imagResZ += (RRz * IM + IRz * RM) * Harmonics::strangeFactor(m, mu);
+                        imagRes.x += (RR.x * IM + IR.x * RM) * Harmonics::strangeFactor(m, mu);
+                        imagRes.y += (RR.y * IM + IR.y * RM) * Harmonics::strangeFactor(m, mu);
+                        imagRes.z += (RR.z * IM + IR.z * RM) * Harmonics::strangeFactor(m, mu);
                      }
 
                      if(-dl <= dnm && dnm <= dl)
@@ -122,24 +110,22 @@ namespace kernels
                         RnM = getReal(a, harmonicBegin, dl, dnm);
                         InM = getImag(a, harmonicBegin, dl, dnm);
 
-                        realResX += (RRx * RnM - IRx * InM) * Harmonics::strangeFactor(-m, mu);
-                        realResY += (RRy * RnM - IRy * InM) * Harmonics::strangeFactor(-m, mu);
-                        realResZ += (RRz * RnM - IRz * InM) * Harmonics::strangeFactor(-m, mu);
+                        realRes.x += (RR.x * RnM - IR.x * InM) * Harmonics::strangeFactor(-m, mu);
+                        realRes.y += (RR.y * RnM - IR.y * InM) * Harmonics::strangeFactor(-m, mu);
+                        realRes.z += (RR.z * RnM - IR.z * InM) * Harmonics::strangeFactor(-m, mu);
 
-                        imagResX -= (RRx * InM + IRx * RnM) * Harmonics::strangeFactor(-m, mu);
-                        imagResY -= (RRy * InM + IRy * RnM) * Harmonics::strangeFactor(-m, mu);
-                        imagResZ -= (RRz * InM + IRz * RnM) * Harmonics::strangeFactor(-m, mu);
+                        imagRes.x -= (RR.x * InM + IR.x * RnM) * Harmonics::strangeFactor(-m, mu);
+                        imagRes.y -= (RR.y * InM + IR.y * RnM) * Harmonics::strangeFactor(-m, mu);
+                        imagRes.z -= (RR.z * InM + IR.z * RnM) * Harmonics::strangeFactor(-m, mu);
                      }
                   }
                }
 
-               getHarmonic(result, harmonicBegin, l, m)->x = realResX * math::R_SQRT_2;
-               getHarmonic(result, harmonicBegin, l, m)->y = realResY * math::R_SQRT_2;
-               getHarmonic(result, harmonicBegin, l, m)->z = realResZ * math::R_SQRT_2;
+               getHarmonic(result, harmonicBegin, l, m)->x = realRes.x * math::R_SQRT_2;
 
-               getHarmonic(result, harmonicBegin, l, -m)->x = imagResX * math::R_SQRT_2;
-               getHarmonic(result, harmonicBegin, l, -m)->y = imagResY * math::R_SQRT_2;
-               getHarmonic(result, harmonicBegin, l, -m)->z = imagResZ * math::R_SQRT_2;
+               getHarmonic(result, harmonicBegin, l, -m)->x = imagRes.x * math::R_SQRT_2;
+               getHarmonic(result, harmonicBegin, l, -m)->y = imagRes.y * math::R_SQRT_2;
+               getHarmonic(result, harmonicBegin, l, -m)->z = imagRes.z * math::R_SQRT_2;
             }
          }
       }
