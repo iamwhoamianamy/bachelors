@@ -115,14 +115,22 @@ namespace kernels
                         const Vector3* b,
                         size_t count, size_t order)
    {
-      uint BLOCK_COUNT = (count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
       size_t harmonicLength = (order + 1) * (order + 1);
 
       cuda::DevPtr<Vector3> result_dev(count * harmonicLength);
       cuda::DevPtr<real> a_dev(a, count * harmonicLength, 0);
       cuda::DevPtr<Vector3> b_dev(b, count * harmonicLength, 0);
 
-      kernels::translateAllGPUKernel<<<BLOCK_COUNT, THREADS_PER_BLOCK>>>
+      /*dim3 BLOCKS((count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
+      dim3 THREADS(THREADS_PER_BLOCK);
+
+      kernels::translateAllGPUKernelSimple<<<BLOCKS, THREADS>>>
+         (result_dev.data(), a_dev.data(), b_dev.data(), count, order);*/
+
+      dim3 BLOCKS();
+      dim3 THREADS(THREADS_PER_BLOCK);
+
+      kernels::translateAllGPUKernelBlockForHarmonic<<<BLOCKS, THREADS>>>
          (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
 
       cuda::tryKernelLaunch();

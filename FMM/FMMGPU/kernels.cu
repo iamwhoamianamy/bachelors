@@ -3,10 +3,9 @@
 
 namespace kernels
 {
-   __global__ void translateAllGPUKernel(Vector3* result,
-                              const real* a,
-                              const Vector3* b,
-                              size_t count, size_t order)
+   __global__ void translateAllGPUKernelSimple(
+      Vector3* result, const real* a, const Vector3* b,
+      size_t count, size_t order)
    {
       size_t harmonicLength = (order + 1) * (order + 1);
       
@@ -86,5 +85,13 @@ namespace kernels
             }
          }
       }
+   }
+
+
+   __global__ void translateAllGPUKernelBlockForHarmonic(
+      Vector3* result, const real* a, const Vector3* b,
+      size_t count, size_t order)
+   {
+      
    }
 }

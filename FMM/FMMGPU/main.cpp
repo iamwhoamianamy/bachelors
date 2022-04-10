@@ -475,7 +475,7 @@ int main()
    //comparisonToTelmaWithTranslation();
    //comparisonBetweenMethodsOnPrecision();
    //translationTest();
-   //layerCalculationsPrecision();
+   layerCalculationsPrecision();
    //calculationTimeForLocalMultipoles();
 
    //cudaAddingTest();
