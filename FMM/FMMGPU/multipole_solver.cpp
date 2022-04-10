@@ -84,6 +84,7 @@ void MultipoleSolver::calcContributionsToHigherLevel(
    std::cout << std::setw(20) << "layer" << std::setw(15) << "mlpl count";
    std::cout << std::setw(10) << "time" << std::endl;
    std::cout << "-----------------------------------------------" << std::endl;
+   std::cout << std::fixed;
 
    for(int i = layers.size() - 1; i >= 1; i--)
    {

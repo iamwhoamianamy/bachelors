@@ -121,17 +121,37 @@ namespace kernels
       cuda::DevPtr<real> a_dev(a, count * harmonicLength, 0);
       cuda::DevPtr<Vector3> b_dev(b, count * harmonicLength, 0);
 
-      /*dim3 BLOCKS((count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
-      dim3 THREADS(THREADS_PER_BLOCK);
+      /*{
+         dim3 BLOCKS((count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
+         dim3 THREADS(THREADS_PER_BLOCK);
 
-      kernels::translateAllGPUKernelSimple<<<BLOCKS, THREADS>>>
-         (result_dev.data(), a_dev.data(), b_dev.data(), count, order);*/
+         kernels::translateAllGPUKernelSimple<<<BLOCKS, THREADS>>>
+            (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+      }*/
 
-      dim3 BLOCKS();
-      dim3 THREADS(THREADS_PER_BLOCK);
+      {
+         dim3 BLOCKS((count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
+         dim3 THREADS(THREADS_PER_BLOCK, order);
 
-      kernels::translateAllGPUKernelBlockForHarmonic<<<BLOCKS, THREADS>>>
-         (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+         kernels::translateAllGPUKernelSimpleXY<<<BLOCKS, THREADS>>>
+            (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+      }
+
+      //{
+      //   dim3 BLOCKS(count);
+      //   dim3 THREADS(order);
+
+      //   kernels::translateAllGPUKernelBlockForHarmonic<<<BLOCKS, THREADS>>>
+      //      (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+      //}
+
+      //{
+      //   dim3 BLOCKS(count);
+      //   dim3 THREADS(harmonicLength);
+
+      //   kernels::translateAllGPUKernelBlockForHarmonic << <BLOCKS, THREADS >> >
+      //      (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+      //}
 
       cuda::tryKernelLaunch();
       cuda::tryKernelSynchronize();
@@ -143,6 +163,11 @@ namespace kernels
                     int l, int m)
    {
       return harmonicBegin + l * l + l + m;
+   }
+
+   size_t lmToIndex(int l, int m)
+   {
+      return l * l + l + m;
    }
 
    __all__ real strangeFactor(int m, int mu)

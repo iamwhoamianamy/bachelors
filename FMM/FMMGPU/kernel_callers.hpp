@@ -17,6 +17,4 @@ namespace kernels
                         const real* a,
                         const Vector3* b,
                         size_t count, size_t order);
-
-   const uint THREADS_PER_BLOCK = 128;
 }

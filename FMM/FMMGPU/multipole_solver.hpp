@@ -6,6 +6,13 @@
 #include "quadrature.hpp"
 #include "octree.hpp"
 
+enum class TranslationAlgorithm
+{
+   CPU = 0,
+   GPUSimple,
+   GPUBlockForHarmonic
+};
+
 class MultipoleSolver
 {
 private:
