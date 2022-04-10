@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+#include <iomanip>
+
 #include "multipole_solver.hpp"
 #include "math.hpp"
 #include "integration.hpp"
@@ -38,22 +41,7 @@ void MultipoleSolver::calcLocalMultipolesWithLayers(bool useGPU)
    enumerateNodes(octreeRoot, layers, 0);
    calcMultipolesAtLeaves(layers);
    octreeRoot->initAllMultipoleExpansions(n);
-
-   for(int i = layers.size() - 1; i >= 1; i--)
-   {
-      std::vector<Vector3> contributions =
-         calcContributionsToHigherLevel(layers[i], useGPU);
-
-      for(size_t c = 0; c < layers[i].size(); c++)
-      {
-         for(size_t j = 0; j < harmonicLength; j++)
-         {
-            layers[i][c]->parent()->multipoleExpansion().getHarmonic(j) +=
-               contributions[c * harmonicLength + j];
-         }
-      }
-   }
-
+   calcContributionsToHigherLevel(layers, useGPU);
    _multipolesAreReady = true;
 }
 
@@ -85,6 +73,36 @@ void MultipoleSolver::calcMultipolesAtLeaves(
          if(!node->quadratures().empty())
             node->multipoleExpansion() = math::calcIntegralContribution(
                node->quadratures(), n, node->box().center);
+      }
+   }
+}
+
+void MultipoleSolver::calcContributionsToHigherLevel(
+   const std::vector<std::vector<OctreeNode*>>& layers, bool useGPU)
+{
+   std::cout << "-----------------------------------------------" << std::endl;
+   std::cout << std::setw(20) << "layer" << std::setw(15) << "mlpl count";
+   std::cout << std::setw(10) << "time" << std::endl;
+   std::cout << "-----------------------------------------------" << std::endl;
+
+   for(int i = layers.size() - 1; i >= 1; i--)
+   {
+      auto start = std::chrono::steady_clock::now();
+      std::vector<Vector3> contributions =
+         calcContributionsToHigherLevel(layers[i], useGPU);
+      auto stop = std::chrono::steady_clock::now();
+      auto time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+
+      std::cout << std::setw(20) << i << std::setw(15) << layers[i].size();
+      std::cout << std::setw(10) << time << std::endl;
+
+      for(size_t c = 0; c < layers[i].size(); c++)
+      {
+         for(size_t j = 0; j < harmonicLength; j++)
+         {
+            layers[i][c]->parent()->multipoleExpansion().getHarmonic(j) +=
+               contributions[c * harmonicLength + j];
+         }
       }
    }
 }

@@ -431,6 +431,36 @@ void layerCalculationsPrecision()
    std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
 }
 
+void layerCalculationTime()
+{
+   bool useGPU = 1;
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+   Vector3 point(3, 1, 2);
+
+   size_t w = 15;
+
+   for(size_t i = 1; i < 10; i++)
+   {
+      int octreeLeafCapacity = pow(2, i);
+      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+
+      std::cout << std::setw(w) << "leaf capacity:";
+      std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
+
+      auto start = std::chrono::steady_clock::now();
+      multipoleSolver.calcLocalMultipolesWithLayers(useGPU);
+      auto stop = std::chrono::steady_clock::now();
+      double timeWithLayers = getTime(start, stop);
+
+      std::cout << std::setw(w) << "total time:";
+      std::cout << std::setw(w) << timeWithLayers << std::endl;
+      std::cout << "==============================" << std::endl;
+   }
+}
+
 void cudaAddingTest()
 {
    std::vector<real> a = { 1, 2, 3, 4 };
@@ -446,9 +476,11 @@ int main()
    //comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //layerCalculationsPrecision();
-   calculationTimeForLocalMultipoles();
+   //calculationTimeForLocalMultipoles();
 
    //cudaAddingTest();
+
+   layerCalculationTime();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

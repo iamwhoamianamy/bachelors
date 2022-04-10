@@ -34,6 +34,8 @@ private:
    void enumerateNodes(OctreeNode* node,
                        std::vector<std::vector<OctreeNode*>>& layers, 
                        size_t currentLayerId);
+   void calcContributionsToHigherLevel(
+      const std::vector<std::vector<OctreeNode*>>& layers, bool useGPU);
    std::vector<Vector3> calcContributionsToHigherLevel(
       const std::vector<OctreeNode*>& layer, bool useGPU);
    void calcMultipolesAtLeaves(
