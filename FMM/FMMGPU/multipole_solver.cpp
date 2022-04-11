@@ -88,14 +88,10 @@ void MultipoleSolver::calcContributionsToHigherLevel(
 
    for(int i = layers.size() - 1; i >= 1; i--)
    {
-      auto start = std::chrono::steady_clock::now();
+      std::cout << std::setw(20) << i << std::setw(15) << layers[i].size();
+
       std::vector<Vector3> contributions =
          calcContributionsToHigherLevel(layers[i], useGPU);
-      auto stop = std::chrono::steady_clock::now();
-      auto time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
-
-      std::cout << std::setw(20) << i << std::setw(15) << layers[i].size();
-      std::cout << std::setw(10) << time << std::endl;
 
       for(size_t c = 0; c < layers[i].size(); c++)
       {
@@ -128,10 +124,17 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevel(
 
    std::vector<Vector3> result(layer.size() * harmonicLength);
 
+   auto start = std::chrono::steady_clock::now();
+
    if(useGPU)
       kernels::translateAllGPU(result.data(), regulars.data(), harmonics.data(), layer.size(), n);
    else
       kernels::translateAllCPU(result.data(), regulars.data(), harmonics.data(), layer.size(), n);
+
+   auto stop = std::chrono::steady_clock::now();
+   double time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+
+   std::cout << std::setw(10) << time << std::endl;
 
    return result;
 }
