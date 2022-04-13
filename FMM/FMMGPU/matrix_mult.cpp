@@ -69,7 +69,12 @@ namespace test
                {
                   int dm = m - mu;
 
-
+                  if(-dl <= dm && dm <= dl)
+                  {
+                     res[l * l + l + m][dl * dl + dl + dm] = 
+                        regular.getHarmonic(lambda * lambda + lambda + mu) * 
+                        Harmonics::strangeFactor(m, mu);
+                  }
                }
             }
          }
@@ -77,4 +82,5 @@ namespace test
 
       return res;
    }
+
 }

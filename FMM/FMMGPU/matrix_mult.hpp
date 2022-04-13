@@ -17,10 +17,6 @@ namespace test
       const HarmonicSeries<Vector3>& expansion,
       const Vector3& translation);
 
-   ComplexHarmonicSeries translateWithMatrix(
-      const ComplexMatrix& regularMatrix,
-      const ComplexHarmonicSeries& expansion);
-
    template <class T>
    std::vector<T> mult(
       const Matrix<T>& a,
