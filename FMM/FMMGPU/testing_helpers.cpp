@@ -43,8 +43,6 @@ namespace test
       return bq;
    }
 
-
-
    std::vector<Vector3> createPoints(const Vector3& begin, const Vector3& end, int n)
    {
       Vector3 step = (end - begin) / (n - 1);

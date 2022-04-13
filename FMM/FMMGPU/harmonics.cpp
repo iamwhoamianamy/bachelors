@@ -147,9 +147,9 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
    const HarmonicSeries<std::complex<real>>& a,
    const HarmonicSeries<std::complex<real>>& b)
 {
-   HarmonicSeries<std::complex<real>> res(a.size());
+   HarmonicSeries<std::complex<real>> res(a.order());
 
-   for(int l = 0; l < a.size(); l++)
+   for(int l = 0; l < a.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -178,9 +178,9 @@ HarmonicSeries<real> Harmonics::translate(
    const HarmonicSeries<real>& a,
    const HarmonicSeries<real>& b)
 {
-   HarmonicSeries<real> res(b.size());
+   HarmonicSeries<real> res(b.order());
 
-   for(int l = 0; l < b.size(); l++)
+   for(int l = 0; l < b.order(); l++)
    {
       real zeroRes = 0;
 
@@ -255,7 +255,7 @@ HarmonicSeries<Vector3> Harmonics::translateWithComplex(
    const HarmonicSeries<Vector3>& expansion,
    const Vector3& translation)
 {
-   auto regular = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(expansion.size(), translation));
+   auto regular = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(expansion.order(), translation));
 
    auto xComponent = Harmonics::realToComplex(Harmonics::separateX(expansion));
    auto yComponent = Harmonics::realToComplex(Harmonics::separateY(expansion));
@@ -270,7 +270,7 @@ HarmonicSeries<Vector3> Harmonics::translateWithReal(
    const HarmonicSeries<Vector3>& expansion,
    const Vector3& translation)
 {
-   auto regular = Harmonics::calcRegularSolidHarmonics(expansion.size(), translation);
+   auto regular = Harmonics::calcRegularSolidHarmonics(expansion.order(), translation);
 
    auto xComponent = Harmonics::separateX(expansion);
    auto yComponent = Harmonics::separateY(expansion);
@@ -288,9 +288,9 @@ real Harmonics::getFactorial(size_t n)
 
 HarmonicSeries<real> Harmonics::separateX(const HarmonicSeries<Vector3>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.size());
+   HarmonicSeries<real> res(harmonics.order());
 
-   for(int l = 0; l < harmonics.size(); l++)
+   for(int l = 0; l < harmonics.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -303,9 +303,9 @@ HarmonicSeries<real> Harmonics::separateX(const HarmonicSeries<Vector3>& harmoni
 
 HarmonicSeries<real> Harmonics::separateY(const HarmonicSeries<Vector3>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.size());
+   HarmonicSeries<real> res(harmonics.order());
 
-   for(int l = 0; l < harmonics.size(); l++)
+   for(int l = 0; l < harmonics.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -318,9 +318,9 @@ HarmonicSeries<real> Harmonics::separateY(const HarmonicSeries<Vector3>& harmoni
 
 HarmonicSeries<real> Harmonics::separateZ(const HarmonicSeries<Vector3>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.size());
+   HarmonicSeries<real> res(harmonics.order());
 
-   for(int l = 0; l < harmonics.size(); l++)
+   for(int l = 0; l < harmonics.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -335,9 +335,9 @@ HarmonicSeries<Vector3> Harmonics::createFormXYZ(const HarmonicSeries<real>& xs,
                                                  const HarmonicSeries<real>& ys,
                                                  const HarmonicSeries<real>& zs)
 {
-   HarmonicSeries<Vector3> res(xs.size());
+   HarmonicSeries<Vector3> res(xs.order());
 
-   for(int l = 0; l < xs.size(); l++)
+   for(int l = 0; l < xs.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -351,10 +351,10 @@ HarmonicSeries<Vector3> Harmonics::createFormXYZ(const HarmonicSeries<real>& xs,
 HarmonicSeries<std::complex<real>> Harmonics::realToComplex(
    const HarmonicSeries<real>& harmonics)
 {
-   HarmonicSeries<std::complex<real>> res(harmonics.size());
+   HarmonicSeries<std::complex<real>> res(harmonics.order());
    
    real c = 1.0 / sqrt(2);
-   for(int l = 0; l < harmonics.size(); l++)
+   for(int l = 0; l < harmonics.order(); l++)
    {
       res.getHarmonic(l, 0) = std::complex<real>(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
@@ -371,10 +371,10 @@ HarmonicSeries<std::complex<real>> Harmonics::realToComplex(
 
 HarmonicSeries<real> Harmonics::complexToReal(const HarmonicSeries<std::complex<real>>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.size());
+   HarmonicSeries<real> res(harmonics.order());
 
    real c = 1.0 / sqrt(2);
-   for(int l = 0; l < harmonics.size(); l++)
+   for(int l = 0; l < harmonics.order(); l++)
    {
       res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
       for(int m = 1; m <= l; m++)

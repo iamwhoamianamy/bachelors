@@ -209,7 +209,7 @@ void OctreeNode::initAllMultipoleExpansions(size_t n)
 
 Vector3 OctreeNode::calcA(const Vector3& point) const
 {
-   int n = _multipoleExpansion.size();
+   int n = _multipoleExpansion.order();
 
    Vector3 res;
 
@@ -238,7 +238,7 @@ Vector3 OctreeNode::calcA(const Vector3& point) const
 
 Vector3 OctreeNode::caclRot(const Vector3& point) const
 {
-   int n = _multipoleExpansion.size();
+   int n = _multipoleExpansion.order();
    real eps = 1e-3;
 
    Vector3 res;
