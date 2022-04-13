@@ -13,19 +13,19 @@ namespace kernels
 
    __global__ void translateAllGPUKernelSimple(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order);
+      size_t harmonicCount, size_t harmonicOrder);
 
    __global__ void translateAllGPUKernelSimpleXY(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order);
+      size_t harmonicCount, size_t harmonicOrder);
 
    __global__ void translateAllGPUKernelBlockForHarmonic(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order);
+      size_t harmonicCount, size_t harmonicOrder);
 
    __global__ void translateAllGPUKernelBlockForHarmonicShared(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order);
+      size_t harmonicCount, size_t harmonicOrder);
 
 
    __all__ size_t lmToIndex(int harmonicBegin,
@@ -53,7 +53,7 @@ namespace kernels
              int harmonicBegin,
              int l, int m)
    {
-      return getHarmonic(harmonics, harmonicBegin, l, abs(m)) *
+      return harmonics[lmToIndex(harmonicBegin, l, abs(m))] *
          (math::R_SQRT_2 * (m != 0) + (m == 0));
    }
 
@@ -61,7 +61,7 @@ namespace kernels
    inline __all__ T getReal(const T* harmonics,
                      int l, int m)
    {
-      return getHarmonic(harmonics, l, abs(m)) *
+      return harmonics[lmToIndex(l, abs(m))] *
          (math::R_SQRT_2 * (m != 0) + (m == 0));
    }
 
@@ -70,7 +70,7 @@ namespace kernels
              int harmonicBegin,
              int l, int m)
    {
-     return getHarmonic(harmonics, harmonicBegin, l, -abs(m)) *
+     return harmonics[lmToIndex(harmonicBegin, l, -abs(m))] *
          math::R_SQRT_2 * (m != 0) * math::sign(m);
    }
 
@@ -78,7 +78,7 @@ namespace kernels
    inline __all__ T getImag(const T* harmonics,
                      int l, int m)
    {
-      return getHarmonic(harmonics, l, -abs(m)) *
+      return harmonics[lmToIndex(l, -abs(m))] *
          math::R_SQRT_2 * (m != 0) * math::sign(m);
    }
 

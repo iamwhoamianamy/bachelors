@@ -5,16 +5,16 @@ namespace kernels
 {
    __global__ void translateAllGPUKernelSimple(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order)
+      size_t harmonicCount, size_t harmonicOrder)
    {
-      size_t harmonicLength = (order + 1) * (order + 1);
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
       uint harmonicId = blockIdx.x * blockDim.x + threadIdx.x;
 
-      if(harmonicId < count)
+      if(harmonicId < harmonicCount)
       {
          size_t harmonicBegin = harmonicLength * harmonicId;
 
-         for(int l = 0; l < order; l++)
+         for(int l = 0; l < harmonicOrder; l++)
          {
             Vector3 zeroRes = 0;
 
@@ -87,12 +87,12 @@ namespace kernels
 
    __global__ void translateAllGPUKernelSimpleXY(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order)
+      size_t harmonicCount, size_t harmonicOrder)
    {
-      size_t harmonicLength = (order + 1) * (order + 1);
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
       uint harmonicId = blockIdx.x * blockDim.x + threadIdx.x;
 
-      if(harmonicId < count)
+      if(harmonicId < harmonicCount)
       {
          size_t harmonicBegin = harmonicLength * harmonicId;
 
@@ -107,8 +107,8 @@ namespace kernels
             {
                if(-dl <= mu && mu <= +dl)
                {
-                  zeroRes += getHarmonic(b, harmonicBegin, lambda, mu) *
-                     getHarmonic(a, harmonicBegin, dl, mu) *
+                  zeroRes += b[lmToIndex(harmonicBegin, lambda, mu)] *
+                     a[lmToIndex(harmonicBegin, dl, mu)] *
                      strangeFactor(0, mu);
                }
             }
@@ -167,9 +167,9 @@ namespace kernels
 
    __global__ void translateAllGPUKernelBlockForHarmonic(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order)
+      size_t harmonicCount, size_t harmonicOrder)
    {
-      size_t harmonicBegin = (order + 1) * (order + 1) * blockIdx.x;
+      size_t harmonicBegin = (harmonicOrder + 1) * (harmonicOrder + 1) * blockIdx.x;
       Vector3 zeroRes = 0;
       int l = threadIdx.x;
 
@@ -240,24 +240,18 @@ namespace kernels
 
    __global__ void translateAllGPUKernelBlockForHarmonicShared(
       Vector3* result, const real* a, const Vector3* b,
-      size_t count, size_t order)
+      size_t harmonicCount, size_t harmonicOrder)
    {
       __shared__ real localA[kernels::HARMONIC_LENGTH];
       __shared__ Vector3 localB[kernels::HARMONIC_LENGTH];
-      __shared__ Vector3 localRes[kernels::HARMONIC_LENGTH];
 
-      size_t harmonicBegin = blockIdx.x * (order + 1) * (order + 1);
+      size_t harmonicBegin = blockIdx.x * (harmonicOrder + 1) * (harmonicOrder + 1);
 
       localA[threadIdx.x] = a[harmonicBegin + threadIdx.x];
-      __syncthreads();
-
       localB[threadIdx.x] = b[harmonicBegin + threadIdx.x];
       __syncthreads();
 
-      localRes[threadIdx.x] = 0;
-      __syncthreads();
-
-      if(threadIdx.x < order)
+      if(threadIdx.x < harmonicOrder)
       {
          int l = threadIdx.x;
          Vector3 zeroRes = 0;
@@ -277,7 +271,7 @@ namespace kernels
             }
          }
 
-         localRes[lmToIndex(l, 0)] = zeroRes;
+         result[lmToIndex(harmonicBegin, l, 0)] = zeroRes;
 
          for(int m = 1; m <= l; m++)
          {
@@ -322,13 +316,9 @@ namespace kernels
                }
             }
 
-            localRes[lmToIndex(l, m)] = realRes * math::R_SQRT_2;
-            localRes[lmToIndex(l, -m)] = imagRes * math::R_SQRT_2;
+            result[lmToIndex(harmonicBegin, l, m)] = realRes * math::R_SQRT_2;
+            result[lmToIndex(harmonicBegin, l, -m)] = imagRes * math::R_SQRT_2;
          }
       }
-
-      __syncthreads();
-
-      result[harmonicBegin + threadIdx.x] = localRes[threadIdx.x];
    }
 }

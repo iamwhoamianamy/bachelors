@@ -30,16 +30,16 @@ namespace kernels
    void translateAllCPU(Vector3* result,
                         const real* a,
                         const Vector3* b,
-                        size_t count, size_t order)
+                        size_t harmonicCount, size_t harmonicOrder)
    {
-      size_t harmonicLength = (order + 1) * (order + 1);
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-      for(size_t harmonicId = 0; harmonicId < count; harmonicId++)
+      for(size_t harmonicId = 0; harmonicId < harmonicCount; harmonicId++)
       {
          size_t harmonicBegin = harmonicLength * harmonicId;
          size_t harmonicEnd = harmonicBegin + harmonicLength;
 
-         for(int l = 0; l < order; l++)
+         for(int l = 0; l < harmonicOrder; l++)
          {
             Vector3 zeroRes = 0;
 
@@ -48,6 +48,7 @@ namespace kernels
                int dl = l - lambda;
 
                for(int mu = -lambda; mu <= lambda; mu++)
+               //for(int mu = std::max(-(l - lambda), -lambda); mu <= std::min(l - lambda, lambda); mu++)
                {
                   if(-dl <= mu && mu <= +dl)
                   {
@@ -113,45 +114,45 @@ namespace kernels
    void translateAllGPU(Vector3* result,
                         const real* a,
                         const Vector3* b,
-                        size_t count, size_t order)
+                        size_t harmonicCount, size_t harmonicOrder)
    {
-      size_t harmonicLength = (order + 1) * (order + 1);
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-      cuda::DevPtr<Vector3> result_dev(count * harmonicLength);
-      cuda::DevPtr<real> a_dev(a, count * harmonicLength, 0);
-      cuda::DevPtr<Vector3> b_dev(b, count * harmonicLength, 0);
-
-      /*{
-         dim3 BLOCKS((count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
-         dim3 THREADS(THREADS_PER_BLOCK);
-
-         kernels::translateAllGPUKernelSimple<<<BLOCKS, THREADS>>>
-            (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
-      }*/
+      cuda::DevPtr<Vector3> result_dev(harmonicCount * harmonicLength);
+      cuda::DevPtr<real> a_dev(a, harmonicCount * harmonicLength, 0);
+      cuda::DevPtr<Vector3> b_dev(b, harmonicCount * harmonicLength, 0);
 
       {
-         dim3 BLOCKS((count + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
-         dim3 THREADS(THREADS_PER_BLOCK, order);
+         //dim3 BLOCKS((harmonicCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
+         //dim3 THREADS(THREADS_PER_BLOCK);
 
-         kernels::translateAllGPUKernelSimpleXY<<<BLOCKS, THREADS>>>
-            (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
+         //kernels::translateAllGPUKernelSimple<<<BLOCKS, THREADS>>>
+         //   (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
       }
 
-      //{
-      //   dim3 BLOCKS(count);
-      //   dim3 THREADS(order);
+      {
+         dim3 BLOCKS((harmonicCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
+         dim3 THREADS(THREADS_PER_BLOCK, harmonicOrder);
+
+         kernels::translateAllGPUKernelSimpleXY<<<BLOCKS, THREADS>>>
+            (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
+      }
+
+      {
+      //   dim3 BLOCKS(harmonicCount);
+      //   dim3 THREADS(harmonicOrder);
 
       //   kernels::translateAllGPUKernelBlockForHarmonic<<<BLOCKS, THREADS>>>
-      //      (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
-      //}
+      //      (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
+      }
 
-      //{
-      //   dim3 BLOCKS(count);
-      //   dim3 THREADS(harmonicLength);
+     {
+         //dim3 BLOCKS(harmonicCount);
+         //dim3 THREADS(harmonicLength);
 
-      //   kernels::translateAllGPUKernelBlockForHarmonic << <BLOCKS, THREADS >> >
-      //      (result_dev.data(), a_dev.data(), b_dev.data(), count, order);
-      //}
+         //kernels::translateAllGPUKernelBlockForHarmonicShared<<<BLOCKS, THREADS>>>
+         //   (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
+      }
 
       cuda::tryKernelLaunch();
       cuda::tryKernelSynchronize();

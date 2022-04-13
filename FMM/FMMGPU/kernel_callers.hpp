@@ -12,9 +12,9 @@ namespace kernels
    void translateAllCPU(Vector3* result,
                         const real* a,
                         const Vector3* b,
-                        size_t count, size_t order);
+                        size_t harmonicCount, size_t harmonicOrder);
    void translateAllGPU(Vector3* result,
                         const real* a,
                         const Vector3* b,
-                        size_t count, size_t order);
+                        size_t harmonicCount, size_t harmonicOrder);
 }

@@ -2,28 +2,19 @@
 #include <string>
 #include <fstream>
 #include <iomanip>
-#include <chrono>
 
 #include "vector3.cuh"
-#include "tetrahedron.hpp"
-#include "hexahedron.hpp"
-#include "torus.hpp"
-#include "basis_quadratures.hpp"
-#include "exeptions.hpp"
 #include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_solver.hpp"
 #include "kernel_callers.hpp"
+#include "matrix_mult.hpp"
+#include "testing_helpers.hpp"
 
 using namespace math;
+using namespace test;
 const real current = 5;
-
-double getTime(const std::chrono::steady_clock::time_point& start,
-               const std::chrono::steady_clock::time_point& stop)
-{
-   return std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
-}
 
 std::vector<std::pair<Vector3, Vector3>> readTelmaResults(const std::string& filename)
 {
@@ -42,56 +33,6 @@ std::vector<std::pair<Vector3, Vector3>> readTelmaResults(const std::string& fil
       fin >> _ >> px >> py >> pz >> hx >> hy >> hz;
 
       res[i] = std::pair<Vector3, Vector3>(Vector3(px, py, pz), Vector3(hx, hy, hz));
-   }
-
-   return res;
-}
-
-Torus createTorus()
-{
-   const double torusRadius = 2;
-   const double torusSectionWidth = 0.2;
-   return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-   //return Torus(torusRadius, torusSectionWidth, 80, 4, 4);
-}
-
-BasisQuadratures readBasisQuadratures()
-{
-   BasisQuadratures bq;
-   std::string bqDir = "basis_quadratures/";
-
-   try
-   {
-      bq.InitFromTXT(bqDir + "keast 7 x.txt", bqDir + "keast 7 w.txt");
-      //std::cout << "Quadratures were successfully read. Order = " << bq.order() << std::endl;
-   }
-   catch(Exeption ex)
-   {
-      std::cout << ex;
-   }
-
-   return bq;
-}
-
-template <class T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
-{
-   for(size_t i = 0; i < vec.size(); i++)
-   {
-      os << vec[i] << std::endl;
-   }
-
-   return os;
-}
-
-std::vector<Vector3> createPoints(const Vector3& begin, const Vector3& end, int n)
-{
-   Vector3 step = (end - begin) / (n - 1);
-   std::vector<Vector3> res(n);
-
-   for(size_t i = 0; i < n; i++)
-   {
-      res[i] = begin + step * i;
    }
 
    return res;
@@ -468,6 +409,121 @@ void cudaAddingTest()
    std::cout << kernels::addVectors(a, b);
 }
 
+void printIndeces()
+{
+   int n = 10;
+   int N = (n + 1) * (n + 1);
+   std::vector<std::vector<bool>> matrix(N, std::vector<bool>(N));
+   std::ofstream foutIdx("results/indeces.txt");
+   std::ofstream foutMatrix("results/regular_matrix.txt");
+   int w = 1;
+
+   for(int l = 0; l <= n; l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         std::stringstream line;
+
+         line << "M(" << std::setw(w) << l << "," << std::setw(w) << m << ") = ";
+
+         for(int lambda = 0; lambda <= l; lambda++)
+         {
+            int dl = l - lambda;
+            line << "[";
+
+            for(int mu = -lambda; mu <= lambda; mu++)
+            {
+               int dm = m - mu;
+
+               if(-dl <= dm && dm <= dl)
+               {
+                  line << "R(" << std::setw(w) << lambda << "," << std::setw(w) << mu << ")";
+                  line << "M(" << std::setw(w) << dl << "," << std::setw(w) << dm << ")";
+                  
+                  if(mu != lambda && lambda != l)
+                     line << " + ";
+                  else
+                     line << "] + ";
+
+                  matrix[l * l + l + m][dl * dl + dl + dm] = true;
+               }
+            }
+         }
+
+         line << std::endl;
+         std::string newStr = line.str();
+         newStr.erase(newStr.end() - 3);
+         line.str(newStr);
+         foutIdx << line.str();
+      }
+
+      foutIdx << "------------------------------------" << std::endl;
+   }
+
+   //for(int l = 0; l <= n; l++)
+   //{
+   //   for(int m = -l; m <= l; m++)
+   //   {
+   //      for(int lambda = 0; lambda <= l; lambda++)
+   //      {
+   //         for(int mu = -lambda; mu <= lambda; mu++)
+   //         {
+   //            foutMatrix << (matrix[l * l + l + m][lambda * lambda + lambda + mu] 
+   //                           ? "O" : ".") << " ";
+   //         }
+   //      }
+   //      foutMatrix << std::endl;
+   //   }
+   //}
+
+   std::vector<int> indx;
+   int id = 1;
+
+   while(id < N)
+   {
+      indx.push_back((id * id) - 1);
+      id++;
+   }
+   
+
+   for(int i = 0; i < N; i++)
+   {
+      for(int j = 0; j < N; j++)
+      {
+         if(j <= i)
+         {
+            foutMatrix << (matrix[i][j] ? "O" : ".");
+
+            for(size_t k = 0; k < indx.size(); k++)
+            {
+               if(indx[k] == j)
+               {
+                  foutMatrix << "|";
+                  break;
+               }
+            }
+         }
+      }
+
+      foutMatrix << std::endl;
+
+      for(size_t k = 0; k < indx.size(); k++)
+      {
+         if(indx[k] == i)
+         {
+            for(size_t o = 0; o < N + n + 1; o++)
+            {
+               foutMatrix << "-";
+            }
+
+            foutMatrix << std::endl;
+            break;
+         }
+      }
+   }
+
+}
+
 int main()
 {
    //NMResearch();
@@ -480,7 +536,9 @@ int main()
 
    //cudaAddingTest();
 
-   layerCalculationTime();
+   //layerCalculationTime();
+
+   printIndeces();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

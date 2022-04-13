@@ -80,6 +80,9 @@
     <ClInclude Include="math.hpp">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="testing_helpers.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cuda_helper.cpp">
@@ -128,6 +131,13 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix_mult.hpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="testing_helpers.cpp" />
+    <ClCompile Include="matrix_mult.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>
