@@ -19,14 +19,21 @@ public:
    T& getHarmonic(int l, int m);
    const T& getHarmonic(int l, int m) const;
    size_t order() const;
+   size_t elemCount() const;
 
    const T& getReal(int l, int m) const;
    const T& getImag(int l, int m) const;
 
+   std::vector<T>& data();
+   const std::vector<T>& data() const;
+
    HarmonicSeries<T>(HarmonicSeries<T>&& harmonicSeries) noexcept;
-   HarmonicSeries<T>(const HarmonicSeries<T>& harmonicSeries) noexcept;
+   HarmonicSeries<T>(const HarmonicSeries<T>& harmonicSeries);
    HarmonicSeries<T>& operator=(HarmonicSeries<T>&& harmonicSeries) noexcept;
    HarmonicSeries<T>& operator=(const HarmonicSeries<T>& harmonicSeries);
+
+   HarmonicSeries<T>(std::vector<T>&& harmonicData) noexcept;
+   HarmonicSeries<T>(const std::vector<T>& harmonicData);
 
    void add(const HarmonicSeries<T>& harmonicSeries);
    void subtract(const HarmonicSeries<T>& harmonicSeries);
@@ -75,6 +82,12 @@ inline size_t HarmonicSeries<T>::order() const
 }
 
 template<class T>
+inline size_t HarmonicSeries<T>::elemCount() const
+{
+   return (_order + 1) * (_order + 1);
+}
+
+template<class T>
 inline const T& HarmonicSeries<T>::getReal(int l, int m) const
 {
    return getHarmonic(l, abs(m)) * 
@@ -85,6 +98,18 @@ template<class T>
 inline const T& HarmonicSeries<T>::getImag(int l, int m) const
 {
    return math::sign(m) * getHarmonic(l, -abs(m)) * math::R_SQRT_2 * (m != 0);
+}
+
+template<class T>
+inline std::vector<T>& HarmonicSeries<T>::data()
+{
+   return _data;
+}
+
+template<class T>
+inline const std::vector<T>& HarmonicSeries<T>::data() const
+{
+   return _data;
 }
 
 template<class T>
@@ -129,8 +154,22 @@ inline HarmonicSeries<T>::HarmonicSeries(HarmonicSeries<T>&& harmonicSeries) noe
 }
 
 template<class T>
-inline HarmonicSeries<T>::HarmonicSeries(const HarmonicSeries<T>& harmonicSeries) noexcept
+inline HarmonicSeries<T>::HarmonicSeries(const HarmonicSeries<T>& harmonicSeries)
 {
    _data = harmonicSeries._data;
    _order = harmonicSeries._order;
+}
+
+template<class T>
+inline HarmonicSeries<T>::HarmonicSeries(std::vector<T>&& harmonicData) noexcept
+{
+   _order = sqrt(harmonicData.size() - 1);
+   _data = std::move(harmonicData);
+}
+
+template<class T>
+inline HarmonicSeries<T>::HarmonicSeries(const std::vector<T>& harmonicData)
+{
+   _order = sqrt(harmonicData.size() - 1);
+   _data = harmonicData;
 }

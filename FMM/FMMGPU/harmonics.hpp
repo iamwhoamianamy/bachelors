@@ -6,36 +6,39 @@
 #include "factorials.hpp"
 #include "harmonic_series.hpp"
 
+typedef HarmonicSeries<std::complex<real>> ComplexHarmonicSeries;
+typedef HarmonicSeries<real> RealHarmonicSeries;
+
 class Harmonics
 {
 private:
    size_t _order;
-   HarmonicSeries<real> _sphericalHarmonics;
+   RealHarmonicSeries _sphericalHarmonics;
    static Factorials _factorials;
 public:   
    Harmonics(int order, const Vector3& point);
 
-   const HarmonicSeries<real>& sphericalHarmonics() const;
+   const RealHarmonicSeries& sphericalHarmonics() const;
 
-   static HarmonicSeries<real> calcSolidHarmonics(
+   static RealHarmonicSeries calcSolidHarmonics(
       size_t order,Vector3 point, bool isRegular);
-   static HarmonicSeries<real> calcRegularSolidHarmonics(
+   static RealHarmonicSeries calcRegularSolidHarmonics(
       size_t order, Vector3 point);
-   static HarmonicSeries<real> calcIrregularSolidHarmonics(
+   static RealHarmonicSeries calcIrregularSolidHarmonics(
       size_t order, Vector3 point);
 
-   static HarmonicSeries<std::complex<real>> realToComplex(
-      const HarmonicSeries<real>& harmonics);
-   static HarmonicSeries<real> complexToReal(
-      const HarmonicSeries<std::complex<real>>& harmonics);
+   static ComplexHarmonicSeries realToComplex(
+      const RealHarmonicSeries& harmonics);
+   static RealHarmonicSeries complexToReal(
+      const ComplexHarmonicSeries& harmonics);
 
-   static HarmonicSeries<std::complex<real>> translate(
-      const HarmonicSeries<std::complex<real>>& a,
-      const HarmonicSeries<std::complex<real>>& b);
+   static ComplexHarmonicSeries translate(
+      const ComplexHarmonicSeries& a,
+      const ComplexHarmonicSeries& b);
 
-   static HarmonicSeries<real> translate(
-      const HarmonicSeries<real>& a,
-      const HarmonicSeries<real>& b);
+   static RealHarmonicSeries translate(
+      const RealHarmonicSeries& a,
+      const RealHarmonicSeries& b);
 
    static HarmonicSeries<Vector3> translateWithComplex(
       const HarmonicSeries<Vector3>& expansion,
@@ -47,12 +50,12 @@ public:
 
    static real getFactorial(size_t n);
    
-   static HarmonicSeries<real> separateX(const HarmonicSeries<Vector3>& harmonics);
-   static HarmonicSeries<real> separateY(const HarmonicSeries<Vector3>& harmonics);
-   static HarmonicSeries<real> separateZ(const HarmonicSeries<Vector3>& harmonics);
-   static HarmonicSeries<Vector3> createFormXYZ(const HarmonicSeries<real>& xs,
-                                                const HarmonicSeries<real>& ys,
-                                                const HarmonicSeries<real>& zs);
+   static RealHarmonicSeries separateX(const HarmonicSeries<Vector3>& harmonics);
+   static RealHarmonicSeries separateY(const HarmonicSeries<Vector3>& harmonics);
+   static RealHarmonicSeries separateZ(const HarmonicSeries<Vector3>& harmonics);
+   static HarmonicSeries<Vector3> createFormXYZ(const RealHarmonicSeries& xs,
+                                                const RealHarmonicSeries& ys,
+                                                const RealHarmonicSeries& zs);
 
    static real strangeFactor(int m, int mu);
 private:

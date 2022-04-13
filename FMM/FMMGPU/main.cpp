@@ -529,16 +529,17 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   comparisonBetweenMethodsOnPrecision();
+   //comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //layerCalculationsPrecision();
    //calculationTimeForLocalMultipoles();
 
    //cudaAddingTest();
-
    //layerCalculationTime();
-
    //printIndeces();
+
+   //testMultiplication();
+   compareWithMatrixMultiplication();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

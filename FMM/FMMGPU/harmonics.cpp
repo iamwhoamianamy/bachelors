@@ -11,12 +11,12 @@ Harmonics::Harmonics(int order, const Vector3& point) :
    calcSphericalHarmonics(point);
 }
 
-const HarmonicSeries<real>& Harmonics::sphericalHarmonics() const
+const RealHarmonicSeries& Harmonics::sphericalHarmonics() const
 {
    return _sphericalHarmonics;
 }
 
-HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t order,
+RealHarmonicSeries Harmonics::calcSolidHarmonics(size_t order,
                                                    Vector3 point,
                                                    bool isRegular)
 {
@@ -54,19 +54,19 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t order,
    return solidlHarmonics;
 }
 
-HarmonicSeries<real> Harmonics::calcRegularSolidHarmonics(size_t order, Vector3 point)
+RealHarmonicSeries Harmonics::calcRegularSolidHarmonics(size_t order, Vector3 point)
 {
    return calcSolidHarmonics(order, point, true);
 }
 
-HarmonicSeries<real> Harmonics::calcIrregularSolidHarmonics(size_t order, Vector3 point)
+RealHarmonicSeries Harmonics::calcIrregularSolidHarmonics(size_t order, Vector3 point)
 {
    return calcSolidHarmonics(order, point, false);
 }
 
 void Harmonics::calcSphericalHarmonics(const Vector3& point)
 {
-   _sphericalHarmonics = HarmonicSeries<real>(_order);
+   _sphericalHarmonics = RealHarmonicSeries(_order);
    fillWithLegendrePolynomials(point.z);
    fillWithLegendrePolynomialDerivatives(point.z);
    mirrorLegendrePolynomialDerivatives(point.z);
@@ -143,11 +143,11 @@ real Harmonics::strangeFactor(int m, int mu)
    return pow(-1, -0.5 * (abs(m) - abs(mu) - abs(m - mu)));
 }
 
-HarmonicSeries<std::complex<real>> Harmonics::translate(
-   const HarmonicSeries<std::complex<real>>& a,
-   const HarmonicSeries<std::complex<real>>& b)
+ComplexHarmonicSeries Harmonics::translate(
+   const ComplexHarmonicSeries& a,
+   const ComplexHarmonicSeries& b)
 {
-   HarmonicSeries<std::complex<real>> res(a.order());
+   ComplexHarmonicSeries res(a.order());
 
    for(int l = 0; l <= a.order(); l++)
    {
@@ -174,11 +174,11 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
    return res;
 }
 
-HarmonicSeries<real> Harmonics::translate(
-   const HarmonicSeries<real>& a,
-   const HarmonicSeries<real>& b)
+RealHarmonicSeries Harmonics::translate(
+   const RealHarmonicSeries& a,
+   const RealHarmonicSeries& b)
 {
-   HarmonicSeries<real> res(b.order());
+   RealHarmonicSeries res(b.order());
 
    for(int l = 0; l <= b.order(); l++)
    {
@@ -286,9 +286,9 @@ real Harmonics::getFactorial(size_t n)
    return _factorials[n];
 }
 
-HarmonicSeries<real> Harmonics::separateX(const HarmonicSeries<Vector3>& harmonics)
+RealHarmonicSeries Harmonics::separateX(const HarmonicSeries<Vector3>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.order());
+   RealHarmonicSeries res(harmonics.order());
 
    for(int l = 0; l <= harmonics.order(); l++)
    {
@@ -301,9 +301,9 @@ HarmonicSeries<real> Harmonics::separateX(const HarmonicSeries<Vector3>& harmoni
    return res;
 }
 
-HarmonicSeries<real> Harmonics::separateY(const HarmonicSeries<Vector3>& harmonics)
+RealHarmonicSeries Harmonics::separateY(const HarmonicSeries<Vector3>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.order());
+   RealHarmonicSeries res(harmonics.order());
 
    for(int l = 0; l <= harmonics.order(); l++)
    {
@@ -316,9 +316,9 @@ HarmonicSeries<real> Harmonics::separateY(const HarmonicSeries<Vector3>& harmoni
    return res;
 }
 
-HarmonicSeries<real> Harmonics::separateZ(const HarmonicSeries<Vector3>& harmonics)
+RealHarmonicSeries Harmonics::separateZ(const HarmonicSeries<Vector3>& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.order());
+   RealHarmonicSeries res(harmonics.order());
 
    for(int l = 0; l <= harmonics.order(); l++)
    {
@@ -331,9 +331,9 @@ HarmonicSeries<real> Harmonics::separateZ(const HarmonicSeries<Vector3>& harmoni
    return res;
 }
 
-HarmonicSeries<Vector3> Harmonics::createFormXYZ(const HarmonicSeries<real>& xs,
-                                                 const HarmonicSeries<real>& ys,
-                                                 const HarmonicSeries<real>& zs)
+HarmonicSeries<Vector3> Harmonics::createFormXYZ(const RealHarmonicSeries& xs,
+                                                 const RealHarmonicSeries& ys,
+                                                 const RealHarmonicSeries& zs)
 {
    HarmonicSeries<Vector3> res(xs.order());
 
@@ -348,10 +348,10 @@ HarmonicSeries<Vector3> Harmonics::createFormXYZ(const HarmonicSeries<real>& xs,
    return res;
 }
 
-HarmonicSeries<std::complex<real>> Harmonics::realToComplex(
-   const HarmonicSeries<real>& harmonics)
+ComplexHarmonicSeries Harmonics::realToComplex(
+   const RealHarmonicSeries& harmonics)
 {
-   HarmonicSeries<std::complex<real>> res(harmonics.order());
+   ComplexHarmonicSeries res(harmonics.order());
    
    real c = 1.0 / sqrt(2);
    for(int l = 0; l < harmonics.order(); l++)
@@ -369,9 +369,9 @@ HarmonicSeries<std::complex<real>> Harmonics::realToComplex(
    return res;
 }
 
-HarmonicSeries<real> Harmonics::complexToReal(const HarmonicSeries<std::complex<real>>& harmonics)
+RealHarmonicSeries Harmonics::complexToReal(const ComplexHarmonicSeries& harmonics)
 {
-   HarmonicSeries<real> res(harmonics.order());
+   RealHarmonicSeries res(harmonics.order());
 
    real c = 1.0 / sqrt(2);
    for(int l = 0; l <= harmonics.order(); l++)
