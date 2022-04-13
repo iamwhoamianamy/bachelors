@@ -39,7 +39,7 @@ namespace kernels
          size_t harmonicBegin = harmonicLength * harmonicId;
          size_t harmonicEnd = harmonicBegin + harmonicLength;
 
-         for(int l = 0; l < harmonicOrder; l++)
+         for(int l = 0; l <= harmonicOrder; l++)
          {
             Vector3 zeroRes = 0;
 

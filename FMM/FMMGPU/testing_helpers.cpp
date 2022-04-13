@@ -33,7 +33,7 @@ namespace test
       try
       {
          bq.InitFromTXT(bqDir + "keast 7 x.txt", bqDir + "keast 7 w.txt");
-         //std::cout << "Quadratures were successfully read. Order = " << bq.order() << std::endl;
+         //std::cout << "Quadratures were successfully read. Order = " << bq._order() << std::endl;
       }
       catch(Exeption ex)
       {

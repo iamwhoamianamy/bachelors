@@ -460,7 +460,7 @@ void printIndeces()
       foutIdx << "------------------------------------" << std::endl;
    }
 
-   //for(int l = 0; l <= n; l++)
+   //for(int l = 0; l <= _order; l++)
    //{
    //   for(int m = -l; m <= l; m++)
    //   {
@@ -529,7 +529,7 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   //comparisonBetweenMethodsOnPrecision();
+   comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //layerCalculationsPrecision();
    //calculationTimeForLocalMultipoles();
@@ -538,7 +538,7 @@ int main()
 
    //layerCalculationTime();
 
-   printIndeces();
+   //printIndeces();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

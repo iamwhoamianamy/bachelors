@@ -9,20 +9,20 @@
 class Harmonics
 {
 private:
-   int n;
+   size_t _order;
    HarmonicSeries<real> _sphericalHarmonics;
    static Factorials _factorials;
 public:   
-   Harmonics(int n, const Vector3& point);
+   Harmonics(int order, const Vector3& point);
 
    const HarmonicSeries<real>& sphericalHarmonics() const;
 
    static HarmonicSeries<real> calcSolidHarmonics(
-      size_t n,Vector3 point, bool isRegular);
+      size_t order,Vector3 point, bool isRegular);
    static HarmonicSeries<real> calcRegularSolidHarmonics(
-      size_t n, Vector3 point);
+      size_t order, Vector3 point);
    static HarmonicSeries<real> calcIrregularSolidHarmonics(
-      size_t n, Vector3 point);
+      size_t order, Vector3 point);
 
    static HarmonicSeries<std::complex<real>> realToComplex(
       const HarmonicSeries<real>& harmonics);

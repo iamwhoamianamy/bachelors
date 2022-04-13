@@ -5,8 +5,8 @@
 
 Factorials Harmonics::_factorials;
 
-Harmonics::Harmonics(int n, const Vector3& point) :
-   n(n)
+Harmonics::Harmonics(int order, const Vector3& point) :
+   _order(order)
 {
    calcSphericalHarmonics(point);
 }
@@ -16,7 +16,7 @@ const HarmonicSeries<real>& Harmonics::sphericalHarmonics() const
    return _sphericalHarmonics;
 }
 
-HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
+HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t order,
                                                    Vector3 point,
                                                    bool isRegular)
 {
@@ -29,12 +29,12 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
 
    point /= r;
 
-   auto solidlHarmonics = Harmonics(n, point).sphericalHarmonics();
+   auto solidlHarmonics = Harmonics(order, point).sphericalHarmonics();
 
    real mult = isRegular ? r : 1 / r;
    real curr = isRegular ? 1 : mult;
 
-   for(int l = 0; l < n; l++)
+   for(int l = 0; l <= order; l++)
    {
       for(int m = 0; m <= l; m++)
       {
@@ -54,19 +54,19 @@ HarmonicSeries<real> Harmonics::calcSolidHarmonics(size_t n,
    return solidlHarmonics;
 }
 
-HarmonicSeries<real> Harmonics::calcRegularSolidHarmonics(size_t n, Vector3 point)
+HarmonicSeries<real> Harmonics::calcRegularSolidHarmonics(size_t order, Vector3 point)
 {
-   return calcSolidHarmonics(n, point, true);
+   return calcSolidHarmonics(order, point, true);
 }
 
-HarmonicSeries<real> Harmonics::calcIrregularSolidHarmonics(size_t n, Vector3 point)
+HarmonicSeries<real> Harmonics::calcIrregularSolidHarmonics(size_t order, Vector3 point)
 {
-   return calcSolidHarmonics(n, point, false);
+   return calcSolidHarmonics(order, point, false);
 }
 
 void Harmonics::calcSphericalHarmonics(const Vector3& point)
 {
-   _sphericalHarmonics = HarmonicSeries<real>(n);
+   _sphericalHarmonics = HarmonicSeries<real>(_order);
    fillWithLegendrePolynomials(point.z);
    fillWithLegendrePolynomialDerivatives(point.z);
    mirrorLegendrePolynomialDerivatives(point.z);
@@ -78,7 +78,7 @@ void Harmonics::fillWithLegendrePolynomials(real z)
    _sphericalHarmonics.getHarmonic(0, 0) = 1;
    _sphericalHarmonics.getHarmonic(1, 0) = z;
 
-   for(size_t l = 2; l < n; l++)
+   for(size_t l = 2; l <= _order; l++)
    {
       _sphericalHarmonics.getHarmonic(l, 0) = calcLegendrePolynomial(l, z);
    }
@@ -90,7 +90,7 @@ void Harmonics::fillWithLegendrePolynomialDerivatives(real z)
    _sphericalHarmonics.getHarmonic(1, -1) = 1;
    _sphericalHarmonics.getHarmonic(1, 1) = 1;
 
-   for(size_t l = 2; l < n; l++)
+   for(size_t l = 2; l <= _order; l++)
    {
       for(size_t m = 1; m < l; m++)
       {
@@ -106,7 +106,7 @@ void Harmonics::fillWithLegendrePolynomialDerivatives(real z)
 
 void Harmonics::mirrorLegendrePolynomialDerivatives(real z)
 {
-   for(int l = 2; l < n; l++)
+   for(int l = 2; l <= _order; l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -126,11 +126,11 @@ void Harmonics::addComplex(real x, real y)
    std::complex<real> ephi1m(sqrt(2.0));
    std::complex<real> mult(x, y);
 
-   for(int m = 1; m < n; m++)
+   for(int m = 1; m < _order; m++)
    {
       ephi1m *= mult;
 
-      for(int l = m; l < n; l++)
+      for(int l = m; l <= _order; l++)
       {
          _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.real();
          _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.imag();
@@ -149,7 +149,7 @@ HarmonicSeries<std::complex<real>> Harmonics::translate(
 {
    HarmonicSeries<std::complex<real>> res(a.order());
 
-   for(int l = 0; l < a.order(); l++)
+   for(int l = 0; l <= a.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -180,7 +180,7 @@ HarmonicSeries<real> Harmonics::translate(
 {
    HarmonicSeries<real> res(b.order());
 
-   for(int l = 0; l < b.order(); l++)
+   for(int l = 0; l <= b.order(); l++)
    {
       real zeroRes = 0;
 
@@ -290,7 +290,7 @@ HarmonicSeries<real> Harmonics::separateX(const HarmonicSeries<Vector3>& harmoni
 {
    HarmonicSeries<real> res(harmonics.order());
 
-   for(int l = 0; l < harmonics.order(); l++)
+   for(int l = 0; l <= harmonics.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -305,7 +305,7 @@ HarmonicSeries<real> Harmonics::separateY(const HarmonicSeries<Vector3>& harmoni
 {
    HarmonicSeries<real> res(harmonics.order());
 
-   for(int l = 0; l < harmonics.order(); l++)
+   for(int l = 0; l <= harmonics.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -320,7 +320,7 @@ HarmonicSeries<real> Harmonics::separateZ(const HarmonicSeries<Vector3>& harmoni
 {
    HarmonicSeries<real> res(harmonics.order());
 
-   for(int l = 0; l < harmonics.order(); l++)
+   for(int l = 0; l <= harmonics.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -337,7 +337,7 @@ HarmonicSeries<Vector3> Harmonics::createFormXYZ(const HarmonicSeries<real>& xs,
 {
    HarmonicSeries<Vector3> res(xs.order());
 
-   for(int l = 0; l < xs.order(); l++)
+   for(int l = 0; l <= xs.order(); l++)
    {
       for(int m = -l; m <= l; m++)
       {
@@ -374,7 +374,7 @@ HarmonicSeries<real> Harmonics::complexToReal(const HarmonicSeries<std::complex<
    HarmonicSeries<real> res(harmonics.order());
 
    real c = 1.0 / sqrt(2);
-   for(int l = 0; l < harmonics.order(); l++)
+   for(int l = 0; l <= harmonics.order(); l++)
    {
       res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
       for(int m = 1; m <= l; m++)
