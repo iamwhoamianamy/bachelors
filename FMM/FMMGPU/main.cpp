@@ -8,7 +8,7 @@
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_solver.hpp"
-#include "kernel_callers.hpp"
+#include "translation_algorithms.hpp"
 #include "matrix_mult.hpp"
 #include "testing_helpers.hpp"
 
@@ -524,6 +524,32 @@ void printIndeces()
 
 }
 
+void matrixCalculationsPrecision()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   MultipoleSolver multipoleSolverCPU(quadratures);
+   MultipoleSolver multipoleSolverGPU(quadratures);
+
+   Vector3 point(3, 1, 2);
+
+   Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
+
+   multipoleSolverCPU.calcLocalMultipolesWithMatrices(false);
+   Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
+
+   //multipoleSolverGPU.calcLocalMultipolesWithLayers(true);
+   //Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
+
+   std::cout << std::setw(20) << "point ";
+   point.printWithWidth(std::cout, 6);
+   std::cout << std::scientific << std::endl;
+   std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
+   //std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
+}
+
 int main()
 {
    //NMResearch();
@@ -539,7 +565,8 @@ int main()
    //printIndeces();
 
    //testMultiplication();
-   compareWithMatrixMultiplication();
+   matrixCalculationsPrecision();
+   //compareWithMatrixMultiplication();
 
    /*Vector3 point(3, 1, 2);
    auto a = Harmonics::calcRegularSolidHarmonics(10, point);

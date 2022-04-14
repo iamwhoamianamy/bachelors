@@ -100,7 +100,7 @@
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="integration.hpp" />
     <ClInclude Include="kernels.cuh" />
-    <ClInclude Include="kernel_callers.hpp" />
+    <ClInclude Include="translation_algorithms.hpp" />
     <ClInclude Include="math.hpp" />
     <ClInclude Include="multipole_solver.hpp" />
     <ClInclude Include="octree.hpp" />
@@ -110,6 +110,7 @@
     <ClInclude Include="tetrahedron.hpp" />
     <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />
+    <ClInclude Include="typedefs.hpp" />
     <ClInclude Include="vector3.cuh" />
   </ItemGroup>
   <ItemGroup>
@@ -132,10 +133,11 @@
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
+    <ClCompile Include="translation_algorithms_cpu.cpp" />
     <CudaCompile Include="vector3.cu">
       <FileType>Document</FileType>
     </CudaCompile>
-    <CudaCompile Include="kernel_callers.cu">
+    <CudaCompile Include="translation_algorithms_gpu.cu">
       <FileType>Document</FileType>
     </CudaCompile>
   </ItemGroup>

@@ -9,7 +9,7 @@
     <CudaCompile Include="kernels.cu">
       <Filter>Code</Filter>
     </CudaCompile>
-    <CudaCompile Include="kernel_callers.cu">
+    <CudaCompile Include="translation_algorithms_gpu.cu">
       <Filter>Code</Filter>
     </CudaCompile>
     <CudaCompile Include="vector3.cu">
@@ -26,7 +26,7 @@
     <ClInclude Include="dev_ptr.hpp">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="kernel_callers.hpp">
+    <ClInclude Include="translation_algorithms.hpp">
       <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="multipole_solver.hpp">
@@ -83,6 +83,9 @@
     <ClInclude Include="testing_helpers.hpp">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="typedefs.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cuda_helper.cpp">
@@ -136,8 +139,13 @@
     <ClCompile Include="matrix_mult.hpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="testing_helpers.cpp" />
     <ClCompile Include="matrix_mult.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="translation_algorithms_cpu.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="testing_helpers.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>

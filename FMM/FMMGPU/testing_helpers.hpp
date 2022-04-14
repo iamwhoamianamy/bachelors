@@ -4,6 +4,7 @@
 #include "torus.hpp"
 #include "basis_quadratures.hpp"
 #include "exeptions.hpp"
+#include "typedefs.hpp"
 
 namespace test
 {
@@ -19,7 +20,18 @@ namespace test
    {
       for(size_t i = 0; i < vec.size(); i++)
       {
-         os << vec[i] << std::endl;
+         os << vec[i] << " ";
+      }
+
+      return os;
+   }
+
+   template <class T>
+   std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
+   {
+      for(size_t i = 0; i < matrix.size(); i++)
+      {
+         os << matrix[i] << std::endl;
       }
 
       return os;

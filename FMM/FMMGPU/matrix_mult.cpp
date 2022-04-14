@@ -1,20 +1,30 @@
 #include "matrix_mult.hpp"
 #include "testing_helpers.hpp"
 #include "integration.hpp"
+#include "math.hpp"
 
 namespace test
 {
    void testMultiplication()
    {
-      std::vector<std::vector<real>> matrix = {
+      std::vector<std::vector<real>> matrix1 = {
          {1, 2, 3},
          {4, 5, 6},
          {7, 8, 9}
       };
 
-      std::vector<real> vec = { 1, 1, 1 };
+      std::vector<std::vector<real>> matrix2 = {
+         {5, 2, 8},
+         {6, 4, 9},
+         {3, 7, 1}
+      };
 
-      std::cout << mult(matrix, vec);
+      std::vector<real> vec1 = { 1, 1, 1 };
+      std::vector<real> vec2 = { 2, 3, 4 };
+
+      std::cout << math::mult(matrix1, vec1) << std::endl;
+      std::cout << math::mult(vec1, vec2) << std::endl;
+      std::cout << math::mult(matrix1, matrix2) << std::endl;
    }
 
    void compareWithMatrixMultiplication()
@@ -45,9 +55,9 @@ namespace test
       auto zComponent = Harmonics::realToComplex(Harmonics::separateZ(expansion));
 
       return Harmonics::createFormXYZ(
-         Harmonics::complexToReal(ComplexHarmonicSeries(mult(regularMatrix, xComponent.data()))),
-         Harmonics::complexToReal(ComplexHarmonicSeries(mult(regularMatrix, yComponent.data()))),
-         Harmonics::complexToReal(ComplexHarmonicSeries(mult(regularMatrix, zComponent.data()))));
+         Harmonics::complexToReal(ComplexHarmonicSeries(math::mult(regularMatrix, xComponent.data()))),
+         Harmonics::complexToReal(ComplexHarmonicSeries(math::mult(regularMatrix, yComponent.data()))),
+         Harmonics::complexToReal(ComplexHarmonicSeries(math::mult(regularMatrix, zComponent.data()))));
    }
 
    Matrix<std::complex<real>> regularToMatrix(

@@ -286,6 +286,23 @@ real Harmonics::getFactorial(size_t n)
    return _factorials[n];
 }
 
+RealHarmonicSeries Harmonics::separateCoord(
+   const HarmonicSeries<Vector3>& harmonics,
+   size_t i)
+{
+   RealHarmonicSeries res(harmonics.order());
+
+   for(int l = 0; l <= harmonics.order(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         res.getHarmonic(l, m) = harmonics.getHarmonic(l, m)[i];
+      }
+   }
+
+   return res;
+}
+
 RealHarmonicSeries Harmonics::separateX(const HarmonicSeries<Vector3>& harmonics)
 {
    RealHarmonicSeries res(harmonics.order());

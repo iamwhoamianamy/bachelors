@@ -16,6 +16,7 @@ public:
    __all__ Vector3(real x = 0, real y = 0, real z = 0);
 
    __all__ real& operator[](int i);
+   __all__ const real operator[](int i) const;
 
    __all__ Vector3& operator=(Vector3&& vector) noexcept;
    __all__ Vector3& operator=(const Vector3& vector);

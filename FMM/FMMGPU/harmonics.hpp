@@ -50,12 +50,23 @@ public:
 
    static real getFactorial(size_t n);
    
-   static RealHarmonicSeries separateX(const HarmonicSeries<Vector3>& harmonics);
-   static RealHarmonicSeries separateY(const HarmonicSeries<Vector3>& harmonics);
-   static RealHarmonicSeries separateZ(const HarmonicSeries<Vector3>& harmonics);
-   static HarmonicSeries<Vector3> createFormXYZ(const RealHarmonicSeries& xs,
-                                                const RealHarmonicSeries& ys,
-                                                const RealHarmonicSeries& zs);
+   static RealHarmonicSeries separateCoord(
+      const HarmonicSeries<Vector3>& harmonics,
+      size_t i);
+
+   static RealHarmonicSeries separateX(
+      const HarmonicSeries<Vector3>& harmonics);
+
+   static RealHarmonicSeries separateY(
+      const HarmonicSeries<Vector3>& harmonics);
+
+   static RealHarmonicSeries separateZ(
+      const HarmonicSeries<Vector3>& harmonics);
+
+   static HarmonicSeries<Vector3> createFormXYZ(
+      const RealHarmonicSeries& xs,
+      const RealHarmonicSeries& ys,
+      const RealHarmonicSeries& zs);
 
    static real strangeFactor(int m, int mu);
 private:

@@ -3,6 +3,7 @@
 #include "real.hpp"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "typedefs.hpp"
 
 namespace math
 {
@@ -18,5 +19,59 @@ namespace math
    __all__ int sign(T val)
    {
       return (T(0) < val) - (val < T(0));
+   }
+
+   template <class T>
+   T mult(
+      const std::vector<T>& a,
+      const std::vector<T>& b)
+   {
+      T res = 0;
+
+      for(size_t i = 0; i < a.size(); i++)
+      {
+         res += a[i] * b[i];
+      }
+
+      return res;
+   }
+
+   template <class T>
+   std::vector<T> mult(
+      const Matrix<T>& a,
+      const std::vector<T>& b)
+   {
+      std::vector<T> res(b.size());
+
+      for(size_t y = 0; y < a.size(); y++)
+      {
+         for(size_t x = 0; x < b.size(); x++)
+         {
+            res[y] += a[y][x] * b[x];
+         }
+      }
+
+      return res;
+   }
+
+   template <class T>
+   Matrix<T> mult(
+      const Matrix<T>& a,
+      const Matrix<T>& b)
+   {
+      Matrix<T> res(a.size(), std::vector<T>(b[0].size()));
+
+      for(size_t i = 0; i < a.size(); i++)
+      {
+         for(size_t j = 0; j < b[0].size(); j++)
+         {
+            for(size_t k = 0; k < b.size(); k++)
+            {
+               res[i][j] += a[i][k] * b[k][j];
+            }
+         }
+      }
+
+      return res;
    }
 }
