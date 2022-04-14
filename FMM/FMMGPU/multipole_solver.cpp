@@ -101,15 +101,15 @@ void MultipoleSolver::calcContributionsToHigherLevels(
    const std::vector<std::vector<OctreeNode*>>& layers,
    bool useGPU)
 {
-   std::cout << "-----------------------------------------------" << std::endl;
-   std::cout << std::setw(20) << "layer" << std::setw(15) << "mlpl count";
-   std::cout << std::setw(10) << "time" << std::endl;
-   std::cout << "-----------------------------------------------" << std::endl;
-   std::cout << std::fixed;
+   //std::cout << "-----------------------------------------------" << std::endl;
+   //std::cout << std::setw(20) << "layer" << std::setw(15) << "mlpl count";
+   //std::cout << std::setw(10) << "time" << std::endl;
+   //std::cout << "-----------------------------------------------" << std::endl;
+   //std::cout << std::fixed;
 
    for(int i = layers.size() - 1; i >= 1; i--)
    {
-      std::cout << std::setw(20) << i << std::setw(15) << layers[i].size();
+      //std::cout << std::setw(20) << i << std::setw(15) << layers[i].size();
 
       std::vector<Vector3> contributions =
          calcContributionsToHigherLevel(layers[i], useGPU);
@@ -146,7 +146,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevel(
 
    std::vector<Vector3> result(layer.size() * harmonicLength);
 
-   auto start = std::chrono::steady_clock::now();
+   //auto start = std::chrono::steady_clock::now();
 
    if(useGPU)
       kernels::translateAllGPU(
@@ -155,10 +155,10 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLevel(
       kernels::translateAllCPU(
          result.data(), regulars.data(), harmonics.data(), layer.size(), n);
 
-   auto stop = std::chrono::steady_clock::now();
-   double time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+   //auto stop = std::chrono::steady_clock::now();
+   //double time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
 
-   std::cout << std::setw(10) << time << std::endl;
+   //std::cout << std::setw(10) << time << std::endl;
 
    return result;
 }
@@ -175,18 +175,21 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
       for(size_t o = 0; o < 8; o++)
       {
-         auto expansionMatrixXYZ =
-            getComponentsOfExpansionsInOneOrientation(nodesByOrientation[o]);
-
-         std::vector<ComplexMatrix> translated;
-         translated.reserve(3);
-
-         for(size_t c = 0; c < 3; c++)
+         if(!nodesByOrientation[o].empty())
          {
-            translated.emplace_back(math::mult(regularMatrices[o], expansionMatrixXYZ[c]));
-         }
+            auto expansionMatrixXYZ =
+               getComponentsOfExpansionsInOneOrientation(nodesByOrientation[o]);
 
-         accountContributions(nodesByOrientation[o], translated);
+            std::vector<ComplexMatrix> translated;
+            translated.reserve(3);
+
+            for(size_t c = 0; c < 3; c++)
+            {
+               translated.emplace_back(math::mult(regularMatrices[o], expansionMatrixXYZ[c]));
+            }
+
+            accountContributions(nodesByOrientation[o], translated);
+         }
       }
    }
 }
@@ -198,11 +201,9 @@ Matrix<OctreeNode*> MultipoleSolver::separateByOrientation(
 
    for(auto node : layer)
    {
-      auto parent = node->parent();
-
       for(size_t i = 0; i < 8; i++)
       {
-         if(parent->children()[i] == node)
+         if(node->parent()->children()[i] == node)
          {
             res[i].push_back(node);
             break;
@@ -217,19 +218,17 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatrices(
    const Matrix<OctreeNode*>& nodesByOrientation)
 {
    std::vector<ComplexMatrix> res;
+   res.reserve(8);
 
-   if(!nodesByOrientation.empty())
+   for(size_t i = 0; i < 8; i++)
    {
-      for(size_t i = 0; i < 8; i++)
-      {
-         auto parent = nodesByOrientation[i][0]->parent();
+      auto parent = nodesByOrientation[i][0]->parent();
 
-         if(!nodesByOrientation[i].empty())
-         {
-            auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
-            auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(n, translation);
-            res.push_back(matrixFromRegularHarmonic(Harmonics::realToComplex(regularHarmonic)));
-         }
+      if(!nodesByOrientation[i].empty())
+      {
+         auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
+         auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(n, translation);
+         res.emplace_back(matrixFromRegularHarmonic(Harmonics::realToComplex(regularHarmonic)));
       }
    }
 

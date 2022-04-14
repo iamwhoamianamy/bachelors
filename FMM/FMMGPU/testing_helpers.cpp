@@ -7,8 +7,8 @@ namespace test
    {
       const double torusRadius = 2;
       const double torusSectionWidth = 0.2;
-      //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-      return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
+      return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+      //return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
    }
 
    double getTime(void (*f)())
