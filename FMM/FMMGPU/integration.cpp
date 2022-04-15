@@ -10,13 +10,16 @@ namespace math
       {
          case 0: return 1;
          case 1: return x;
-         default: return ((2 * n - 1) * x * calcLegendrePolynomial(x, n - 1) + (1 - n) * calcLegendrePolynomial(x, n - 2)) / (n);
+         default: return ((2 * n - 1) * x * 
+                          calcLegendrePolynomial(x, n - 1) + (1 - n) * 
+                          calcLegendrePolynomial(x, n - 2)) / (n);
       }
    }
 
-   Vector3 calcVectorFunctionIntegral(Vector3(*f)(const Vector3&, const Vector3&),
-                                      const Vector3& point,
-                                      const std::vector<Quadrature>& quadratures)
+   Vector3 calcVectorFunctionIntegral(
+      Vector3(*f)(const Vector3&, const Vector3&),
+      const Vector3& point,
+      const std::vector<Quadrature>& quadratures)
    {
       Vector3 res = 0;
 
@@ -28,8 +31,9 @@ namespace math
       return res;
    }
 
-   Vector3 pointFromBasisQuadrature(const Tetrahedron& tetr,
-                                    const Vector3& quadr)
+   Vector3 pointFromBasisQuadrature(
+      const Tetrahedron& tetr,
+      const Vector3& quadr)
    {
       return tetr.a() +
          (tetr.b() - tetr.a()) * quadr.x +
@@ -37,30 +41,43 @@ namespace math
          (tetr.d() - tetr.a()) * quadr.z;
    }
 
-   Vector3 calcAViaSimpleIntegration(real current, const Vector3& point,
-                                     const std::vector<Tetrahedron>& mesh,
-                                     const BasisQuadratures& basisQuadratures)
+   Vector3 calcAViaSimpleIntegration(
+      real current,
+      const Vector3& point,
+      const std::vector<Tetrahedron>& mesh,
+      const BasisQuadratures& basisQuadratures)
    {
-      return calcVectorFunctionIntegral(simpleIntegrationFunctionForA,
-                                        point, tetrahedraToQuadratures(mesh, basisQuadratures)) / (4 * PI) * current;
+      return calcVectorFunctionIntegral(
+         simpleIntegrationFunctionForA,
+         point, 
+         tetrahedraToQuadratures(mesh, basisQuadratures)) / 
+         (4 * PI) * current;
    }
 
-   Vector3 simpleIntegrationFunctionForA(const Vector3& point, const Vector3& integr)
+   Vector3 simpleIntegrationFunctionForA(
+      const Vector3& point,
+      const Vector3& integr)
    {
       return integr.perp().normalized() / (point - integr).length();
    }
 
-   Vector3 calcAViaMultipoleMethod(real current, const Vector3& point,
-                                   const std::vector<Tetrahedron>& mesh,
-                                   const BasisQuadratures& basisQuadratures, int n)
+   Vector3 calcAViaMultipoleMethod(
+      real current,
+      const Vector3& point,
+      const std::vector<Tetrahedron>& mesh,
+      const BasisQuadratures& basisQuadratures,
+      int harmonicOrder)
    {
       auto quadratures = tetrahedraToQuadratures(mesh, basisQuadratures);
-      HarmonicSeries<Vector3> integrals = calcIntegralContribution(quadratures, n);
+      HarmonicSeries<Vector3> integrals = 
+         calcIntegralContribution(quadratures, harmonicOrder);
 
-      auto irregularHarmonics = Harmonics::calcSolidHarmonics(n, point, false);
+      auto irregularHarmonics = 
+         Harmonics::calcSolidHarmonics(harmonicOrder, point, false);
+
       Vector3 res;
 
-      for(int l = 0; l < n; l++)
+      for(int l = 0; l <= harmonicOrder; l++)
       {
          for(int m = -l; m <= l; m++)
          {
@@ -71,21 +88,31 @@ namespace math
       return res / (4.0 * PI) * current;
    }
 
-   Vector3 calcBioSavartLaplace(real current, const Vector3& point, std::vector<Quadrature>& quadratures)
+   Vector3 calcBioSavartLaplace(
+      real current,
+      const Vector3& point,
+      std::vector<Quadrature>& quadratures)
    {
-      return calcVectorFunctionIntegral(bioSavartLaplaceFunction,
-                                        point, quadratures) *
+      return calcVectorFunctionIntegral(
+         bioSavartLaplaceFunction,
+         point,
+         quadratures) *
          mu0 / (4 * PI) * current;
    }
 
-   Vector3 bioSavartLaplaceFunction(const Vector3& point, const Vector3& integr)
+   Vector3 bioSavartLaplaceFunction(
+      const Vector3& point,
+      const Vector3& integr)
    {
       Vector3 diff = point - integr;
-      return Vector3::cross(integr.perp().normalized(), (diff)) / pow(diff.length(), 3);
+      return Vector3::cross(integr.perp().normalized(), (diff)) / 
+         pow(diff.length(), 3);
    }
 
-   HarmonicSeries<Vector3> calcIntegralContribution(std::vector<Quadrature>& quadratures,
-                                                    int n, const Vector3& center)
+   HarmonicSeries<Vector3> calcIntegralContribution(
+      std::vector<Quadrature>& quadratures,
+      int harmonicOrder,
+      const Vector3& center)
    {
       std::vector<Quadrature*> newQuadratures(quadratures.size());
 
@@ -94,20 +121,24 @@ namespace math
          newQuadratures[i] = &quadratures[i];
       }
 
-      return calcIntegralContribution(newQuadratures, n, center);
+      return calcIntegralContribution(newQuadratures, harmonicOrder, center);
    }
 
-   HarmonicSeries<Vector3> calcIntegralContribution(const std::vector<Quadrature*>& quadratures,
-                                                    int n, const Vector3& center)
+   HarmonicSeries<Vector3> calcIntegralContribution(
+      const std::vector<Quadrature*>& quadratures, 
+      int harmonicOrder,
+      const Vector3& center)
    {
-      HarmonicSeries<Vector3> res(n);
+      HarmonicSeries<Vector3> res(harmonicOrder);
 
       for(auto quadrature : quadratures)
       {
-         auto regularHarmonics = Harmonics::calcSolidHarmonics(n,
-                                                               quadrature->coordinates - center,
-                                                               true);
-         for(int l = 0; l < n; l++)
+         auto regularHarmonics = Harmonics::calcSolidHarmonics(
+            harmonicOrder,
+            quadrature->coordinates - center,
+            true);
+
+         for(int l = 0; l <= harmonicOrder; l++)
          {
             for(int m = -l; m <= l; m++)
             {
@@ -133,10 +164,14 @@ namespace math
 
          for(size_t i = 0; i < basisQuadratures.order(); i++)
          {
-            Vector3 quadrature = math::pointFromBasisQuadrature(mesh[t],
-                                                                basisQuadratures.values(i));
-            res[t * basisQuadratures.order() + i] = Quadrature(quadrature, volume,
-                                                               basisQuadratures.w(i));
+            Vector3 quadrature = math::pointFromBasisQuadrature(
+               mesh[t],
+               basisQuadratures.values(i));
+
+            res[t * basisQuadratures.order() + i] = Quadrature(
+               quadrature,
+               volume,
+               basisQuadratures.w(i));
          }
       }
 
