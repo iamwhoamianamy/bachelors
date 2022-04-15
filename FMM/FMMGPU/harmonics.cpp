@@ -369,9 +369,9 @@ ComplexHarmonicSeries Harmonics::realToComplex(
    const RealHarmonicSeries& harmonics)
 {
    ComplexHarmonicSeries res(harmonics.order());
-   
    real c = 1.0 / sqrt(2);
-   for(int l = 0; l < harmonics.order(); l++)
+
+   for(int l = 0; l <= harmonics.order(); l++)
    {
       res.getHarmonic(l, 0) = std::complex<real>(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
@@ -389,8 +389,8 @@ ComplexHarmonicSeries Harmonics::realToComplex(
 RealHarmonicSeries Harmonics::complexToReal(const ComplexHarmonicSeries& harmonics)
 {
    RealHarmonicSeries res(harmonics.order());
-
    real c = 1.0 / sqrt(2);
+
    for(int l = 0; l <= harmonics.order(); l++)
    {
       res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
