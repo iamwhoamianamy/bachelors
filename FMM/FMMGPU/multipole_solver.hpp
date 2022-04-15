@@ -84,16 +84,4 @@ private:
       const std::vector<OctreeNode*>& nodesByOrientation,
       const std::vector<ComplexMatrix>& contributions);
 
-   template<class T>
-   std::vector<T> getColumn(const Matrix<T>& matrix, int idx)
-   {
-      std::vector<T> res(matrix.size());
-
-      for(size_t i = 0; i < matrix.size(); i++)
-      {
-         res[i] = matrix[i][idx];
-      }
-
-      return res;
-   }
 };

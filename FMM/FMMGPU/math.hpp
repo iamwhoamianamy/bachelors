@@ -74,4 +74,39 @@ namespace math
 
       return res;
    }
+
+   template<class T>
+   std::vector<T> getColumn(const Matrix<T>& matrix, int idx)
+   {
+      std::vector<T> res(matrix.size());
+
+      for(size_t i = 0; i < matrix.size(); i++)
+      {
+         res[i] = matrix[i][idx];
+      }
+
+      return res;
+   }
+
+   template <class T>
+   std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+   {
+      for(size_t i = 0; i < vec.size(); i++)
+      {
+         os << vec[i] << " ";
+      }
+
+      return os;
+   }
+
+   template <class T>
+   std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
+   {
+      for(size_t i = 0; i < matrix.size(); i++)
+      {
+         os << matrix[i] << std::endl;
+      }
+
+      return os;
+   }
 }

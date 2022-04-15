@@ -14,26 +14,4 @@ namespace test
                   const std::chrono::steady_clock::time_point& stop);
    BasisQuadratures readBasisQuadratures();
    std::vector<Vector3> createPoints(const Vector3& begin, const Vector3& end, int n);
-   
-   template <class T>
-   std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
-   {
-      for(size_t i = 0; i < vec.size(); i++)
-      {
-         os << vec[i] << " ";
-      }
-
-      return os;
-   }
-
-   template <class T>
-   std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
-   {
-      for(size_t i = 0; i < matrix.size(); i++)
-      {
-         os << matrix[i] << std::endl;
-      }
-
-      return os;
-   }
 }
