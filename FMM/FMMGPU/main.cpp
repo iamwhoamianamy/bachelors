@@ -2,6 +2,8 @@
 #include <string>
 #include <fstream>
 #include <iomanip>
+#include <ostream>
+#include <sstream>
 
 #include "vector3.cuh"
 #include "math.hpp"
@@ -383,7 +385,7 @@ void layerCalculationTime()
 
    size_t w = 15;
 
-   for(size_t i = 9; i < 10; i++)
+   for(size_t i = 10; i < 11; i++)
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
@@ -413,7 +415,7 @@ void matrixCalculationTime()
 
    size_t w = 15;
 
-   for(size_t i = 9; i < 10; i++)
+   for(size_t i = 10; i < 11; i++)
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
@@ -604,15 +606,15 @@ void matrixCalculationsPrecision()
    multipoleSolverCPU.calcLocalMultipolesWithMatrices(false);
    Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
 
-   //multipoleSolverGPU.calcLocalMultipolesWithLayers(true);
+   //multipoleSolverGPU.calcLocalMultipolesWithMatrices(true);
    //Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
-   std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
-   //std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithLayersCPU << std::endl;
+   //std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
 }
 
 int main()
@@ -622,18 +624,13 @@ int main()
    //comparisonToTelmaWithTranslation();
    //comparisonBetweenMethodsOnPrecision();
    //translationTest();
-   //layerCalculationsPrecision();
    //calculationTimeForLocalMultipoles();
-
-   //cudaAddingTest();
-   //layerCalculationTime();
-   //printIndeces();
-
-   //testMultiplication();
+   //layerCalculationsPrecision();
    matrixCalculationsPrecision();
 
+   //layerCalculationTime();
    //matrixCalculationTime();
-   layerMatrixCalculationTime();
+   //layerMatrixCalculationTime();
 
    //compareWithMatrixMultiplication();
 
@@ -644,7 +641,7 @@ int main()
    auto ac = Harmonics::realToComplex(a);
    auto bc = Harmonics::realToComplex(b);
 
-   Harmonics::mult(ac, 1.0 / std::complex<real>(0, 1));
+   Harmonics::mult(ac, 1.0 / Complex(0, 1));
    Harmonics::multToIDiv(bc);*/
 
 }

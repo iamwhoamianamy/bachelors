@@ -1,4 +1,5 @@
 #include "cuda_runtime.h"
+#include "cublas_v2.h"
 #include "device_launch_parameters.h"
 #include "harmonics.hpp"
 
@@ -27,6 +28,46 @@ namespace kernels
       Vector3* result, const real* a, const Vector3* b,
       size_t harmonicCount, size_t harmonicOrder);
 
+   template <class T>
+   struct KernelMatrix
+   {
+      int width;
+      int height;
+      int stride;
+      T* elements;
+   };
+
+   //typedef KernelMatrix<Complex> ComplexKernelMatrix;
+
+   template<class T>
+   __device__ T getElement(const KernelMatrix<T> A, int row, int col)
+   {
+      return A.elements[row * A.stride + col];
+   }
+
+   template<class T>
+   __device__ void setElement(KernelMatrix<T> A, int row, int col,
+                              T value)
+   {
+      A.elements[row * A.stride + col] = value;
+   }
+
+   template<class T>
+   __device__ KernelMatrix<T> getSubMatrix(KernelMatrix<T> A, int row, int col)
+   {
+      KernelMatrix<T> Asub;
+      Asub.width = THREADS_PER_BLOCK;
+      Asub.height = THREADS_PER_BLOCK;
+      Asub.stride = A.stride;
+      Asub.elements = &A.elements[A.stride * THREADS_PER_BLOCK * row
+         + THREADS_PER_BLOCK * col];
+      return Asub;
+   }
+
+   //__global__ void matMulKernel(
+   //   ComplexKernelMatrix A,
+   //   ComplexKernelMatrix B,
+   //   ComplexKernelMatrix C);
 
    __all__ size_t lmToIndex(int harmonicBegin,
                     int l, int m);

@@ -6,6 +6,7 @@
 namespace test
 {
    void testMultiplication();
+   void testBLASMultiplication();
    void compareWithMatrixMultiplication();
 
    HarmonicSeries<Vector3> translateWithMatrix(

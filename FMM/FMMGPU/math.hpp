@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <ostream>
 #include "real.hpp"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
@@ -88,25 +89,57 @@ namespace math
       return res;
    }
 
-   template <class T>
-   std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+   template<class T>
+   std::vector<T> matrixToVector(const Matrix<T>& matrix)
    {
-      for(size_t i = 0; i < vec.size(); i++)
-      {
-         os << vec[i] << " ";
-      }
+      std::vector<T> res(matrix.size() * matrix[0].size());
 
-      return os;
-   }
-
-   template <class T>
-   std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
-   {
       for(size_t i = 0; i < matrix.size(); i++)
       {
-         os << matrix[i] << std::endl;
+         for(size_t j = 0; j < matrix[i].size(); j++)
+         {
+            res[i * matrix[i].size() + j] = matrix[i][j];
+         }
       }
 
-      return os;
+      return res;
    }
+
+   template<class T>
+   Matrix<T> vectorToMatrix(const std::vector<T>& vector, size_t width)
+   {
+      Matrix<T> res(vector.size() / width, std::vector<T>(width));
+
+      for(size_t i = 0; i < vector.size() / width; i++)
+      {
+         for(size_t j = 0; j < width; j++)
+         {
+            res[i][j] = vector[i * width + j];
+         }
+      }
+
+      return res;
+   }
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+{
+   for(size_t i = 0; i < vec.size(); i++)
+   {
+      os << vec[i] << " ";
+   }
+
+   return os;
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
+{
+   for(size_t i = 0; i < matrix.size(); i++)
+   {
+      os << matrix[i] << std::endl;
+   }
+
+   return os;
 }

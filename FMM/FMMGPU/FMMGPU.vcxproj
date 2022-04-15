@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ACF4384A-A159-4543-8390-D6DDDEE7340F}</ProjectGuid>
     <RootNamespace>FMMGPU</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -52,6 +53,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -86,11 +88,13 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="complex.cu" />
     <CudaCompile Include="kernels.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="basis_quadratures.hpp" />
     <ClInclude Include="box.hpp" />
+    <ClInclude Include="complex.cuh" />
     <ClInclude Include="cuda_helper.hpp" />
     <ClInclude Include="dev_ptr.hpp" />
     <ClInclude Include="exeptions.hpp" />

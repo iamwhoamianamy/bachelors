@@ -21,6 +21,7 @@ private:
    std::vector<Quadrature>& _quadratures;
    OctreeNode* octreeRoot;
    bool _multipolesAreReady = false;
+   bool _log = true;
 
 public:
    const int n = 10;
@@ -84,4 +85,7 @@ private:
       const std::vector<OctreeNode*>& nodesByOrientation,
       const std::vector<ComplexMatrix>& contributions);
 
+   void printMatrices(
+      const std::vector<ComplexMatrix>& regularMatrices,
+      const std::vector<ComplexMatrix>& expansionMatrices);
 };

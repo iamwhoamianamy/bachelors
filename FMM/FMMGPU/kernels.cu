@@ -321,4 +321,64 @@ namespace kernels
          }
       }
    }
+
+   //__global__ void matMulKernel(
+   //   ComplexKernelMatrix A,
+   //   ComplexKernelMatrix B,
+   //   ComplexKernelMatrix C)
+   //{
+   //   // Block row and column
+   //   int blockRow = blockIdx.y;
+   //   int blockCol = blockIdx.x;
+
+   //   // Each thread block computes one sub-matrix Csub of C
+   //   ComplexKernelMatrix Csub = getSubMatrix(C, blockRow, blockCol);
+
+   //   // Each thread computes one element of Csub
+   //   // by accumulating results into Cvalue
+   //   Complex Cvalue = 0;
+
+   //   // Thread row and column within Csub
+   //   int row = threadIdx.y;
+   //   int col = threadIdx.x;
+
+   //   // Loop over all the sub-matrices of A and B that are
+   //   // required to compute Csub
+   //   // Multiply each pair of sub-matrices together
+   //   // and accumulate the results
+   //   for(int m = 0; m < (A.width / THREADS_PER_BLOCK); ++m)
+   //   {
+
+   //      // Get sub-matrix Asub of A
+   //      ComplexKernelMatrix Asub = getSubMatrix(A, blockRow, m);
+
+   //      // Get sub-matrix Bsub of B
+   //      ComplexKernelMatrix Bsub = getSubMatrix(B, m, blockCol);
+
+   //      // Shared memory used to store Asub and Bsub respectively
+   //      __shared__ Complex As[THREADS_PER_BLOCK][THREADS_PER_BLOCK];
+   //      __shared__ Complex Bs[THREADS_PER_BLOCK][THREADS_PER_BLOCK];
+
+   //      // Load Asub and Bsub from device memory to shared memory
+   //      // Each thread loads one element of each sub-matrix
+   //      As[row][col] = getElement(Asub, row, col);
+   //      Bs[row][col] = getElement(Bsub, row, col);
+
+   //      // Synchronize to make sure the sub-matrices are loaded
+   //      // before starting the computation
+   //      __syncthreads();
+   //      // Multiply Asub and Bsub together
+   //      for(int e = 0; e < THREADS_PER_BLOCK; ++e)
+   //         Cvalue += As[row][e] * Bs[e][col];
+
+   //      // Synchronize to make sure that the preceding
+   //      // computation is done before loading two new
+   //      // sub-matrices of A and B in the next iteration
+   //      __syncthreads();
+   //   }
+
+   //   // Write Csub to device memory
+   //   // Each thread writes one element
+   //   setElement(Csub, row, col, Cvalue);
+   //}
 }

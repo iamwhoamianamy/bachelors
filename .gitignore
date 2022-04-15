@@ -346,3 +346,4 @@ IntegralsGPU/results/
 !meshes/*.obj
 !meshes/*/*.obj
 
+expansion_*.txt

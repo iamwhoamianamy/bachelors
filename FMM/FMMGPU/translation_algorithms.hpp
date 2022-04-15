@@ -15,10 +15,18 @@ namespace kernels
       const Vector3* b,
       size_t harmonicCount,
       size_t harmonicOrder);
+
    void translateAllGPU(
       Vector3* result,
       const real* a,
       const Vector3* b,
       size_t harmonicCount,
       size_t harmonicOrder);
+
+   //void translateAllGPUMatrix(
+   //   Complex* result,
+   //   const Complex* a,
+   //   const Complex* b,
+   //   size_t harmonicCount,
+   //   size_t harmonicOrder);
 }
