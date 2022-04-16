@@ -2,7 +2,7 @@
 #include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
-#include <complex>
+#include "complex.cuh"
 
 OctreeNode::OctreeNode() : 
    _parent(nullptr)

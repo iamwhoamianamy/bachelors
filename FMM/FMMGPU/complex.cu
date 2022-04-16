@@ -22,8 +22,11 @@ __all__ Complex& Complex::operator+=(const Complex& rhs)
 
 __all__ Complex& Complex::operator*=(const Complex& rhs)
 {
-   r = r * rhs.r - i * rhs.i;
-   i = i * rhs.r + r * rhs.i;
+   real newR = r * rhs.r - i * rhs.i;
+   real newI = i * rhs.r + r * rhs.i;
+
+   r = newR;
+   i = newI;
 
    return *this;
 }

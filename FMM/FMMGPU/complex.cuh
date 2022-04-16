@@ -1,6 +1,5 @@
 #pragma once
 #include <ostream>
-#include "complex.cuh"
 #include "real.hpp"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"

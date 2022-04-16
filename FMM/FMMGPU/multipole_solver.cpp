@@ -310,7 +310,7 @@ ComplexMatrix MultipoleSolver::matrixFromRegularHarmonic(
 {
    ComplexMatrix res(
       regular.elemCount(),
-      std::vector<std::complex<real>>(regular.elemCount()));
+      std::vector<Complex>(regular.elemCount()));
 
    for(int l = 0; l <= regular.order(); l++)
    {
