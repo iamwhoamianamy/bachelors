@@ -56,7 +56,11 @@ void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(bool useGPU, bool 
 
    if(_log)
    {
-      std::cout << "-------------------------------------------------------" << std::endl;
+      if(useMatrices)
+         std::cout << "-----------------------matrices------------------------" << std::endl;
+      else
+         std::cout << "------------------------layers-------------------------" << std::endl;
+
       std::cout << std::setw(10) << "layer" << std::setw(15) << "mlpl count";
       std::cout << std::setw(15) << "kernel time" << std::setw(15) << "total time" << std::endl;
       std::cout << "-------------------------------------------------------" << std::endl;

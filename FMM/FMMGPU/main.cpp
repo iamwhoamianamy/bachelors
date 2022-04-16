@@ -449,9 +449,8 @@ void matrixCalculationTime()
    }
 }
 
-void layerMatrixCalculationTime()
+void layerMatrixCalculationTime(bool useGPU = 0)
 {
-   bool useGPU = 1;
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
@@ -479,6 +478,8 @@ void layerMatrixCalculationTime()
       stop = std::chrono::steady_clock::now();
       double timeWithMatrices = getTime(start, stop);
 
+      
+      std::cout << "device" << std::setw(w) << (useGPU ? "GPU" : "CPU") << std::endl;
       std::cout << "layers:  " << std::setw(w) << timeWithLayers << std::endl;
       std::cout << "matrices:" << std::setw(w) << timeWithMatrices << std::endl;
    }
@@ -637,7 +638,7 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   comparisonBetweenMethodsOnPrecision();
+   //comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
@@ -645,7 +646,8 @@ int main()
 
    //layerCalculationTime();
    //matrixCalculationTime();
-   //layerMatrixCalculationTime();
+   layerMatrixCalculationTime(0);
+   layerMatrixCalculationTime(1);
 
    //compareWithMatrixMultiplication();
 

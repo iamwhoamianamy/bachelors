@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <complex>
+#include <thrust/complex.h>
 #include "real.hpp"
 
 template <class T>

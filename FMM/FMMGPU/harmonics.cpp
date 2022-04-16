@@ -1,4 +1,4 @@
-#include <complex>
+#include <thrust/complex.h>
 #include <limits>
 #include "harmonics.hpp"
 #include "math.hpp"
