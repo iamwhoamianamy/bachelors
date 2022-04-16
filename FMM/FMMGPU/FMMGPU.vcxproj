@@ -89,11 +89,13 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="complex.cu" />
     <CudaCompile Include="kernels.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="basis_quadratures.hpp" />
     <ClInclude Include="box.hpp" />
+    <ClInclude Include="complex.cuh" />
     <ClInclude Include="cuda_helper.hpp" />
     <ClInclude Include="dev_ptr.hpp" />
     <ClInclude Include="exeptions.hpp" />
