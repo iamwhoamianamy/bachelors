@@ -6,7 +6,7 @@
 #include "factorials.hpp"
 #include "harmonic_series.hpp"
 
-typedef HarmonicSeries<std::complex<real>> ComplexHarmonicSeries;
+typedef HarmonicSeries<thrust::complex<real>> ComplexHarmonicSeries;
 typedef HarmonicSeries<real> RealHarmonicSeries;
 
 class Harmonics

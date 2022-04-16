@@ -37,7 +37,7 @@ namespace kernels
       T* elements;
    };
 
-   typedef KernelMatrix<std::complex<real>> ComplexKernelMatrix;
+   typedef KernelMatrix<thrust::complex<real>> ComplexKernelMatrix;
 
    template<class T>
    __device__ T getElement(const KernelMatrix<T> A, int row, int col)
@@ -64,10 +64,10 @@ namespace kernels
       return Asub;
    }
 
-   //__global__ void matMulKernel(
-   //   ComplexKernelMatrix A,
-   //   ComplexKernelMatrix B,
-   //   ComplexKernelMatrix C);
+   __global__ void matMulKernel(
+      ComplexKernelMatrix A,
+      ComplexKernelMatrix B,
+      ComplexKernelMatrix C);
 
    __all__ size_t lmToIndex(int harmonicBegin,
                     int l, int m);

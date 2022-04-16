@@ -81,6 +81,9 @@ private:
    std::vector<ComplexMatrix> getComponentsOfExpansionsInOneOrientation(
       const std::vector<OctreeNode*>& nodesByOrientation);
 
+   ComplexMatrix getComponentsOfExpansionsInOneOrientationAsVectors(
+      const std::vector<OctreeNode*>& nodesByOrientation);
+
    void accountContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
       const std::vector<ComplexMatrix>& contributions);

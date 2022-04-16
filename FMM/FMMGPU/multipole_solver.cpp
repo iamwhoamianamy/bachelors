@@ -230,7 +230,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                      expansionMatrices[c],
                      kernels::THREADS_PER_BLOCK);
 
-                  std::vector<std::complex<real>> t(
+                  std::vector<thrust::complex<real>> t(
                      math::nextDevisible(harmonicLength, kernels::THREADS_PER_BLOCK) *
                      math::nextDevisible(expansionMatrices[c][0].size(), kernels::THREADS_PER_BLOCK));
 
@@ -333,7 +333,7 @@ ComplexMatrix MultipoleSolver::matrixFromRegularHarmonic(
 {
    ComplexMatrix res(
       regular.elemCount(),
-      std::vector<std::complex<real>>(regular.elemCount()));
+      std::vector<thrust::complex<real>>(regular.elemCount()));
 
    for(int l = 0; l <= regular.order(); l++)
    {
@@ -366,6 +366,38 @@ std::vector<ComplexMatrix> MultipoleSolver::getComponentsOfExpansionsInOneOrient
 {
    std::vector<ComplexMatrix> res(3, ComplexMatrix(harmonicLength));
    
+   for(size_t c = 0; c < 3; c++)
+   {
+      for(size_t i = 0; i < harmonicLength; i++)
+      {
+         res[c][i].resize(nodesByOrientation.size());
+      }
+   }
+
+   for(size_t h = 0; h < nodesByOrientation.size(); h++)
+   {
+      auto& expansion = nodesByOrientation[h]->multipoleExpansion();
+
+      for(size_t c = 0; c < 3; c++)
+      {
+         auto ñomplex = Harmonics::realToComplex(Harmonics::separateCoord(expansion, c));
+
+         for(size_t i = 0; i < harmonicLength; i++)
+         {
+            res[c][i][h] = ñomplex.getHarmonic(i);
+         }
+      }
+   }
+
+   return res;
+}
+
+ComplexMatrix MultipoleSolver::getComponentsOfExpansionsInOneOrientationAsVectors(
+   const std::vector<OctreeNode*>& nodesByOrientation)
+{
+   
+   ComplexMatrix res(3, std::vector<thrust::complex<real>>(harmonicLength));
+
    for(size_t c = 0; c < 3; c++)
    {
       for(size_t i = 0; i < harmonicLength; i++)

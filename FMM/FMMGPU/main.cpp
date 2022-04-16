@@ -154,6 +154,12 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.calcLocalMultipolesWithLayers(true);
    Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
 
+   multipoleSolver.calcLocalMultipolesWithMatrices(false);
+   Vector3 byMultipolesWithMatricesCPU = multipoleSolver.calcB(current, point);
+
+   multipoleSolver.calcLocalMultipolesWithMatrices(true);
+   Vector3 byMultipolesWithMatricesGPU = multipoleSolver.calcB(current, point);
+
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
@@ -163,6 +169,8 @@ void comparisonBetweenMethodsOnPrecision()
    std::cout << std::setw(40) << "multipoles with r translation " << byMultipolesWithRealTranslation << std::endl;
    std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
    std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithMatricesCPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithMatricesGPU << std::endl;
 }
 
 void translationTest()
@@ -426,24 +434,24 @@ void matrixCalculationTime()
    for(size_t i = 1; i < 2; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
+     // MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
       MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolverCPU.calcLocalMultipolesWithMatrices(0);
+      //multipoleSolverCPU.calcLocalMultipolesWithMatrices(0);
       auto stop = std::chrono::steady_clock::now();
-      double timeWithCPU = getTime(start, stop);
+      //double timeWithCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
       multipoleSolverGPU.calcLocalMultipolesWithMatrices(1);
       stop = std::chrono::steady_clock::now();
       double timeWithGPU = getTime(start, stop);
 
-      std::cout << std::setw(w) << "total time CPU:";
-      std::cout << std::setw(w) << timeWithCPU << std::endl;
+      //std::cout << std::setw(w) << "total time CPU:";
+      //std::cout << std::setw(w) << timeWithCPU << std::endl;
       std::cout << std::setw(w) << "total time GPU:";
       std::cout << std::setw(w) << timeWithGPU << std::endl;
    }
@@ -642,12 +650,12 @@ int main()
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   //matrixCalculationsPrecision();
+   matrixCalculationsPrecision();
 
    //layerCalculationTime();
-   //matrixCalculationTime();
-   layerMatrixCalculationTime(0);
-   layerMatrixCalculationTime(1);
+   matrixCalculationTime();
+   //layerMatrixCalculationTime(0);
+   //layerMatrixCalculationTime(1);
 
    //compareWithMatrixMultiplication();
 

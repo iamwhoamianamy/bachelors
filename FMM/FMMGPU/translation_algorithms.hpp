@@ -24,9 +24,9 @@ namespace kernels
       size_t harmonicOrder);
 
    void translateAllGPUMatrix(
-      std::complex<real>* result,
-      const std::complex<real>* a,
-      const std::complex<real>* b,
+      thrust::complex<real>* result,
+      const thrust::complex<real>* a,
+      const thrust::complex<real>* b,
       size_t harmonicCount,
       size_t harmonicOrder);
 }
