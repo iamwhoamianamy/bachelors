@@ -6,5 +6,7 @@
 template <class T>
 using Matrix = std::vector<std::vector<T>>;
 
-typedef Matrix<thrust::complex<real>> ComplexMatrix;
+typedef thrust::complex<real> Complex;
+
+typedef Matrix<Complex> ComplexMatrix;
 typedef Matrix<real> RealMatrix;

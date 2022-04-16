@@ -124,8 +124,8 @@ real Harmonics::calcLegendrePolynomial(int l, real z)
 
 void Harmonics::addComplex(real x, real y)
 {
-   thrust::complex<real> ephi1m(sqrt(2.0));
-   thrust::complex<real> mult(x, y);
+   Complex ephi1m(sqrt(2.0));
+   Complex mult(x, y);
 
    for(int m = 1; m < _order; m++)
    {
@@ -374,12 +374,12 @@ ComplexHarmonicSeries Harmonics::realToComplex(
    real c = math::R_SQRT_2;
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = thrust::complex<real>(harmonics.getHarmonic(l, 0), 0);
+      res.getHarmonic(l, 0) = Complex(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
       {
-         res.setHarmonic(l, m, thrust::complex<real>(harmonics.getHarmonic(l, m) * c,
+         res.setHarmonic(l, m, Complex(harmonics.getHarmonic(l, m) * c,
                                        harmonics.getHarmonic(l, -m) * c));
-         res.setHarmonic(l, -m, thrust::complex<real>(harmonics.getHarmonic(l, m) * c,
+         res.setHarmonic(l, -m, Complex(harmonics.getHarmonic(l, m) * c,
                                       -harmonics.getHarmonic(l, -m) * c));
       }
    }

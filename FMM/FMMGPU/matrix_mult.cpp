@@ -60,12 +60,12 @@ namespace test
          Harmonics::complexToReal(ComplexHarmonicSeries(math::mult(regularMatrix, zComponent.data()))));
    }
 
-   Matrix<thrust::complex<real>> regularToMatrix(
+   Matrix<Complex> regularToMatrix(
       const ComplexHarmonicSeries& regular)
    {
       ComplexMatrix res(
          regular.elemCount(),
-         std::vector<thrust::complex<real>>(regular.elemCount()));
+         std::vector<Complex>(regular.elemCount()));
 
       for(int l = 0; l <= regular.order(); l++)
       {

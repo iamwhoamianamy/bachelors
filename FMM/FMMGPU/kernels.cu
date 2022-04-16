@@ -337,7 +337,7 @@ namespace kernels
 
       // Each thread computes one element of Csub
       // by accumulating results into Cvalue
-      thrust::complex<real> Cvalue = 0.0;
+      Complex Cvalue = 0.0;
 
       // Thread row and column within Csub
       int row = threadIdx.y;
@@ -357,8 +357,8 @@ namespace kernels
          ComplexKernelMatrix Bsub = getSubMatrix(B, m, blockCol);
 
          // Shared memory used to store Asub and Bsub respectively
-         __shared__ thrust::complex<real> As[THREADS_PER_BLOCK][THREADS_PER_BLOCK];
-         __shared__ thrust::complex<real> Bs[THREADS_PER_BLOCK][THREADS_PER_BLOCK];
+         __shared__ Complex As[THREADS_PER_BLOCK][THREADS_PER_BLOCK];
+         __shared__ Complex Bs[THREADS_PER_BLOCK][THREADS_PER_BLOCK];
 
          // Load Asub and Bsub from device memory to shared memory
          // Each thread loads one element of each sub-matrix
