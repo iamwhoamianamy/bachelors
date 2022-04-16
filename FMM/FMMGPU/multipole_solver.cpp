@@ -193,6 +193,13 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
    const std::vector<std::vector<OctreeNode*>>& layers,
    bool useGPU)
 {
+   useGPU ? calcContributionsToHigherLevelsWithMatricesCPU(layers) :
+      calcContributionsToHigherLevelsWithMatricesGPU(layers);
+}
+
+void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesCPU(
+   const std::vector<std::vector<OctreeNode*>>& layers)
+{
    for(size_t l = layers.size() - 1; l >= 1; l--)
    {
       auto start = std::chrono::steady_clock::now();
@@ -218,59 +225,98 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
             std::vector<ComplexMatrix> translated;
             translated.reserve(3);
 
-            if(useGPU)
+            for(size_t c = 0; c < 3; c++)
             {
-               for(size_t c = 0; c < 3; c++)
-               {
-                  auto regularMatrixAsVector = math::matrixToVector(
-                     regularMatrices[o],
-                     kernels::THREADS_PER_BLOCK);
+               auto kernelStart = std::chrono::steady_clock::now();
 
-                  auto expansionMatrixAsVector = math::matrixToVector(
-                     expansionMatrices[c],
-                     kernels::THREADS_PER_BLOCK);
+               auto t = math::mult(
+                  regularMatrices[o],
+                  expansionMatrices[c]);
 
-                  std::vector<Complex> t(
-                     math::nextDevisible(harmonicLength, kernels::THREADS_PER_BLOCK) *
-                     math::nextDevisible(expansionMatrices[c][0].size(), kernels::THREADS_PER_BLOCK));
+               auto kernelStop = std::chrono::steady_clock::now();
+               kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
+                  (kernelStop - kernelStart).count() * 1e-6;
 
-                  auto kernelStart = std::chrono::steady_clock::now();
-
-                  kernels::translateAllGPUMatrix(
-                     t.data(),
-                     regularMatrixAsVector.data(),
-                     expansionMatrixAsVector.data(),
-                     expansionMatrices[c][0].size(),
-                     n);
-
-                  auto kernelStop = std::chrono::steady_clock::now();
-                  kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
-                     (kernelStop - kernelStart).count() * 1e-6;
-
-                  translated.emplace_back(math::vectorToMatrix(t,
-                                          harmonicLength,
-                                          expansionMatrices[c][0].size(),
-                                          kernels::THREADS_PER_BLOCK));
-               }
-            }
-            else
-            {
-               for(size_t c = 0; c < 3; c++)
-               {
-                  auto kernelStart = std::chrono::steady_clock::now();
-
-                  auto t = math::mult(
-                     regularMatrices[o],
-                     expansionMatrices[c]);
-
-                  auto kernelStop = std::chrono::steady_clock::now();
-                  kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
-                     (kernelStop - kernelStart).count() * 1e-6;
-
-                  translated.emplace_back(t);
-               }
+               translated.emplace_back(t);
             }
 
+            accountContributions(nodesByOrientation[o], translated);
+         }
+      }
+
+      auto stop = std::chrono::steady_clock::now();
+      double layerTime = std::chrono::duration_cast<std::chrono::microseconds>
+         (stop - start).count() * 1e-6;
+
+      if(_log)
+      {
+         std::cout << std::setw(15) << kernelTime;
+         std::cout << std::setw(15) << layerTime << std::endl;
+      }
+   }
+}
+
+void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
+   const std::vector<std::vector<OctreeNode*>>& layers)
+{
+   for(size_t l = layers.size() - 1; l >= 1; l--)
+   {
+      auto start = std::chrono::steady_clock::now();
+
+      if(_log)
+      {
+         std::cout << std::setw(10) << l << std::setw(15) << layers[l].size();
+      }
+
+      auto& layer = layers[l];
+      auto nodesByOrientation = separateByOrientation(layer);
+      auto regularMatrices = calcRegularMatrices(nodesByOrientation);
+
+      double kernelTime = 0;
+
+      for(size_t o = 0; o < 8; o++)
+      {
+         if(!nodesByOrientation[o].empty())
+         {
+            auto expansionMatrices =
+               getComponentsOfExpansionsInOneOrientation(nodesByOrientation[o]);
+
+            std::vector<ComplexMatrix> translated;
+            translated.reserve(3);
+
+            for(size_t c = 0; c < 3; c++)
+            {
+               auto regularMatrixAsVector = math::matrixToVector(
+                  regularMatrices[o],
+                  kernels::THREADS_PER_BLOCK);
+
+               auto expansionMatrixAsVector = math::matrixToVector(
+                  expansionMatrices[c],
+                  kernels::THREADS_PER_BLOCK);
+
+               std::vector<Complex> t(
+                  math::nextDevisible(harmonicLength, kernels::THREADS_PER_BLOCK) *
+                  math::nextDevisible(expansionMatrices[c][0].size(), kernels::THREADS_PER_BLOCK));
+
+               auto kernelStart = std::chrono::steady_clock::now();
+
+               kernels::translateAllGPUMatrix(
+                  t.data(),
+                  regularMatrixAsVector.data(),
+                  expansionMatrixAsVector.data(),
+                  expansionMatrices[c][0].size(),
+                  n);
+
+               auto kernelStop = std::chrono::steady_clock::now();
+               kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
+                  (kernelStop - kernelStart).count() * 1e-6;
+
+               translated.emplace_back(math::vectorToMatrix(t,
+                                       harmonicLength,
+                                       expansionMatrices[c][0].size(),
+                                       kernels::THREADS_PER_BLOCK));
+            }
+            
             accountContributions(nodesByOrientation[o], translated);
          }
       }
@@ -322,6 +368,28 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatrices(
          auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
          auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(n, translation);
          res.emplace_back(matrixFromRegularHarmonic(Harmonics::realToComplex(regularHarmonic)));
+      }
+   }
+
+   return res;
+}
+
+ComplexMatrix MultipoleSolver::calcRegularVectors(
+   const Matrix<OctreeNode*>& nodesByOrientation)
+{
+   ComplexMatrix res;
+   res.reserve(8);
+
+   for(size_t i = 0; i < 8; i++)
+   {
+      auto parent = nodesByOrientation[i][0]->parent();
+
+      if(!nodesByOrientation[i].empty())
+      {
+         auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
+         auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(n, translation);
+         res.emplace_back(Harmonics::realToComplex(regularHarmonic));
+         res[i].resize(math::nextDevisible(res[i].size(), kernels::THREADS_PER_BLOCK));
       }
    }
 

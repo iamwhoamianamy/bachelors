@@ -66,6 +66,12 @@ private:
       const std::vector<std::vector<OctreeNode*>>& layers,
       bool useGPU);
 
+   void calcContributionsToHigherLevelsWithMatricesCPU(
+      const std::vector<std::vector<OctreeNode*>>& layers);
+
+   void calcContributionsToHigherLevelsWithMatricesGPU(
+      const std::vector<std::vector<OctreeNode*>>& layers);
+
    void calcMultipolesAtLeaves(
       const std::vector<std::vector<OctreeNode*>>& layers);
 
@@ -73,6 +79,9 @@ private:
       const std::vector<OctreeNode*>& layer);
 
    std::vector<ComplexMatrix> calcRegularMatrices(
+      const Matrix<OctreeNode*>& nodesByOrientation);
+
+   ComplexMatrix calcRegularVectors(
       const Matrix<OctreeNode*>& nodesByOrientation);
 
    ComplexMatrix matrixFromRegularHarmonic(
