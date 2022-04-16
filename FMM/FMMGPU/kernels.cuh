@@ -37,7 +37,7 @@ namespace kernels
       T* elements;
    };
 
-   //typedef KernelMatrix<Complex> ComplexKernelMatrix;
+   typedef KernelMatrix<std::complex<real>> ComplexKernelMatrix;
 
    template<class T>
    __device__ T getElement(const KernelMatrix<T> A, int row, int col)

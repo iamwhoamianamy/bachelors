@@ -1,7 +1,8 @@
-#include "complex.cuh"
+#include <complex>
 #include <limits>
 #include "harmonics.hpp"
 #include "math.hpp"
+#include <iostream>
 
 Factorials Harmonics::_factorials;
 
@@ -123,8 +124,8 @@ real Harmonics::calcLegendrePolynomial(int l, real z)
 
 void Harmonics::addComplex(real x, real y)
 {
-   Complex ephi1m(sqrt(2.0));
-   Complex mult(x, y);
+   std::complex<real> ephi1m(sqrt(2.0));
+   std::complex<real> mult(x, y);
 
    for(int m = 1; m < _order; m++)
    {
@@ -132,8 +133,8 @@ void Harmonics::addComplex(real x, real y)
 
       for(int l = m; l <= _order; l++)
       {
-         _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.r;
-         _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.i;
+         _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.real();
+         _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.imag();
       }
    }
 }
@@ -370,16 +371,16 @@ ComplexHarmonicSeries Harmonics::realToComplex(
 {
    ComplexHarmonicSeries res(harmonics.order());
    
-   real c = 1.0 / sqrt(2);
+   real c = math::R_SQRT_2;
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = Complex(harmonics.getHarmonic(l, 0), 0);
+      res.getHarmonic(l, 0) = std::complex<real>(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
       {
-         res.getHarmonic(l, m) =  c * Complex(harmonics.getHarmonic(l, m),
-                                                         harmonics.getHarmonic(l, -m));
-         res.getHarmonic(l, -m) = c * Complex(harmonics.getHarmonic(l, m),
-                                                        -harmonics.getHarmonic(l, -m));
+         res.setHarmonic(l, m, std::complex<real>(harmonics.getHarmonic(l, m) * c,
+                                       harmonics.getHarmonic(l, -m) * c));
+         res.setHarmonic(l, -m, std::complex<real>(harmonics.getHarmonic(l, m) * c,
+                                      -harmonics.getHarmonic(l, -m) * c));
       }
    }
 
@@ -393,11 +394,11 @@ RealHarmonicSeries Harmonics::complexToReal(const ComplexHarmonicSeries& harmoni
    real c = 1.0 / sqrt(2);
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).r;
+      res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
       for(int m = 1; m <= l; m++)
       {
-         res.getHarmonic(l, m) = c *  (harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m)).r;
-         res.getHarmonic(l, -m) = c * (harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m)).i;
+         res.getHarmonic(l, m) = c *  (harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m)).real();
+         res.getHarmonic(l, -m) = c * (harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m)).imag();
       }
    }
 

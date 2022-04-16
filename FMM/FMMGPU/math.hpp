@@ -16,6 +16,8 @@ namespace math
    real calcFactorial(int n);
    real calcBinomial(int k, int n);
 
+   size_t nextDevisible(const size_t number, const size_t devidor);
+
    template <class T>
    __all__ int sign(T val)
    {
@@ -90,15 +92,17 @@ namespace math
    }
 
    template<class T>
-   std::vector<T> matrixToVector(const Matrix<T>& matrix)
+   std::vector<T> matrixToVector(const Matrix<T>& matrix, size_t padding)
    {
-      std::vector<T> res(matrix.size() * matrix[0].size());
+      size_t height = math::nextDevisible(matrix.size(), padding);
+      size_t width = math::nextDevisible(matrix[0].size(), padding);
+      std::vector<T> res(height * width);
 
       for(size_t i = 0; i < matrix.size(); i++)
       {
-         for(size_t j = 0; j < matrix[i].size(); j++)
+         for(size_t j = 0; j < matrix[0].size(); j++)
          {
-            res[i * matrix[i].size() + j] = matrix[i][j];
+            res[i * width + j] = matrix[i][j];
          }
       }
 
@@ -106,15 +110,20 @@ namespace math
    }
 
    template<class T>
-   Matrix<T> vectorToMatrix(const std::vector<T>& vector, size_t width)
+   Matrix<T> vectorToMatrix(
+      const std::vector<T>& vector,
+      size_t height,
+      size_t width,
+      size_t padding)
    {
-      Matrix<T> res(vector.size() / width, std::vector<T>(width));
+      size_t currentWidth = math::nextDevisible(width, padding);
+      Matrix<T> res(height, std::vector<T>(width));
 
-      for(size_t i = 0; i < vector.size() / width; i++)
+      for(size_t i = 0; i < height; i++)
       {
          for(size_t j = 0; j < width; j++)
          {
-            res[i][j] = vector[i * width + j];
+            res[i][j] = vector[i * currentWidth + j];
          }
       }
 

@@ -1,12 +1,12 @@
 #pragma once
 #include <vector>
-#include "complex.cuh"
+#include <complex>
 #include "real.hpp"
 #include "vector3.cuh"
 #include "factorials.hpp"
 #include "harmonic_series.hpp"
 
-typedef HarmonicSeries<Complex> ComplexHarmonicSeries;
+typedef HarmonicSeries<std::complex<real>> ComplexHarmonicSeries;
 typedef HarmonicSeries<real> RealHarmonicSeries;
 
 class Harmonics

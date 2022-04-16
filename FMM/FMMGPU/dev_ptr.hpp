@@ -1,6 +1,7 @@
 #pragma once
 #include "cuda_runtime.h"
 #include "cuda_helper.hpp"
+#include "math.hpp"
 
 namespace cuda
 {
@@ -75,7 +76,7 @@ namespace cuda
    {
       cudaFree(_data);
 
-      _sizePadded = nextDevisible(size, padding);
+      _sizePadded = math::nextDevisible(size, padding);
       _size = size;
 
       cudaError_t result = cudaMalloc((void**)&_data,

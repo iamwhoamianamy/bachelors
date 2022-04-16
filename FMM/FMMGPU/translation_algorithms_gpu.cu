@@ -76,51 +76,53 @@ namespace kernels
       result_dev.copyToHost(result);
    }
 
-   //void translateAllGPUMatrix(
-   //   Complex* result,
-   //   const Complex* a,
-   //   const Complex* b,
-   //   size_t harmonicCount,
-   //   size_t harmonicOrder)
-   //{     
-   //   size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
-   //   // Load A and B to device memory
-   //   ComplexKernelMatrix d_A;
-   //   d_A.width = d_A.stride = harmonicLength;
-   //   d_A.height = harmonicLength;
-   //   size_t size = harmonicLength * harmonicLength * sizeof(float);
-   //   cudaMalloc(&d_A.elements, size);
-   //   cudaMemcpy(d_A.elements, a, size,
-   //              cudaMemcpyHostToDevice);
-   //   ComplexKernelMatrix d_B;
-   //   d_B.width = d_B.stride = harmonicCount;
-   //   d_B.height = harmonicLength;
-   //   size = harmonicCount * harmonicLength * sizeof(float);
-   //   cudaMalloc(&d_B.elements, size);
-   //   cudaMemcpy(d_B.elements, b, size,
-   //              cudaMemcpyHostToDevice);
+   void translateAllGPUMatrix(
+      std::complex<real>* result,
+      const std::complex<real>* a,
+      const std::complex<real>* b,
+      size_t harmonicCount,
+      size_t harmonicOrder)
+   {     
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
+      size_t harLenPadded = math::nextDevisible(harmonicLength, THREADS_PER_BLOCK);
+      size_t harCountPadded = math::nextDevisible(harmonicCount, THREADS_PER_BLOCK);
+      // Load A and B to device memory
+      ComplexKernelMatrix d_A;
+      d_A.width = d_A.stride = harLenPadded;
+      d_A.height = harLenPadded;
+      size_t size = harLenPadded * harLenPadded * sizeof(std::complex<real>);
+      cudaMalloc(&d_A.elements, size);
+      cudaMemcpy(d_A.elements, a, size,
+                 cudaMemcpyHostToDevice);
+      ComplexKernelMatrix d_B;
+      d_B.width = d_B.stride = harCountPadded;
+      d_B.height = harLenPadded;
+      size = harCountPadded * harLenPadded * sizeof(std::complex<real>);
+      cudaMalloc(&d_B.elements, size);
+      cudaMemcpy(d_B.elements, b, size,
+                 cudaMemcpyHostToDevice);
 
-   //   // Allocate C in device memory
-   //   ComplexKernelMatrix d_C;
-   //   d_C.width = d_C.stride = harmonicCount;
-   //   d_C.height = harmonicLength;
-   //   size = harmonicCount * harmonicLength * sizeof(float);
-   //   cudaMalloc(&d_C.elements, size);
+      // Allocate C in device memory
+      ComplexKernelMatrix d_C;
+      d_C.width = d_C.stride = harCountPadded;
+      d_C.height = harLenPadded;
+      size = harCountPadded * harLenPadded * sizeof(std::complex<real>);
+      cudaMalloc(&d_C.elements, size);
 
-   //   // Invoke kernel
-   //   dim3 dimBlock(THREADS_PER_BLOCK, THREADS_PER_BLOCK);
-   //   dim3 dimGrid(d_B.width / dimBlock.x, d_A.height / dimBlock.y);
-   //   matMulKernel<<<dimGrid, dimBlock >>>(d_A, d_B, d_C);
+      // Invoke kernel
+      dim3 dimBlock(THREADS_PER_BLOCK, THREADS_PER_BLOCK);
+      dim3 dimGrid(d_B.width / dimBlock.x, d_A.height / dimBlock.y);
+      //matMulKernel<<<dimGrid, dimBlock >>>(d_A, d_B, d_C);
 
-   //   // Read C from device memory
-   //   cudaMemcpy(result, d_C.elements, size,
-   //              cudaMemcpyDeviceToHost);
+      // Read C from device memory
+      cudaMemcpy(result, d_C.elements, size,
+                 cudaMemcpyDeviceToHost);
 
-   //   // Free device memory
-   //   cudaFree(d_A.elements);
-   //   cudaFree(d_B.elements);
-   //   cudaFree(d_C.elements);
-   //}
+      // Free device memory
+      cudaFree(d_A.elements);
+      cudaFree(d_B.elements);
+      cudaFree(d_C.elements);
+   }
 
    size_t lmToIndex(int harmonicBegin,
                     int l, int m)

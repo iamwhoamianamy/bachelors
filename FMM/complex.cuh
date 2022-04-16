@@ -6,22 +6,30 @@
 
 class Complex
 {
-public:
-   real r;
-   real i;
+private:
+   real _r;
+   real _i;
 
-   __all__ Complex(real r = 0, real i = 0);
+public:
+   __all__ Complex();
+   __all__ Complex(real value);
+   __all__ Complex(real r, real i);
    __all__ Complex(const Complex& complex);
+   __all__ Complex(Complex&& complex) noexcept;
+
+   __all__ real r() const;
+   __all__ real i() const;
 
    __all__ Complex& operator+=(const Complex& rhs);
    __all__ Complex& operator*=(const Complex& rhs);
 
    __all__ Complex& operator=(const Complex& complex);
+   __all__ Complex& operator=(Complex&& complex) noexcept;
+
    __all__ Complex& operator+(const Complex& rhs) const;
    __all__ Complex& operator-(const Complex& rhs) const;
    __all__ Complex& operator*(const Complex& rhs) const;
    __all__ Complex& operator*(const real rhs) const;
 };
 
-Complex& operator*(real lhs, const Complex& rhs);
 std::ostream& operator<<(std::ostream& os, const Complex& complex);

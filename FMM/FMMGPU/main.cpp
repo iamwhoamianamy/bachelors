@@ -188,7 +188,7 @@ void calculationTimeForLocalMultipoles()
 
    std::cout << std::setw(w) << "leaf capacity";
    std::cout << std::setw(w) << "w/t";
-   std::cout << std::setw(w) << "complex";
+   std::cout << std::setw(w) << "Complex";
    std::cout << std::setw(w) << "real";
    std::cout << std::setw(w) << "layersCPU";
    std::cout << std::setw(w) << "layersGPU";
@@ -376,7 +376,8 @@ void layerCalculationsPrecision()
 
 void layerCalculationTime()
 {
-   bool useGPU = 0;
+   std::cout << "LAYERS" << std::endl;
+
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
@@ -385,28 +386,35 @@ void layerCalculationTime()
 
    size_t w = 15;
 
-   for(size_t i = 10; i < 11; i++)
+   for(size_t i = 1; i < 2; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolver.calcLocalMultipolesWithLayers(useGPU);
+      multipoleSolverCPU.calcLocalMultipolesWithLayers(0);
       auto stop = std::chrono::steady_clock::now();
-      double timeWithLayers = getTime(start, stop);
+      double timeWithCPU = getTime(start, stop);
 
-      std::cout << std::setw(w) << "total time:";
-      std::cout << std::setw(w) << timeWithLayers << std::endl;
-      std::cout << "==============================" << std::endl;
+      start = std::chrono::steady_clock::now();
+      multipoleSolverGPU.calcLocalMultipolesWithLayers(1);
+      stop = std::chrono::steady_clock::now();
+      double timeWithGPU = getTime(start, stop);
+
+      std::cout << std::setw(w) << "total time CPU:";
+      std::cout << std::setw(w) << timeWithCPU << std::endl;
+      std::cout << std::setw(w) << "total time GPU:";
+      std::cout << std::setw(w) << timeWithGPU << std::endl;
    }
 }
 
 void matrixCalculationTime()
 {
-   bool useGPU = 0;
+   std::cout << "MATRICES" << std::endl; 
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
@@ -415,28 +423,35 @@ void matrixCalculationTime()
 
    size_t w = 15;
 
-   for(size_t i = 10; i < 11; i++)
+   for(size_t i = 1; i < 2; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolver.calcLocalMultipolesWithMatrices(useGPU);
+      multipoleSolverCPU.calcLocalMultipolesWithMatrices(0);
       auto stop = std::chrono::steady_clock::now();
-      double timeWithLayers = getTime(start, stop);
+      double timeWithCPU = getTime(start, stop);
 
-      std::cout << std::setw(w) << "total time:";
-      std::cout << std::setw(w) << timeWithLayers << std::endl;
-      std::cout << "==============================" << std::endl;
+      start = std::chrono::steady_clock::now();
+      multipoleSolverGPU.calcLocalMultipolesWithMatrices(1);
+      stop = std::chrono::steady_clock::now();
+      double timeWithGPU = getTime(start, stop);
+
+      std::cout << std::setw(w) << "total time CPU:";
+      std::cout << std::setw(w) << timeWithCPU << std::endl;
+      std::cout << std::setw(w) << "total time GPU:";
+      std::cout << std::setw(w) << timeWithGPU << std::endl;
    }
 }
 
 void layerMatrixCalculationTime()
 {
-   bool useGPU = 0;
+   bool useGPU = 1;
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
@@ -445,7 +460,7 @@ void layerMatrixCalculationTime()
 
    size_t w = 15;
 
-   for(size_t i = 9; i < 10; i++)
+   for(size_t i = 1; i < 2; i++)
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverLayers(quadratures, octreeLeafCapacity);
@@ -606,15 +621,15 @@ void matrixCalculationsPrecision()
    multipoleSolverCPU.calcLocalMultipolesWithMatrices(false);
    Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
 
-   //multipoleSolverGPU.calcLocalMultipolesWithMatrices(true);
-   //Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
+   multipoleSolverGPU.calcLocalMultipolesWithMatrices(true);
+   Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
    std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithLayersCPU << std::endl;
-   //std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
 }
 
 int main()
@@ -622,11 +637,11 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   //comparisonBetweenMethodsOnPrecision();
+   comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   matrixCalculationsPrecision();
+   //matrixCalculationsPrecision();
 
    //layerCalculationTime();
    //matrixCalculationTime();

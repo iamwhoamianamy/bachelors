@@ -73,6 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -88,13 +89,11 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="complex.cu" />
     <CudaCompile Include="kernels.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="basis_quadratures.hpp" />
     <ClInclude Include="box.hpp" />
-    <ClInclude Include="complex.cuh" />
     <ClInclude Include="cuda_helper.hpp" />
     <ClInclude Include="dev_ptr.hpp" />
     <ClInclude Include="exeptions.hpp" />

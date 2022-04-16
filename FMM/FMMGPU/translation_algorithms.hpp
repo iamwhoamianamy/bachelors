@@ -23,10 +23,10 @@ namespace kernels
       size_t harmonicCount,
       size_t harmonicOrder);
 
-   //void translateAllGPUMatrix(
-   //   Complex* result,
-   //   const Complex* a,
-   //   const Complex* b,
-   //   size_t harmonicCount,
-   //   size_t harmonicOrder);
+   void translateAllGPUMatrix(
+      std::complex<real>* result,
+      const std::complex<real>* a,
+      const std::complex<real>* b,
+      size_t harmonicCount,
+      size_t harmonicOrder);
 }

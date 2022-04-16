@@ -29,12 +29,4 @@ namespace cuda
          std::exit(0);
       }
    }
-
-   size_t nextDevisible(const size_t number, const size_t devidor)
-   {
-      if(devidor == 0)
-         return number;
-      else
-         return (number + devidor - 1) / devidor * devidor;
-   }
 }

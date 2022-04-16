@@ -18,6 +18,7 @@ public:
 
    T& getHarmonic(int l, int m);
    const T& getHarmonic(int l, int m) const;
+   void setHarmonic(int l, int m, T value);
    size_t order() const;
    size_t elemCount() const;
 
@@ -73,6 +74,12 @@ template<class T>
 inline const T& HarmonicSeries<T>::getHarmonic(int l, int m) const
 {
    return _data[l * l + l + m];
+}
+
+template<class T>
+inline void HarmonicSeries<T>::setHarmonic(int l, int m, T value)
+{
+   _data[l * l + l + m] = value;
 }
 
 template<class T>

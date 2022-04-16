@@ -15,9 +15,6 @@
     <CudaCompile Include="vector3.cu">
       <Filter>Code</Filter>
     </CudaCompile>
-    <CudaCompile Include="complex.cu">
-      <Filter>Code</Filter>
-    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernels.cuh">
@@ -87,9 +84,6 @@
       <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="typedefs.hpp">
-      <Filter>Code</Filter>
-    </ClInclude>
-    <ClInclude Include="complex.cuh">
       <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
