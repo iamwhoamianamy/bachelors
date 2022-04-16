@@ -100,6 +100,10 @@ private:
       const std::vector<OctreeNode*>& nodesByOrientation,
       const std::vector<ComplexMatrix>& contributions);
 
+   void accountContributions(
+      const std::vector<OctreeNode*>& nodesByOrientation,
+      const ComplexMatrix& contributions);
+
    void printMatrices(
       const std::vector<ComplexMatrix>& regularMatrices,
       const std::vector<ComplexMatrix>& expansionMatrices);

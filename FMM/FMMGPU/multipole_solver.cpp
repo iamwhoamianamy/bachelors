@@ -283,7 +283,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
             auto expansionVectors =
                getComponentsOfExpansionsInOneOrientationAsVectors(nodesByOrientation[o]);
 
-            std::vector<ComplexMatrix> translated;
+            ComplexMatrix translated;
             translated.reserve(3);
 
             for(size_t c = 0; c < 3; c++)
@@ -305,10 +305,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
                kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
                   (kernelStop - kernelStart).count() * 1e-6;
 
-               translated.emplace_back(math::vectorToMatrix(t,
-                                       harmonicLength,
-                                       nodesByOrientation[o].size(),
-                                       kernels::THREADS_PER_BLOCK));
+               translated.emplace_back(t);
             }
             
             accountContributions(nodesByOrientation[o], translated);
@@ -536,6 +533,45 @@ void MultipoleSolver::accountContributions(
       auto zComponent = Harmonics::complexToReal(
          ComplexHarmonicSeries(math::getColumn(contributions[2], nodeId)));
       
+      auto totalContribution = Harmonics::createFormXYZ(
+         xComponent, yComponent, zComponent);
+
+      parent->multipoleExpansion().add(totalContribution);
+   }
+}
+
+void MultipoleSolver::accountContributions(
+   const std::vector<OctreeNode*>& nodesByOrientation,
+   const ComplexMatrix& contributions)
+{
+   for(size_t nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
+   {
+      auto parent = nodesByOrientation[nodeId]->parent();
+
+      auto xComponent = Harmonics::complexToReal(
+         ComplexHarmonicSeries(math::getColumn(
+         contributions[0],
+         nodesByOrientation.size(),
+         harmonicLength,
+         kernels::THREADS_PER_BLOCK,
+         nodeId)));
+
+      auto yComponent = Harmonics::complexToReal(
+         ComplexHarmonicSeries(math::getColumn(
+         contributions[1],
+         nodesByOrientation.size(),
+         harmonicLength,
+         kernels::THREADS_PER_BLOCK,
+         nodeId)));
+
+      auto zComponent = Harmonics::complexToReal(
+         ComplexHarmonicSeries(math::getColumn(
+         contributions[2],
+         nodesByOrientation.size(),
+         harmonicLength,
+         kernels::THREADS_PER_BLOCK,
+         nodeId)));
+
       auto totalContribution = Harmonics::createFormXYZ(
          xComponent, yComponent, zComponent);
 

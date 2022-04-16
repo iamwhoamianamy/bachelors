@@ -92,6 +92,25 @@ namespace math
    }
 
    template<class T>
+   std::vector<T> getColumn(
+      const std::vector<T>& matrix,
+      size_t stride, 
+      size_t height,
+      size_t padding,
+      int idx)
+   {
+      size_t currentWidth = nextDevisible(stride, padding);
+      std::vector<T> res(height);
+
+      for(size_t i = 0; i < height; i++)
+      {
+         res[i] = matrix[i * currentWidth + idx];
+      }
+
+      return res;
+   }
+
+   template<class T>
    std::vector<T> matrixToVector(const Matrix<T>& matrix, size_t padding)
    {
       size_t height = math::nextDevisible(matrix.size(), padding);
