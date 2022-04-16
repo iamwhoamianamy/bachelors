@@ -24,8 +24,8 @@ private:
    bool _log = true;
 
 public:
-   const int n = 10;
-   const int harmonicLength = (n + 1) * (n + 1);
+   const int harmonicOrder = 10;
+   const int harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
    const real eps = 1e-6;
    const size_t octreeLeafCapacity;
 
@@ -42,7 +42,9 @@ public:
    ~MultipoleSolver();
 
 private:
-   void calcLocalMultipolesWithLayersOrMatrices(bool useGPU, bool useMatrices);
+   void calcLocalMultipolesWithLayersOrMatrices(
+      bool useGPU,
+      bool useMatrices);
 
    void enumerateNodes(
       OctreeNode* node,
@@ -75,32 +77,32 @@ private:
    void calcMultipolesAtLeaves(
       const std::vector<std::vector<OctreeNode*>>& layers);
 
-   Matrix<OctreeNode*> separateByOrientation(
+   Matrix<OctreeNode*> separateNodesByOrientation(
       const std::vector<OctreeNode*>& layer);
 
-   std::vector<ComplexMatrix> calcRegularMatrices(
+   std::vector<ComplexMatrix> calcRegularMatricesForLayer(
       const Matrix<OctreeNode*>& nodesByOrientation);
 
-   ComplexMatrix calcRegularVectors(
+   ComplexMatrix calcRegularMatricesForLayerAsVectors(
       const Matrix<OctreeNode*>& nodesByOrientation);
 
-   ComplexMatrix matrixFromRegularHarmonic(
+   ComplexMatrix formMatrixFromRegularHarmonics(
       const ComplexHarmonicSeries& regular);
 
-   std::vector<Complex> vectorFromRegularHarmonic(
+   std::vector<Complex> formMatrixFromRegularHarmonicsAsVectors(
       const ComplexHarmonicSeries& regular);
 
-   std::vector<ComplexMatrix> getComponentsOfExpansionsInOneOrientation(
+   std::vector<ComplexMatrix> getExpansionsInOneOrientation(
       const std::vector<OctreeNode*>& nodesByOrientation);
 
-   ComplexMatrix getComponentsOfExpansionsInOneOrientationAsVectors(
+   ComplexMatrix getExpansionsInOneOrientationAsVectors(
       const std::vector<OctreeNode*>& nodesByOrientation);
 
-   void accountContributions(
+   void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
       const std::vector<ComplexMatrix>& contributions);
 
-   void accountContributions(
+   void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
       const ComplexMatrix& contributions);
 
