@@ -87,6 +87,9 @@ private:
    ComplexMatrix matrixFromRegularHarmonic(
       const ComplexHarmonicSeries& regular);
 
+   std::vector<Complex> vectorFromRegularHarmonic(
+      const ComplexHarmonicSeries& regular);
+
    std::vector<ComplexMatrix> getComponentsOfExpansionsInOneOrientation(
       const std::vector<OctreeNode*>& nodesByOrientation);
 

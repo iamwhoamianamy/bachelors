@@ -193,13 +193,15 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
    const std::vector<std::vector<OctreeNode*>>& layers,
    bool useGPU)
 {
-   useGPU ? calcContributionsToHigherLevelsWithMatricesCPU(layers) :
-      calcContributionsToHigherLevelsWithMatricesGPU(layers);
+   useGPU ? calcContributionsToHigherLevelsWithMatricesGPU(layers) :
+      calcContributionsToHigherLevelsWithMatricesCPU(layers);
 }
 
 void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesCPU(
    const std::vector<std::vector<OctreeNode*>>& layers)
 {
+   bool useGPU = false;
+
    for(size_t l = layers.size() - 1; l >= 1; l--)
    {
       auto start = std::chrono::steady_clock::now();
@@ -270,7 +272,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
 
       auto& layer = layers[l];
       auto nodesByOrientation = separateByOrientation(layer);
-      auto regularMatrices = calcRegularMatrices(nodesByOrientation);
+      auto regularVectors = calcRegularVectors(nodesByOrientation);
 
       double kernelTime = 0;
 
@@ -278,33 +280,25 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
       {
          if(!nodesByOrientation[o].empty())
          {
-            auto expansionMatrices =
-               getComponentsOfExpansionsInOneOrientation(nodesByOrientation[o]);
+            auto expansionVectors =
+               getComponentsOfExpansionsInOneOrientationAsVectors(nodesByOrientation[o]);
 
             std::vector<ComplexMatrix> translated;
             translated.reserve(3);
 
             for(size_t c = 0; c < 3; c++)
             {
-               auto regularMatrixAsVector = math::matrixToVector(
-                  regularMatrices[o],
-                  kernels::THREADS_PER_BLOCK);
-
-               auto expansionMatrixAsVector = math::matrixToVector(
-                  expansionMatrices[c],
-                  kernels::THREADS_PER_BLOCK);
-
                std::vector<Complex> t(
                   math::nextDevisible(harmonicLength, kernels::THREADS_PER_BLOCK) *
-                  math::nextDevisible(expansionMatrices[c][0].size(), kernels::THREADS_PER_BLOCK));
+                  math::nextDevisible(nodesByOrientation[o].size(), kernels::THREADS_PER_BLOCK));
 
                auto kernelStart = std::chrono::steady_clock::now();
 
                kernels::translateAllGPUMatrix(
                   t.data(),
-                  regularMatrixAsVector.data(),
-                  expansionMatrixAsVector.data(),
-                  expansionMatrices[c][0].size(),
+                  regularVectors[o].data(),
+                  expansionVectors[c].data(),
+                  nodesByOrientation[o].size(),
                   n);
 
                auto kernelStop = std::chrono::steady_clock::now();
@@ -313,7 +307,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
 
                translated.emplace_back(math::vectorToMatrix(t,
                                        harmonicLength,
-                                       expansionMatrices[c][0].size(),
+                                       nodesByOrientation[o].size(),
                                        kernels::THREADS_PER_BLOCK));
             }
             
@@ -377,8 +371,7 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatrices(
 ComplexMatrix MultipoleSolver::calcRegularVectors(
    const Matrix<OctreeNode*>& nodesByOrientation)
 {
-   ComplexMatrix res;
-   res.reserve(8);
+   ComplexMatrix res(8);
 
    for(size_t i = 0; i < 8; i++)
    {
@@ -388,7 +381,7 @@ ComplexMatrix MultipoleSolver::calcRegularVectors(
       {
          auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
          auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(n, translation);
-         res.emplace_back(Harmonics::realToComplex(regularHarmonic));
+         res[i] = vectorFromRegularHarmonic(Harmonics::realToComplex(regularHarmonic));
          res[i].resize(math::nextDevisible(res[i].size(), kernels::THREADS_PER_BLOCK));
       }
    }
@@ -418,6 +411,41 @@ ComplexMatrix MultipoleSolver::matrixFromRegularHarmonic(
                if(-dl <= dm && dm <= dl)
                {
                   res[l * l + l + m][dl * dl + dl + dm] =
+                     regular.getHarmonic(lambda * lambda + lambda + mu) *
+                     Harmonics::strangeFactor(m, mu);
+               }
+            }
+         }
+      }
+   }
+
+   return res;
+}
+
+std::vector<Complex> MultipoleSolver::vectorFromRegularHarmonic(
+   const ComplexHarmonicSeries& regular)
+{
+   size_t width = math::nextDevisible(
+      harmonicLength,
+      kernels::THREADS_PER_BLOCK);
+
+   std::vector<Complex> res(width * width);
+
+   for(int l = 0; l <= regular.order(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         for(int lambda = 0; lambda <= l; lambda++)
+         {
+            int dl = l - lambda;
+
+            for(int mu = -lambda; mu <= lambda; mu++)
+            {
+               int dm = m - mu;
+
+               if(-dl <= dm && dm <= dl)
+               {
+                  res[(l * l + l + m) * width + dl * dl + dl + dm] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
                      Harmonics::strangeFactor(m, mu);
                }
@@ -483,7 +511,7 @@ ComplexMatrix MultipoleSolver::getComponentsOfExpansionsInOneOrientationAsVector
 
          for(size_t i = 0; i < harmonicLength; i++)
          {
-            res[c][h * width + i] = ñomplex.getHarmonic(i);
+            res[c][i * width + h] = ñomplex.getHarmonic(i);
          }
       }
    }
