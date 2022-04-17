@@ -233,8 +233,8 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesCPU(
                auto kernelStart = std::chrono::steady_clock::now();
 
                auto t = math::mult(
-                  regularMatrices[o],
-                  expansionMatrices[c]);
+                  expansionMatrices[c],
+                  regularMatrices[o]);
 
                auto kernelStop = std::chrono::steady_clock::now();
                kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
@@ -414,7 +414,7 @@ ComplexMatrix MultipoleSolver::formMatrixFromRegularHarmonics(
 
                if(-dl <= dm && dm <= dl)
                {
-                  res[l * l + l + m][dl * dl + dl + dm] =
+                  res[dl * dl + dl + dm][l * l + l + m] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
                      Harmonics::strangeFactor(m, mu);
                }
@@ -464,17 +464,18 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
 std::vector<ComplexMatrix> MultipoleSolver::getExpansionsInOneOrientation(
    const std::vector<OctreeNode*>& nodesByOrientation)
 {
-   std::vector<ComplexMatrix> res(3, ComplexMatrix(harmonicLength));
+   size_t nodeCount = nodesByOrientation.size();
+   std::vector<ComplexMatrix> res(3, ComplexMatrix(nodeCount));
    
    for(size_t c = 0; c < 3; c++)
    {
-      for(size_t i = 0; i < harmonicLength; i++)
+      for(size_t i = 0; i < nodeCount; i++)
       {
-         res[c][i].resize(nodesByOrientation.size());
+         res[c][i].resize(harmonicLength);
       }
    }
 
-   for(size_t h = 0; h < nodesByOrientation.size(); h++)
+   for(size_t h = 0; h < nodeCount; h++)
    {
       auto& expansion = nodesByOrientation[h]->multipoleExpansion();
 
@@ -484,7 +485,7 @@ std::vector<ComplexMatrix> MultipoleSolver::getExpansionsInOneOrientation(
 
          for(size_t i = 0; i < harmonicLength; i++)
          {
-            res[c][i][h] = ñomplex.getHarmonic(i);
+            res[c][h][i] = ñomplex.getHarmonic(i);
          }
       }
    }
@@ -532,13 +533,13 @@ void MultipoleSolver::accountChildrenContributions(
       auto parent = nodesByOrientation[nodeId]->parent();
 
       auto xComponent = Harmonics::complexToReal(
-         ComplexHarmonicSeries(math::getColumn(contributions[0], nodeId)));
+         ComplexHarmonicSeries(contributions[0][nodeId]));
 
       auto yComponent = Harmonics::complexToReal(
-         ComplexHarmonicSeries(math::getColumn(contributions[1], nodeId)));
+         ComplexHarmonicSeries(contributions[1][nodeId]));
 
       auto zComponent = Harmonics::complexToReal(
-         ComplexHarmonicSeries(math::getColumn(contributions[2], nodeId)));
+         ComplexHarmonicSeries(contributions[2][nodeId]));
       
       auto totalContribution = Harmonics::createFormXYZ(
          xComponent, yComponent, zComponent);
