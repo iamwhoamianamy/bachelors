@@ -16,5 +16,3 @@
 #endif // REAL_IS_DOUBLE
 
 #define __all__ __device__ __host__
-
-   typedef unsigned int uint;

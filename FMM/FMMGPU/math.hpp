@@ -117,13 +117,9 @@ namespace math
       size_t padding,
       int idx)
    {
-      std::vector<T> res(width);
       size_t currentWidth = nextDevisible(width, padding);
-
-      for(size_t i = 0; i < width; i++)
-      {
-         res[i] = matrix[idx * currentWidth + i];
-      }
+      std::vector<T> res(matrix.begin() + idx * currentWidth,
+          matrix.begin() + (idx + 1) * currentWidth);
 
       return res;
    }

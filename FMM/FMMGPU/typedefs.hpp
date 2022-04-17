@@ -10,3 +10,5 @@ typedef thrust::complex<real> Complex;
 
 typedef Matrix<Complex> ComplexMatrix;
 typedef Matrix<real> RealMatrix;
+
+typedef unsigned int uint;
