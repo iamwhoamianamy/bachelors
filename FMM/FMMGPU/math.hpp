@@ -94,17 +94,35 @@ namespace math
    template<class T>
    std::vector<T> getColumn(
       const std::vector<T>& matrix,
-      size_t stride, 
+      size_t width,
       size_t height,
       size_t padding,
       int idx)
    {
-      size_t currentWidth = nextDevisible(stride, padding);
+      size_t currentWidth = nextDevisible(width, padding);
       std::vector<T> res(height);
 
       for(size_t i = 0; i < height; i++)
       {
          res[i] = matrix[i * currentWidth + idx];
+      }
+
+      return res;
+   }
+
+   template<class T>
+   std::vector<T> getRow(
+      const std::vector<T>& matrix,
+      size_t width,
+      size_t padding,
+      int idx)
+   {
+      std::vector<T> res(width);
+      size_t currentWidth = nextDevisible(width, padding);
+
+      for(size_t i = 0; i < width; i++)
+      {
+         res[i] = matrix[idx * currentWidth + i];
       }
 
       return res;

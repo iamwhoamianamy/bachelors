@@ -86,26 +86,26 @@ namespace kernels
       size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
       size_t harLenPadded = math::nextDevisible(harmonicLength, THREADS_PER_BLOCK);
       size_t harCountPadded = math::nextDevisible(harmonicCount, THREADS_PER_BLOCK);
-      // Load A and B to device memory
+
       ComplexKernelMatrix d_A;
       d_A.width = d_A.stride = harLenPadded;
-      d_A.height = harLenPadded;
-      size_t size = harLenPadded * harLenPadded * sizeof(Complex);
+      d_A.height = harCountPadded;
+      size_t size = harCountPadded * harLenPadded * sizeof(Complex);
       cudaMalloc(&d_A.elements, size);
       cudaMemcpy(d_A.elements, a, size,
                  cudaMemcpyHostToDevice);
+
       ComplexKernelMatrix d_B;
-      d_B.width = d_B.stride = harCountPadded;
+      d_B.width = d_B.stride = harLenPadded;
       d_B.height = harLenPadded;
-      size = harCountPadded * harLenPadded * sizeof(Complex);
+      size = harLenPadded * harLenPadded * sizeof(Complex);
       cudaMalloc(&d_B.elements, size);
       cudaMemcpy(d_B.elements, b, size,
                  cudaMemcpyHostToDevice);
 
-      // Allocate C in device memory
       ComplexKernelMatrix d_C;
-      d_C.width = d_C.stride = harCountPadded;
-      d_C.height = harLenPadded;
+      d_C.width = d_C.stride = harLenPadded;
+      d_C.height = harCountPadded;
       size = harCountPadded * harLenPadded * sizeof(Complex);
       cudaMalloc(&d_C.elements, size);
 
