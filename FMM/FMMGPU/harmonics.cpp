@@ -355,12 +355,11 @@ HarmonicSeries<Vector3> Harmonics::createFormXYZ(const RealHarmonicSeries& xs,
 {
    HarmonicSeries<Vector3> res(xs.order());
 
-   for(int l = 0; l <= xs.order(); l++)
+   for(size_t i = 0; i < xs.elemCount(); i++)
    {
-      for(int m = -l; m <= l; m++)
-      {
-         res.getHarmonic(l, m) = Vector3(xs.getHarmonic(l, m), ys.getHarmonic(l, m), zs.getHarmonic(l, m));
-      }
+      res.getHarmonic(i) = Vector3(xs.getHarmonic(i), 
+                                   ys.getHarmonic(i), 
+                                   zs.getHarmonic(i));
    }
 
    return res;

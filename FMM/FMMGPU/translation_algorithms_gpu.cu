@@ -114,6 +114,9 @@ namespace kernels
       dim3 dimGrid(d_B.width / dimBlock.x, d_A.height / dimBlock.y);
       matMulKernel<<<dimGrid, dimBlock >>>(d_A, d_B, d_C);
 
+      cuda::tryKernelLaunch();
+      cuda::tryKernelSynchronize();
+
       // Read C from device memory
       cudaMemcpy(result, d_C.elements, size,
                  cudaMemcpyDeviceToHost);

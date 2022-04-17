@@ -643,16 +643,16 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
-   comparisonBetweenMethodsOnPrecision();
+   //comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   //matrixCalculationsPrecision();
+   matrixCalculationsPrecision();
 
    //layerCalculationTime();
    //matrixCalculationTime();
    //layerMatrixCalculationTime(0);
-   //layerMatrixCalculationTime(1);
+   layerMatrixCalculationTime(1);
 
    //compareWithMatrixMultiplication();
 

@@ -264,6 +264,9 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
 {
    for(size_t l = layers.size() - 1; l >= 1; l--)
    {
+      double kernelTime = 0;
+      double fTime = 0;
+
       auto start = std::chrono::steady_clock::now();
 
       if(_log)
@@ -274,17 +277,20 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
       auto& layer = layers[l];
       auto nodesByOrientation = separateNodesByOrientation(layer);
       auto regularVectors = calcRegularMatricesForLayerAsVectors(nodesByOrientation);
-
-      double kernelTime = 0;
-
+      
       for(size_t o = 0; o < 8; o++)
       {
          if(!nodesByOrientation[o].empty())
          {
             size_t nodesCount = nodesByOrientation[o].size();
 
+
+            auto fStart = std::chrono::steady_clock::now();
             auto expansionVectors =
                getExpansionsInOneOrientationAsVectors(nodesByOrientation[o]);
+            auto fStop = std::chrono::steady_clock::now();
+            fTime += std::chrono::duration_cast<std::chrono::microseconds>
+               (fStop - fStart).count() * 1e-6;
 
             ComplexMatrix translated;
             translated.reserve(3);
@@ -322,6 +328,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatricesGPU(
       if(_log)
       {
          std::cout << std::setw(15) << kernelTime;
+         std::cout << std::setw(15) << fTime;
          std::cout << std::setw(15) << layerTime << std::endl;
       }
    }
@@ -375,7 +382,8 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatricesForLayer(
 ComplexMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
    const Matrix<OctreeNode*>& nodesByOrientation)
 {
-   ComplexMatrix res(8);
+   ComplexMatrix res;
+   res.reserve(8);
 
    for(size_t i = 0; i < 8; i++)
    {
@@ -384,13 +392,9 @@ ComplexMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
       if(!nodesByOrientation[i].empty())
       {
          auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
-         auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
-            harmonicOrder,
-            translation);
-
-         res[i] = formMatrixFromRegularHarmonicsAsVectors(
-            Harmonics::realToComplex(regularHarmonics));
-         res[i].resize(math::nextDevisible(res[i].size(), kernels::THREADS_PER_BLOCK));
+         res.emplace_back(formMatrixFromRegularHarmonicsAsVectors(
+            Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder, translation))));
       }
    }
 
