@@ -148,6 +148,18 @@ namespace math
 
       return res;
    }
+
+   template<class T>
+   void translateSquareMatrix(Matrix<T>& matrix)
+   {
+      for(size_t i = 0; i < matrix.size(); i++)
+      {
+         for(size_t j = 0; j < i; j++)
+         {
+            std::swap(matrix[i][j], matrix[j][i]);
+         }
+      }
+   }
 }
 
 template <class T>
