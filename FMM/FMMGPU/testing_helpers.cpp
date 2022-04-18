@@ -23,7 +23,8 @@ namespace test
    double getTime(const std::chrono::steady_clock::time_point& start,
                   const std::chrono::steady_clock::time_point& stop)
    {
-      return std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 1e-6;
+      return std::chrono::duration_cast<std::chrono::microseconds>
+         (stop - start).count() * 1e-6;
    }
 
    BasisQuadratures readBasisQuadratures()

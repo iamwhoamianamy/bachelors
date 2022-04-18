@@ -51,16 +51,16 @@ private:
       std::vector<std::vector<OctreeNode*>>& layers, 
       size_t currentLayerId);
 
-   void calcContributionsToHigherLevels(
+   void calcContributionsToHigherLayers(
       const std::vector<std::vector<OctreeNode*>>& layers,
       bool useGPU,
       bool useMatrices);
 
-   void calcContributionsToHigherLevels(
+   void calcContributionsToHigherLayers(
       const std::vector<std::vector<OctreeNode*>>& layers,
       bool useGPU);
 
-   std::vector<Vector3> calcContributionsToHigherLevel(
+   std::vector<Vector3> calcContributionsToHigherLayer(
       const std::vector<OctreeNode*>& layer,
       bool useGPU);
 
