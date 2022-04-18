@@ -517,7 +517,6 @@ ComplexMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
 
    ComplexMatrix res(3, std::vector<Complex>(width * height));
 
-#pragma omp parallel for
    for(int nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
    {
       auto& expansion = nodesByOrientation[nodeId]->multipoleExpansion();
@@ -562,7 +561,6 @@ void MultipoleSolver::accountChildrenContributions(
    const std::vector<OctreeNode*>& nodesByOrientation,
    const ComplexMatrix& contributions)
 {
-#pragma omp parallel for
    for(int nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
    {
       auto parent = nodesByOrientation[nodeId]->parent();
