@@ -254,34 +254,12 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
                if(useGPU)
                {
-                  std::vector<cuComplex> tC(t.size());
-                  std::vector<cuComplex> expansionVectorsC(expansionVectors[c].size());
-                  std::vector<cuComplex> regularVectorsC(regularVectors[o].size());
-
-                  for(size_t i = 0; i < expansionVectorsC.size(); i++)
-                  {
-                     expansionVectorsC[i] = make_cuComplex(
-                        expansionVectors[c][i].real(), expansionVectors[c][i].imag());
-                  }
-
-                  for(size_t i = 0; i < regularVectorsC.size(); i++)
-                  {
-                     regularVectorsC[i] = make_cuComplex(
-                        regularVectors[o][i].real(), regularVectors[o][i].imag());
-                  }
-
                   kernels::translateAllGPUMatrixCuBLAS(
-                     tC.data(),
-                     expansionVectorsC.data(),
-                     regularVectorsC.data(),
+                     t.data(),
+                     expansionVectors[c].data(),
+                     regularVectors[o].data(),
                      nodesCount,
                      harmonicOrder);
-
-                  for(size_t i = 0; i < tC.size(); i++)
-                  {
-                     t[i] = Complex(
-                        cuCrealf(tC[i]), cuCimagf(tC[i]));
-                  }
                }
                else
                {

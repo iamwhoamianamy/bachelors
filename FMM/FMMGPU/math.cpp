@@ -23,3 +23,39 @@ namespace math
    }
 }
 
+Complex& operator*(const Complex& lhs, const Complex& rhs)
+{
+   return cuCmulf(lhs, rhs);
+}
+
+__all__ Complex& operator*(const Complex& lhs, const real rhs)
+{
+   return make_cuComplex(cuCrealf(lhs) * rhs, cuCimagf(lhs) * rhs);
+}
+
+Complex& operator+(const Complex& lhs, const Complex& rhs)
+{
+   return cuCaddf(lhs, rhs);
+}
+
+__all__ Complex& operator-(const Complex& lhs, const Complex& rhs)
+{
+   return cuCsubf(lhs, rhs);
+}
+
+Complex& operator*=(Complex& lhs, const Complex& rhs)
+{
+   lhs = lhs * rhs;
+   return lhs;
+}
+
+Complex& operator+=(Complex& lhs, const Complex& rhs)
+{
+   lhs = lhs + rhs;
+   return lhs;
+}
+
+std::ostream& operator<<(std::ostream& os, const Complex& val)
+{
+
+}

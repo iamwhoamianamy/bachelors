@@ -12,19 +12,7 @@ namespace kernels
       c[i] = a[i] + b[i];
    }
 
-   __global__ void translateAllGPUKernelSimple(
-      Vector3* result, const real* a, const Vector3* b,
-      size_t harmonicCount, size_t harmonicOrder);
-
    __global__ void translateAllGPUKernelSimpleXY(
-      Vector3* result, const real* a, const Vector3* b,
-      size_t harmonicCount, size_t harmonicOrder);
-
-   __global__ void translateAllGPUKernelBlockForHarmonic(
-      Vector3* result, const real* a, const Vector3* b,
-      size_t harmonicCount, size_t harmonicOrder);
-
-   __global__ void translateAllGPUKernelBlockForHarmonicShared(
       Vector3* result, const real* a, const Vector3* b,
       size_t harmonicCount, size_t harmonicOrder);
 

@@ -124,8 +124,8 @@ real Harmonics::calcLegendrePolynomial(int l, real z)
 
 void Harmonics::addComplex(real x, real y)
 {
-   Complex ephi1m(sqrt(2.0));
-   Complex mult(x, y);
+   Complex ephi1m = make_cuComplex(sqrt(2.0), 0);
+   Complex mult = make_cuComplex(x, y);
 
    for(int m = 1; m < _order; m++)
    {
@@ -133,8 +133,8 @@ void Harmonics::addComplex(real x, real y)
 
       for(int l = m; l <= _order; l++)
       {
-         _sphericalHarmonics.getHarmonic(l, m) *= ephi1m.real();
-         _sphericalHarmonics.getHarmonic(l, -m) *= ephi1m.imag();
+         _sphericalHarmonics.getHarmonic(l, m) *= cuCrealf(ephi1m);
+         _sphericalHarmonics.getHarmonic(l, -m) *= cuCimagf(ephi1m);
       }
    }
 }
@@ -373,12 +373,12 @@ ComplexHarmonicSeries Harmonics::realToComplex(
    real c = math::R_SQRT_2;
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = Complex(harmonics.getHarmonic(l, 0), 0);
+      res.getHarmonic(l, 0) = make_cuComplex(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
       {
-         res.setHarmonic(l, m, Complex(harmonics.getHarmonic(l, m) * c,
+         res.setHarmonic(l, m, make_cuComplex(harmonics.getHarmonic(l, m) * c,
                                        harmonics.getHarmonic(l, -m) * c));
-         res.setHarmonic(l, -m, Complex(harmonics.getHarmonic(l, m) * c,
+         res.setHarmonic(l, -m, make_cuComplex(harmonics.getHarmonic(l, m) * c,
                                       -harmonics.getHarmonic(l, -m) * c));
       }
    }
@@ -393,11 +393,11 @@ RealHarmonicSeries Harmonics::complexToReal(const ComplexHarmonicSeries& harmoni
    real c = 1.0 / sqrt(2);
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = harmonics.getHarmonic(l, 0).real();
+      res.getHarmonic(l, 0) = cuCrealf(harmonics.getHarmonic(l, 0));
       for(int m = 1; m <= l; m++)
       {
-         res.getHarmonic(l, m) = c *  (harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m)).real();
-         res.getHarmonic(l, -m) = c * (harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m)).imag();
+         res.getHarmonic(l, m) = c * cuCrealf(harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m));
+         res.getHarmonic(l, -m) = c * cuCimagf(harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m));
       }
    }
 
