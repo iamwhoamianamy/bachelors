@@ -120,7 +120,8 @@ inline const std::vector<T>& HarmonicSeries<T>::data() const
 }
 
 template<class T>
-inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(HarmonicSeries<T>&& harmonicSeries) noexcept
+inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(
+   HarmonicSeries<T>&& harmonicSeries) noexcept
 {
    _data = std::move(harmonicSeries._data);
    _order = harmonicSeries._order;
@@ -128,7 +129,8 @@ inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(HarmonicSeries<T>&& harmo
 }
 
 template<class T>
-inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(const HarmonicSeries<T>& harmonicSeries)
+inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(
+   const HarmonicSeries<T>& harmonicSeries)
 {
    _data = harmonicSeries._data;
    _order = harmonicSeries._order;
@@ -136,7 +138,8 @@ inline HarmonicSeries<T>& HarmonicSeries<T>::operator=(const HarmonicSeries<T>& 
 }
 
 template<class T>
-inline void HarmonicSeries<T>::add(const HarmonicSeries<T>& harmonicSeries)
+inline void HarmonicSeries<T>::add(
+   const HarmonicSeries<T>& harmonicSeries)
 {
    for(size_t i = 0; i < _data.size(); i++)
    {
@@ -145,7 +148,8 @@ inline void HarmonicSeries<T>::add(const HarmonicSeries<T>& harmonicSeries)
 }
 
 template<class T>
-inline void HarmonicSeries<T>::subtract(const HarmonicSeries<T>& harmonicSeries)
+inline void HarmonicSeries<T>::subtract(
+   const HarmonicSeries<T>& harmonicSeries)
 {
    for(size_t i = 0; i < _data.size(); i++)
    {
@@ -154,28 +158,32 @@ inline void HarmonicSeries<T>::subtract(const HarmonicSeries<T>& harmonicSeries)
 }
 
 template<class T>
-inline HarmonicSeries<T>::HarmonicSeries(HarmonicSeries<T>&& harmonicSeries) noexcept
+inline HarmonicSeries<T>::HarmonicSeries(
+   HarmonicSeries<T>&& harmonicSeries) noexcept
 {
    _data = std::move(harmonicSeries._data);
    _order = harmonicSeries._order;
 }
 
 template<class T>
-inline HarmonicSeries<T>::HarmonicSeries(const HarmonicSeries<T>& harmonicSeries)
+inline HarmonicSeries<T>::HarmonicSeries(
+   const HarmonicSeries<T>& harmonicSeries)
 {
    _data = harmonicSeries._data;
    _order = harmonicSeries._order;
 }
 
 template<class T>
-inline HarmonicSeries<T>::HarmonicSeries(std::vector<T>&& harmonicData) noexcept
+inline HarmonicSeries<T>::HarmonicSeries(
+   std::vector<T>&& harmonicData) noexcept
 {
    _order = sqrt(harmonicData.size() - 1);
    _data = std::move(harmonicData);
 }
 
 template<class T>
-inline HarmonicSeries<T>::HarmonicSeries(const std::vector<T>& harmonicData)
+inline HarmonicSeries<T>::HarmonicSeries(
+   const std::vector<T>& harmonicData)
 {
    _order = sqrt(harmonicData.size() - 1);
    _data = harmonicData;
