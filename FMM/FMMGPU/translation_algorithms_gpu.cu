@@ -101,66 +101,48 @@ namespace kernels
    }
 
    void translateAllGPUMatrixCuBLAS(
-      Complex* result,
-      const Complex* a,
-      const Complex* b,
+      cuComplex* result,
+      const cuComplex* a,
+      const cuComplex* b,
       size_t harmonicCount,
       size_t harmonicOrder)
    {
-      //size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-      //size_t harLenPadded = math::nextDevisible(
-      //   harmonicLength,
-      //   THREADS_PER_BLOCK);
+      size_t harLenPadded = math::nextDevisible(
+         harmonicLength,
+         THREADS_PER_BLOCK);
 
-      //size_t harCountPadded = math::nextDevisible(
-      //   harmonicCount,
-      //   THREADS_PER_BLOCK);
+      size_t harCountPadded = math::nextDevisible(
+         harmonicCount,
+         THREADS_PER_BLOCK);
 
-      //cuda::DevPtr<Complex> aDev(a, harCountPadded * harLenPadded);
-      //ComplexKernelMatrix A;
 
-      //A.width = A.stride = harLenPadded;
-      //A.height = harCountPadded;
-      //A.elements = aDev.data();
+      cuda::DevPtr<cuComplex> aDev(a, harCountPadded * harLenPadded);
+      cuda::DevPtr<cuComplex> bDev(b, harLenPadded * harLenPadded);
+      cuda::DevPtr<cuComplex> cDev(harCountPadded * harLenPadded);
 
-      //cuda::DevPtr<Complex> bDev(b, harLenPadded * harLenPadded);
-      //ComplexKernelMatrix B;
+      int m = harLenPadded;
+      int k = harLenPadded;
+      int n = harCountPadded;
+      int lda = m, ldb = k, ldc = m;
+      const cuComplex alf = make_cuComplex(1, 0);
+      const cuComplex bet = make_cuComplex(0, 0);
+      const cuComplex* alpha = &alf;
+      const cuComplex* beta = &bet;
+      
+        // Create a handle for CUBLAS
+      cublasHandle_t handle;
+      cublasCreate(&handle);
+      
+       // Do the actual multiplication
+      cublasCgemm3m(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, 
+                  bDev.data(), ldb, aDev.data(), lda, beta, cDev.data(), ldc);
+      
+       // Destroy the handle
+      cublasDestroy(handle);
 
-      //B.width = B.stride = harLenPadded;
-      //B.height = harLenPadded;
-      //B.elements = bDev.data();
-
-      //cuda::DevPtr<Complex> cDev(harCountPadded * harLenPadded);
-      //ComplexKernelMatrix C;
-
-      //C.width = C.stride = harLenPadded;
-      //C.height = harCountPadded;
-      //C.elements = cDev.data();
-
-      //int m = harCountPadded;
-      //int k = harLenPadded;
-      //int n = harLenPadded;
-      //int lda = m, ldb = k, ldc = m;
-      //const Complex alf = make_cuComplex(1, 0);
-      //const Complex bet = make_cuComplex(0, 0);
-      //const Complex* alpha = &alf;
-      //const Complex* beta = &bet;
-      //
-      //  // Create a handle for CUBLAS
-      //cublasHandle_t handle;
-      //cublasCreate(&handle);
-      //
-      // // Do the actual multiplication
-      //cublasCgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A.elements, lda, B.elements, ldb, beta, C.elements, ldc);
-      //
-      // // Destroy the handle
-      //cublasDestroy(handle);
-
-      //cuda::tryKernelLaunch();
-      //cuda::tryKernelSynchronize();
-
-      //cDev.copyToHost(result);
+      cDev.copyToHost(result);
    }
 
    size_t lmToIndex(int harmonicBegin,

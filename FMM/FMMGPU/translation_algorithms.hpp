@@ -3,6 +3,7 @@
 #include "real.hpp"
 #include "math.hpp"
 #include "harmonics.hpp"
+#include "cuComplex.h"
 
 namespace kernels
 {
@@ -38,9 +39,9 @@ namespace kernels
       size_t harmonicOrder);
 
    void translateAllGPUMatrixCuBLAS(
-      Complex* result,
-      const Complex* a,
-      const Complex* b,
+      cuComplex* result,
+      const cuComplex* a,
+      const cuComplex* b,
       size_t harmonicCount,
       size_t harmonicOrder);
 }
