@@ -38,93 +38,64 @@ namespace kernels
       cuda::DevPtr<real> a_dev(a, harmonicCount * harmonicLength, 0);
       cuda::DevPtr<Vector3> b_dev(b, harmonicCount * harmonicLength, 0);
 
-      {
-         //dim3 BLOCKS((harmonicCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
-         //dim3 THREADS(THREADS_PER_BLOCK);
+      dim3 BLOCKS((harmonicCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
+      dim3 THREADS(THREADS_PER_BLOCK, harmonicOrder);
 
-         //kernels::translateAllGPUKernelSimple<<<BLOCKS, THREADS>>>
-         //   (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
-      }
-
-      {
-         dim3 BLOCKS((harmonicCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK);
-         dim3 THREADS(THREADS_PER_BLOCK, harmonicOrder);
-
-         kernels::translateAllGPUKernelSimpleXY<<<BLOCKS, THREADS>>>
-            (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
-      }
-
-      {
-      //   dim3 BLOCKS(harmonicCount);
-      //   dim3 THREADS(harmonicOrder);
-
-      //   kernels::translateAllGPUKernelBlockForHarmonic<<<BLOCKS, THREADS>>>
-      //      (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
-      }
-
-      {
-         //dim3 BLOCKS(harmonicCount);
-         //dim3 THREADS(harmonicLength);
-
-         //kernels::translateAllGPUKernelBlockForHarmonicShared<<<BLOCKS, THREADS>>>
-         //   (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
-      }
-
+      kernels::translateAllGPUKernelSimpleXY<<<BLOCKS, THREADS>>>
+         (result_dev.data(), a_dev.data(), b_dev.data(), harmonicCount, harmonicOrder);
+      
       cuda::tryKernelLaunch();
       cuda::tryKernelSynchronize();
 
       result_dev.copyToHost(result);
    }
 
-   void translateAllGPUMatrix(
+   void kernels::translateAllGPUMatrix(
       Complex* result,
       const Complex* a,
       const Complex* b,
       size_t harmonicCount,
       size_t harmonicOrder)
-   {     
+   {
       size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
-      size_t harLenPadded = math::nextDevisible(harmonicLength, THREADS_PER_BLOCK);
-      size_t harCountPadded = math::nextDevisible(harmonicCount, THREADS_PER_BLOCK);
 
-      ComplexKernelMatrix d_A;
-      d_A.width = d_A.stride = harLenPadded;
-      d_A.height = harCountPadded;
-      size_t size = harCountPadded * harLenPadded * sizeof(Complex);
-      cudaMalloc(&d_A.elements, size);
-      cudaMemcpy(d_A.elements, a, size,
-                 cudaMemcpyHostToDevice);
+      size_t harLenPadded = math::nextDevisible(
+         harmonicLength,
+         THREADS_PER_BLOCK);
 
-      ComplexKernelMatrix d_B;
-      d_B.width = d_B.stride = harLenPadded;
-      d_B.height = harLenPadded;
-      size = harLenPadded * harLenPadded * sizeof(Complex);
-      cudaMalloc(&d_B.elements, size);
-      cudaMemcpy(d_B.elements, b, size,
-                 cudaMemcpyHostToDevice);
+      size_t harCountPadded = math::nextDevisible(
+         harmonicCount,
+         THREADS_PER_BLOCK);
 
-      ComplexKernelMatrix d_C;
-      d_C.width = d_C.stride = harLenPadded;
-      d_C.height = harCountPadded;
-      size = harCountPadded * harLenPadded * sizeof(Complex);
-      cudaMalloc(&d_C.elements, size);
+      cuda::DevPtr<Complex> aDev(a, harCountPadded * harLenPadded);
+      ComplexKernelMatrix A;
 
-      // Invoke kernel
+      A.width = A.stride = harLenPadded;
+      A.height = harCountPadded;
+      A.elements = aDev.data();
+
+      cuda::DevPtr<Complex> bDev(b, harLenPadded * harLenPadded);
+      ComplexKernelMatrix B;
+
+      B.width = B.stride = harLenPadded;
+      B.height = harLenPadded;
+      B.elements = bDev.data();
+
+      cuda::DevPtr<Complex> cDev(harCountPadded * harLenPadded);
+      ComplexKernelMatrix C;
+
+      C.width = C.stride = harLenPadded;
+      C.height = harCountPadded;
+      C.elements = cDev.data();
+
       dim3 dimBlock(THREADS_PER_BLOCK, THREADS_PER_BLOCK);
-      dim3 dimGrid(d_B.width / dimBlock.x, d_A.height / dimBlock.y);
-      matMulKernel<<<dimGrid, dimBlock >>>(d_A, d_B, d_C);
+      dim3 dimGrid(B.width / dimBlock.x, A.height / dimBlock.y);
+      matMulKernel<<<dimGrid, dimBlock >>>(A, B, C);
 
       cuda::tryKernelLaunch();
       cuda::tryKernelSynchronize();
 
-      // Read C from device memory
-      cudaMemcpy(result, d_C.elements, size,
-                 cudaMemcpyDeviceToHost);
-
-      // Free device memory
-      cudaFree(d_A.elements);
-      cudaFree(d_B.elements);
-      cudaFree(d_C.elements);
+      cDev.copyToHost(result);
    }
 
    size_t lmToIndex(int harmonicBegin,

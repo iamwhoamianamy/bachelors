@@ -647,12 +647,12 @@ int main()
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   matrixCalculationsPrecision();
+   //matrixCalculationsPrecision();
 
    //layerCalculationTime();
    //matrixCalculationTime();
-   //layerMatrixCalculationTime(0);
-   //layerMatrixCalculationTime(1);
+   layerMatrixCalculationTime(0);
+   layerMatrixCalculationTime(1);
    //compareWithMatrixMultiplication();
 
    /*Vector3 point(3, 1, 2);

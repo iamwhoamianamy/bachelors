@@ -85,3 +85,18 @@ void kernels::translateAllCPU(
       }
    }
 }
+
+void kernels::translateAllCPUMatrix(
+   std::vector<Complex>& result,
+   const std::vector<Complex>& a,
+   const std::vector<Complex>& b,
+   size_t harmonicCount,
+   size_t harmonicOrder)
+{
+   result = math::multMatricesAsVectors(
+      a,
+      b,
+      (harmonicOrder + 1) * (harmonicOrder + 1),
+      harmonicCount,
+      (harmonicOrder + 1) * (harmonicOrder + 1));
+}

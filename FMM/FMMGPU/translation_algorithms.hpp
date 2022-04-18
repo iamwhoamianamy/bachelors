@@ -23,6 +23,13 @@ namespace kernels
       size_t harmonicCount,
       size_t harmonicOrder);
 
+   void translateAllCPUMatrix(
+      std::vector<Complex>& result,
+      const std::vector<Complex>& a,
+      const std::vector<Complex>& b,
+      size_t harmonicCount,
+      size_t harmonicOrder);
+
    void translateAllGPUMatrix(
       Complex* result,
       const Complex* a,

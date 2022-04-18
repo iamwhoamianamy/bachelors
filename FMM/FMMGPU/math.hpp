@@ -58,6 +58,30 @@ namespace math
    }
 
    template <class T>
+   std::vector<T> multMatricesAsVectors(
+      const std::vector<T>& a,
+      const std::vector<T>& b,
+      size_t aWidth,
+      size_t aHeight,
+      size_t bWidth)
+   {
+      std::vector<T> res(aHeight * bWidth);
+
+      for(size_t i = 0; i < aHeight; i++)
+      {
+         for(size_t j = 0; j < bWidth; j++)
+         {
+            for(size_t k = 0; k < aWidth; k++)
+            {
+               res[i * aWidth + j] += a[i * aWidth + k] * b[k * aWidth + j];
+            }
+         }
+      }
+
+      return res;
+   }
+
+   template <class T>
    Matrix<T> mult(
       const Matrix<T>& a,
       const Matrix<T>& b)
@@ -119,7 +143,7 @@ namespace math
    {
       size_t currentWidth = nextDevisible(width, padding);
       std::vector<T> res(matrix.begin() + idx * currentWidth,
-          matrix.begin() + (idx + 1) * currentWidth);
+          matrix.begin() + idx * currentWidth + width);
 
       return res;
    }

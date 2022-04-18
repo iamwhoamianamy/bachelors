@@ -68,12 +68,6 @@ private:
       const std::vector<std::vector<OctreeNode*>>& layers,
       bool useGPU);
 
-   void calcContributionsToHigherLevelsWithMatricesCPU(
-      const std::vector<std::vector<OctreeNode*>>& layers);
-
-   void calcContributionsToHigherLevelsWithMatricesGPU(
-      const std::vector<std::vector<OctreeNode*>>& layers);
-
    void calcMultipolesAtLeaves(
       const std::vector<std::vector<OctreeNode*>>& layers);
 
@@ -84,19 +78,22 @@ private:
       const Matrix<OctreeNode*>& nodesByOrientation);
 
    ComplexMatrix calcRegularMatricesForLayerAsVectors(
-      const Matrix<OctreeNode*>& nodesByOrientation);
+      const Matrix<OctreeNode*>& nodesByOrientation,
+      size_t padding = 0);
 
    ComplexMatrix formMatrixFromRegularHarmonics(
       const ComplexHarmonicSeries& regular);
 
    std::vector<Complex> formMatrixFromRegularHarmonicsAsVectors(
-      const ComplexHarmonicSeries& regular);
+      const ComplexHarmonicSeries& regular,
+      size_t padding = 0);
 
    std::vector<ComplexMatrix> getExpansionsInOneOrientation(
       const std::vector<OctreeNode*>& nodesByOrientation);
 
    ComplexMatrix getExpansionsInOneOrientationAsVectors(
-      const std::vector<OctreeNode*>& nodesByOrientation);
+      const std::vector<OctreeNode*>& nodesByOrientation,
+      size_t padding);
 
    void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
@@ -104,7 +101,8 @@ private:
 
    void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
-      const ComplexMatrix& contributions);
+      const ComplexMatrix& contributions,
+      size_t padding);
 
    void printMatrices(
       const std::vector<ComplexMatrix>& regularMatrices,
