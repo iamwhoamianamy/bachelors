@@ -4,6 +4,8 @@
 #include "kernels.cuh"
 #include "cuda_helper.hpp"
 #include "dev_ptr.hpp"
+#pragma comment (lib, "cublas.lib")
+#include "cublasLt.h"
 
 namespace kernels
 {
@@ -96,6 +98,69 @@ namespace kernels
       cuda::tryKernelSynchronize();
 
       cDev.copyToHost(result);
+   }
+
+   void translateAllGPUMatrixCuBLAS(
+      Complex* result,
+      const Complex* a,
+      const Complex* b,
+      size_t harmonicCount,
+      size_t harmonicOrder)
+   {
+      //size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
+
+      //size_t harLenPadded = math::nextDevisible(
+      //   harmonicLength,
+      //   THREADS_PER_BLOCK);
+
+      //size_t harCountPadded = math::nextDevisible(
+      //   harmonicCount,
+      //   THREADS_PER_BLOCK);
+
+      //cuda::DevPtr<Complex> aDev(a, harCountPadded * harLenPadded);
+      //ComplexKernelMatrix A;
+
+      //A.width = A.stride = harLenPadded;
+      //A.height = harCountPadded;
+      //A.elements = aDev.data();
+
+      //cuda::DevPtr<Complex> bDev(b, harLenPadded * harLenPadded);
+      //ComplexKernelMatrix B;
+
+      //B.width = B.stride = harLenPadded;
+      //B.height = harLenPadded;
+      //B.elements = bDev.data();
+
+      //cuda::DevPtr<Complex> cDev(harCountPadded * harLenPadded);
+      //ComplexKernelMatrix C;
+
+      //C.width = C.stride = harLenPadded;
+      //C.height = harCountPadded;
+      //C.elements = cDev.data();
+
+      //int m = harCountPadded;
+      //int k = harLenPadded;
+      //int n = harLenPadded;
+      //int lda = m, ldb = k, ldc = m;
+      //const Complex alf = make_cuComplex(1, 0);
+      //const Complex bet = make_cuComplex(0, 0);
+      //const Complex* alpha = &alf;
+      //const Complex* beta = &bet;
+      //
+      //  // Create a handle for CUBLAS
+      //cublasHandle_t handle;
+      //cublasCreate(&handle);
+      //
+      // // Do the actual multiplication
+      //cublasCgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A.elements, lda, B.elements, ldb, beta, C.elements, ldc);
+      //
+      // // Destroy the handle
+      //cublasDestroy(handle);
+
+      //cuda::tryKernelLaunch();
+      //cuda::tryKernelSynchronize();
+
+      //cDev.copyToHost(result);
    }
 
    size_t lmToIndex(int harmonicBegin,

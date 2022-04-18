@@ -646,7 +646,7 @@ int main()
    //comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //calculationTimeForLocalMultipoles();
-   layerCalculationsPrecision();
+   //layerCalculationsPrecision();
    matrixCalculationsPrecision();
 
    //layerCalculationTime();

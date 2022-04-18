@@ -254,7 +254,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
                if(useGPU)
                {
-                  kernels::translateAllGPUMatrix(
+                  kernels::translateAllGPUMatrixCuBLAS(
                      t.data(),
                      expansionVectors[c].data(),
                      regularVectors[o].data(),
