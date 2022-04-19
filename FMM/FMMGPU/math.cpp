@@ -57,5 +57,5 @@ Complex& operator+=(Complex& lhs, const Complex& rhs)
 
 std::ostream& operator<<(std::ostream& os, const Complex& val)
 {
-
+   return os;
 }

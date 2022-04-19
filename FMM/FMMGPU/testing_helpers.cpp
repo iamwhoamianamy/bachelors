@@ -8,7 +8,7 @@ namespace test
       const double torusRadius = 2;
       const double torusSectionWidth = 0.2;
       
-      return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
+      return Torus(torusRadius, torusSectionWidth, 100, 16, 16);
       //return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
    }
 

@@ -1,5 +1,6 @@
 #include "translation_algorithms.hpp"
 #include "kernels.cuh"
+#include "cblas.h"
 
 void kernels::translateAllCPU(
    Vector3* result,
@@ -99,4 +100,41 @@ void kernels::translateAllCPUMatrix(
       (harmonicOrder + 1) * (harmonicOrder + 1),
       harmonicCount,
       (harmonicOrder + 1) * (harmonicOrder + 1));
+}
+
+
+void kernels::translateAllCPUMatrixBLAS(
+   Complex* result,
+   const Complex* a,
+   const Complex* b,
+   size_t harmonicCount,
+   size_t harmonicOrder)
+{
+   size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
+
+   size_t harLenPadded = math::nextDevisible(
+      harmonicLength,
+      THREADS_PER_BLOCK);
+
+   size_t harCountPadded = math::nextDevisible(
+      harmonicCount,
+      THREADS_PER_BLOCK);
+
+   int m = harLenPadded;
+   int k = harLenPadded;
+   int n = harCountPadded;
+   int lda = m, ldb = k, ldc = m;
+   const Complex alf = make_cuComplex(1, 0);
+   const Complex bet = make_cuComplex(0, 0);
+   const Complex* alpha = &alf;
+   const Complex* beta = &bet;
+
+   cblas_cgemm(CBLAS_ORDER::CblasColMajor,
+               CBLAS_TRANSPOSE::CblasNoTrans,
+               CBLAS_TRANSPOSE::CblasNoTrans,
+               m, n, k,
+               (float*)alpha, 
+               (float*)b, ldb, (float*)a, lda,
+               (float*)beta,
+               (float*)result, ldc);
 }

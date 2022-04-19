@@ -647,7 +647,7 @@ int main()
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   matrixCalculationsPrecision();
+   //matrixCalculationsPrecision();
 
    //layerCalculationTime();
    //matrixCalculationTime();
@@ -664,5 +664,4 @@ int main()
 
    Harmonics::mult(ac, 1.0 / Complex(0, 1));
    Harmonics::multToIDiv(bc);*/
-
 }

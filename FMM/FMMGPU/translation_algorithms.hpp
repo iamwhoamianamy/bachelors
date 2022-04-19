@@ -38,10 +38,17 @@ namespace kernels
       size_t harmonicCount,
       size_t harmonicOrder);
 
+   void translateAllCPUMatrixBLAS(
+      Complex* result,
+      const Complex* a,
+      const Complex* b,
+      size_t harmonicCount,
+      size_t harmonicOrder);
+
    void translateAllGPUMatrixCuBLAS(
-      cuComplex* result,
-      const cuComplex* a,
-      const cuComplex* b,
+      Complex* result,
+      const Complex* a,
+      const Complex* b,
       size_t harmonicCount,
       size_t harmonicOrder);
 }

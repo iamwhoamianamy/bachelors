@@ -93,7 +93,7 @@ private:
 
    ComplexMatrix getExpansionsInOneOrientationAsVectors(
       const std::vector<OctreeNode*>& nodesByOrientation,
-      size_t padding);
+      size_t padding = 0);
 
    void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
@@ -102,7 +102,7 @@ private:
    void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
       const ComplexMatrix& contributions,
-      size_t padding);
+      size_t padding = 0);
 
    void printMatrices(
       const std::vector<ComplexMatrix>& regularMatrices,

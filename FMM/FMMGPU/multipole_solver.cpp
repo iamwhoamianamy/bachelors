@@ -211,8 +211,6 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
    const std::vector<std::vector<OctreeNode*>>& layers,
    bool useGPU)
 {
-   size_t padding = useGPU ? kernels::THREADS_PER_BLOCK : 0;
-
    for(size_t l = layers.size() - 1; l >= 1; l--)
    {
       double kernelTime = 0;
@@ -227,8 +225,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
       auto& layer = layers[l];
       auto nodesByOrientation = separateNodesByOrientation(layer);
       auto regularVectors = calcRegularMatricesForLayerAsVectors(
-         nodesByOrientation,
-         padding);
+         nodesByOrientation);
       
       for(size_t o = 0; o < 8; o++)
       {
@@ -238,17 +235,14 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
             auto expansionVectors =
                getExpansionsInOneOrientationAsVectors(
-                  nodesByOrientation[o],
-                  padding);
+                  nodesByOrientation[o]);
 
             ComplexMatrix translated;
             translated.reserve(3);
 
             for(size_t c = 0; c < 3; c++)
             {
-               std::vector<Complex> t(
-                  math::nextDevisible(harmonicLength, padding) *
-                  math::nextDevisible(nodesCount, padding));
+               std::vector<Complex> t(harmonicLength * nodesCount);
 
                auto kernelStart = std::chrono::steady_clock::now();
 
@@ -269,6 +263,12 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                      regularVectors[o],
                      nodesCount,
                      harmonicOrder);
+                  /*kernels::translateAllCPUMatrixBLAS(
+                     t.data(),
+                     expansionVectors[c].data(),
+                     regularVectors[o].data(),
+                     nodesCount,
+                     harmonicOrder);*/
                }
 
                auto kernelStop = std::chrono::steady_clock::now();
@@ -280,8 +280,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
             accountChildrenContributions(
                nodesByOrientation[o],
-               translated,
-               padding);
+               translated);
          }
       }
 

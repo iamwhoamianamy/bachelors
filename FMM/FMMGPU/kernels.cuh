@@ -113,7 +113,7 @@ namespace kernels
 
    __all__ real strangeFactor(int m, int mu);
 
-   const uint THREADS_PER_BLOCK = 8;
+   const uint THREADS_PER_BLOCK = 32;
    const uint HARMONIC_ORDER = 10;
    const uint HARMONIC_LENGTH = 121;
 }

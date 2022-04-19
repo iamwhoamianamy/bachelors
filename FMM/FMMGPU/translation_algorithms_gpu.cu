@@ -101,45 +101,33 @@ namespace kernels
    }
 
    void translateAllGPUMatrixCuBLAS(
-      cuComplex* result,
-      const cuComplex* a,
-      const cuComplex* b,
+      Complex* result,
+      const Complex* a,
+      const Complex* b,
       size_t harmonicCount,
       size_t harmonicOrder)
    {
       size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-      size_t harLenPadded = math::nextDevisible(
-         harmonicLength,
-         THREADS_PER_BLOCK);
+      cuda::DevPtr<Complex> aDev(a, harmonicCount * harmonicLength);
+      cuda::DevPtr<Complex> bDev(b, harmonicLength * harmonicLength);
+      cuda::DevPtr<Complex> cDev(harmonicCount * harmonicLength);
 
-      size_t harCountPadded = math::nextDevisible(
-         harmonicCount,
-         THREADS_PER_BLOCK);
-
-
-      cuda::DevPtr<cuComplex> aDev(a, harCountPadded * harLenPadded);
-      cuda::DevPtr<cuComplex> bDev(b, harLenPadded * harLenPadded);
-      cuda::DevPtr<cuComplex> cDev(harCountPadded * harLenPadded);
-
-      int m = harLenPadded;
-      int k = harLenPadded;
-      int n = harCountPadded;
+      int m = harmonicLength;
+      int k = harmonicLength;
+      int n = harmonicCount;
       int lda = m, ldb = k, ldc = m;
-      const cuComplex alf = make_cuComplex(1, 0);
-      const cuComplex bet = make_cuComplex(0, 0);
-      const cuComplex* alpha = &alf;
-      const cuComplex* beta = &bet;
+      const Complex alf = make_cuComplex(1, 0);
+      const Complex bet = make_cuComplex(0, 0);
+      const Complex* alpha = &alf;
+      const Complex* beta = &bet;
       
-        // Create a handle for CUBLAS
       cublasHandle_t handle;
       cublasCreate(&handle);
       
-       // Do the actual multiplication
       cublasCgemm3m(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, 
                   bDev.data(), ldb, aDev.data(), lda, beta, cDev.data(), ldc);
       
-       // Destroy the handle
       cublasDestroy(handle);
 
       cDev.copyToHost(result);
