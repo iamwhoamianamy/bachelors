@@ -8,11 +8,20 @@
 #include "octree.hpp"
 #include "typedefs.hpp"
 
-enum class TranslationAlgorithm
+enum class M2MAlg
+{
+   NoTranslation = 0,
+   ComplexTranslation,
+   RealTranslation,
+   Layers,
+   Matrices,
+};
+
+enum class M2MDevice
 {
    CPU = 0,
-   GPUSimple,
-   GPUBlockForHarmonic
+   GPU,
+   Adaptive
 };
 
 class MultipoleSolver
@@ -32,18 +41,21 @@ public:
    MultipoleSolver(std::vector<Quadrature>& quadratures,
                    size_t octreeLeafCapacity = 1000);
 
-   void calcLocalMultipolesWithoutTranslation();
-   void calcLocalMultipolesWithComplexTranslation();
-   void calcLocalMultipolesWithRealTranslation();
-   void calcLocalMultipolesWithLayers(bool useGPU);
-   void calcLocalMultipolesWithMatrices(bool useGPU);
+   void calcLocalMultipoles(
+      M2MAlg algorithm,
+      M2MDevice device = M2MDevice::CPU);
+
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
    ~MultipoleSolver();
 
 private:
+   void calcLocalMultipolesWithoutTranslation();
+   void calcLocalMultipolesWithComplexTranslation();
+   void calcLocalMultipolesWithRealTranslation();
+
    void calcLocalMultipolesWithLayersOrMatrices(
-      bool useGPU,
+      M2MDevice device,
       bool useMatrices);
 
    void enumerateNodes(
@@ -53,20 +65,20 @@ private:
 
    void calcContributionsToHigherLayers(
       const std::vector<std::vector<OctreeNode*>>& layers,
-      bool useGPU,
+      M2MDevice device,
       bool useMatrices);
 
    void calcContributionsToHigherLayers(
       const std::vector<std::vector<OctreeNode*>>& layers,
-      bool useGPU);
+      M2MDevice device);
 
    std::vector<Vector3> calcContributionsToHigherLayer(
       const std::vector<OctreeNode*>& layer,
-      bool useGPU);
+      M2MDevice device);
 
    void calcContributionsToHigherLevelsWithMatrices(
       const std::vector<std::vector<OctreeNode*>>& layers,
-      bool useGPU);
+      M2MDevice device);
 
    void calcMultipolesAtLeaves(
       const std::vector<std::vector<OctreeNode*>>& layers);

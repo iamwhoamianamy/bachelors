@@ -112,17 +112,9 @@ void kernels::translateAllCPUMatrixBLAS(
 {
    size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-   size_t harLenPadded = math::nextDevisible(
-      harmonicLength,
-      THREADS_PER_BLOCK);
-
-   size_t harCountPadded = math::nextDevisible(
-      harmonicCount,
-      THREADS_PER_BLOCK);
-
-   int m = harLenPadded;
-   int k = harLenPadded;
-   int n = harCountPadded;
+   int m = harmonicLength;
+   int k = harmonicLength;
+   int n = harmonicCount;
    int lda = m, ldb = k, ldc = m;
    const Complex alf = make_cuComplex(1, 0);
    const Complex bet = make_cuComplex(0, 0);

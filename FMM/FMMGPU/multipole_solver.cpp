@@ -21,6 +21,38 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
    octreeRoot->insert(_quadratures);
 }
 
+void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
+{
+   switch(algorithm)
+   {
+      case M2MAlg::NoTranslation:
+      {
+         calcLocalMultipolesWithoutTranslation();
+         break;
+      }
+      case M2MAlg::ComplexTranslation:
+      {
+         calcLocalMultipolesWithComplexTranslation();
+         break;
+      }
+      case M2MAlg::RealTranslation:
+      {
+         calcLocalMultipolesWithRealTranslation();
+         break;
+      }
+      case M2MAlg::Layers:
+      {
+         calcLocalMultipolesWithLayersOrMatrices(device, false);
+         break;
+      }
+      case M2MAlg::Matrices:
+      {
+         calcLocalMultipolesWithLayersOrMatrices(device, true);
+         break;
+      }
+   }
+}
+
 void MultipoleSolver::calcLocalMultipolesWithoutTranslation()
 {
    octreeRoot->calcLocalMultipolesWithoutTranslation(harmonicOrder);
@@ -39,18 +71,8 @@ void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcLocalMultipolesWithLayers(bool useGPU)
-{
-   calcLocalMultipolesWithLayersOrMatrices(useGPU, false);
-}
-
-void MultipoleSolver::calcLocalMultipolesWithMatrices(bool useGPU)
-{
-   calcLocalMultipolesWithLayersOrMatrices(useGPU, true);
-}
-
 void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
-   bool useGPU,
+   M2MDevice device,
    bool useMatrices)
 {
    std::vector<std::vector<OctreeNode*>> layers;
@@ -71,7 +93,7 @@ void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
       std::cout << std::fixed;
    }
 
-   calcContributionsToHigherLayers(layers, useGPU, useMatrices);
+   calcContributionsToHigherLayers(layers, device, useMatrices);
    _multipolesAreReady = true;
 }
 
@@ -96,11 +118,11 @@ void MultipoleSolver::enumerateNodes(
 
 void MultipoleSolver::calcContributionsToHigherLayers(
    const std::vector<std::vector<OctreeNode*>>& layers,
-   bool useGPU,
+   M2MDevice device,
    bool useMatrices)
 {
-   useMatrices ? calcContributionsToHigherLevelsWithMatrices(layers, useGPU) :
-      calcContributionsToHigherLayers(layers, useGPU);
+   useMatrices ? calcContributionsToHigherLevelsWithMatrices(layers, device) :
+      calcContributionsToHigherLayers(layers, device);
 }
 
 void MultipoleSolver::calcMultipolesAtLeaves(
@@ -119,7 +141,7 @@ void MultipoleSolver::calcMultipolesAtLeaves(
 
 void MultipoleSolver::calcContributionsToHigherLayers(
    const std::vector<std::vector<OctreeNode*>>& layers,
-   bool useGPU)
+   M2MDevice device)
 {
    for(int l = layers.size() - 1; l >= 1; l--)
    {
@@ -131,7 +153,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
       }
 
       std::vector<Vector3> contributions =
-         calcContributionsToHigherLayer(layers[l], useGPU);
+         calcContributionsToHigherLayer(layers[l], device);
 
       for(size_t c = 0; c < layers[l].size(); c++)
       {
@@ -154,7 +176,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
 
 std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
    const std::vector<OctreeNode*>& layer,
-   bool useGPU)
+   M2MDevice device)
 {
    std::vector<Vector3> harmonics(layer.size() * harmonicLength);
    std::vector<real> regulars(layer.size() * harmonicLength);
@@ -177,23 +199,34 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
    auto start = std::chrono::steady_clock::now();
 
-   if(useGPU)
+   switch(device)
    {
-      kernels::translateAllGPU(
-         result.data(),
-         regulars.data(),
-         harmonics.data(),
-         layer.size(),
-         harmonicOrder);
-   }
-   else
-   {
-      kernels::translateAllCPU(
-         result.data(),
-         regulars.data(),
-         harmonics.data(),
-         layer.size(),
-         harmonicOrder);
+      case M2MDevice::CPU:
+      {
+         kernels::translateAllCPU(
+            result.data(),
+            regulars.data(),
+            harmonics.data(),
+            layer.size(),
+            harmonicOrder);
+
+         break;
+      }
+      case M2MDevice::GPU:
+      {
+         kernels::translateAllGPU(
+            result.data(),
+            regulars.data(),
+            harmonics.data(),
+            layer.size(),
+            harmonicOrder);
+
+         break;
+      }
+      case M2MDevice::Adaptive:
+      {
+         break;
+      }
    }
 
    auto stop = std::chrono::steady_clock::now();
@@ -209,7 +242,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
 void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
    const std::vector<std::vector<OctreeNode*>>& layers,
-   bool useGPU)
+   M2MDevice device)
 {
    for(size_t l = layers.size() - 1; l >= 1; l--)
    {
@@ -246,29 +279,34 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
                auto kernelStart = std::chrono::steady_clock::now();
 
-               if(useGPU)
+               switch(device)
                {
-                  kernels::translateAllGPUMatrixCuBLAS(
-                     t.data(),
-                     expansionVectors[c].data(),
-                     regularVectors[o].data(),
-                     nodesCount,
-                     harmonicOrder);
-               }
-               else
-               {
-                  kernels::translateAllCPUMatrix(
-                     t,
-                     expansionVectors[c],
-                     regularVectors[o],
-                     nodesCount,
-                     harmonicOrder);
-                  /*kernels::translateAllCPUMatrixBLAS(
-                     t.data(),
-                     expansionVectors[c].data(),
-                     regularVectors[o].data(),
-                     nodesCount,
-                     harmonicOrder);*/
+                  case M2MDevice::CPU:
+                  {
+                     kernels::translateAllCPUMatrixBLAS(
+                        t.data(),
+                        expansionVectors[c].data(),
+                        regularVectors[o].data(),
+                        nodesCount,
+                        harmonicOrder);
+
+                     break;
+                  }
+                  case M2MDevice::GPU:
+                  {
+                     kernels::translateAllGPUMatrixCuBLAS(
+                        t.data(),
+                        expansionVectors[c].data(),
+                        regularVectors[o].data(),
+                        nodesCount,
+                        harmonicOrder);
+
+                     break;
+                  }
+                  case M2MDevice::Adaptive:
+                  {
+                     break;
+                  }
                }
 
                auto kernelStop = std::chrono::steady_clock::now();
