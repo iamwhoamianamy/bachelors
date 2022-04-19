@@ -44,10 +44,34 @@ void comparisonToTelmaIntegrals()
 {
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
+   auto telmaResults = readTelmaResults("results/telma_results.txt");
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-   auto telmaResults = readTelmaResults("results/telma_results.txt");
-   real sumError = 0;
+   MultipoleSolver multipoleSolverNoTranslation(quadratures);
+   MultipoleSolver multipoleSolverComplexTranslation(quadratures);
+   MultipoleSolver multipoleSolverRealTranslation(quadratures);
+   MultipoleSolver multipoleSolverLayersTranslationCPU(quadratures);
+   MultipoleSolver multipoleSolverLayersTranslationGPU(quadratures);
+   MultipoleSolver multipoleSolverMatricesTranslationCPU(quadratures);
+   MultipoleSolver multipoleSolverMatricesTranslationGPU(quadratures);
+
+   multipoleSolverNoTranslation.calcLocalMultipoles(M2MAlg::NoTranslation);
+   multipoleSolverComplexTranslation.calcLocalMultipoles(M2MAlg::ComplexTranslation);
+   multipoleSolverRealTranslation.calcLocalMultipoles(M2MAlg::RealTranslation);
+   multipoleSolverLayersTranslationCPU.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::CPU);
+   multipoleSolverLayersTranslationGPU.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::GPU);
+   multipoleSolverMatricesTranslationCPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
+   multipoleSolverMatricesTranslationGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+
+   real sumErrorIntegration = 0;
+   real sumErrorNoTranslation = 0;
+   real sumErrorComplexTranslation = 0;
+   real sumErrorRealTranslation = 0;
+   real sumErrorLayersTranslationCPU = 0;
+   real sumErrorLayersTranslationGPU = 0;
+   real sumErrorMatricesTranslationCPU = 0;
+   real sumErrorMatricesTranslationGPU = 0;
+
    size_t n = telmaResults.size();
 
    for(size_t i = 0; i < n; i++)
@@ -55,77 +79,52 @@ void comparisonToTelmaIntegrals()
       auto point = telmaResults[i].first;
       auto telmaB = telmaResults[i].second * math::mu0;
 
-      Vector3 myB = math::calcBioSavartLaplace(current, point, quadratures);
-      real error = 100 * (myB - telmaB).length() / telmaB.length();
+      Vector3 integration = math::calcBioSavartLaplace(current, point, quadratures);
+      Vector3 noTranslation = multipoleSolverNoTranslation.calcB(current, point);
+      Vector3 complexTranslation = multipoleSolverComplexTranslation.calcB(current, point);
+      Vector3 realTranslation = multipoleSolverRealTranslation.calcB(current, point);
+      Vector3 layersTranslationCPU = multipoleSolverLayersTranslationCPU.calcB(current, point);
+      Vector3 layersTranslationGPU = multipoleSolverLayersTranslationGPU.calcB(current, point);
+      Vector3 matricesTranslationCPU = multipoleSolverMatricesTranslationCPU.calcB(current, point);
+      Vector3 matricesTranslationGPU = multipoleSolverMatricesTranslationGPU.calcB(current, point);
+
+      real errorIntegration = 100 * (integration - telmaB).length() / telmaB.length();
+      real errorNoTranslation = 100 * (noTranslation - telmaB).length() / telmaB.length();
+      real errorComplexTranslation = 100 * (complexTranslation - telmaB).length() / telmaB.length();
+      real errorRealTranslation = 100 * (realTranslation - telmaB).length() / telmaB.length();
+      real errorLayersTranslationCPU = 100 * (layersTranslationCPU - telmaB).length() / telmaB.length();
+      real errorLayersTranslationGPU = 100 * (layersTranslationGPU - telmaB).length() / telmaB.length();
+      real errorMatricesTranslationCPU = 100 * (matricesTranslationCPU - telmaB).length() / telmaB.length();
+      real errorMatricesTranslationGPU = 100 * (matricesTranslationGPU - telmaB).length() / telmaB.length();
 
       std::cout << std::fixed << std::setw(3) << i << " ";
       point.printWithWidth(std::cout, 6);
-      std::cout << std::setw(16) << error << std::endl;
+      std::cout << std::setw(16) << errorIntegration;
+      std::cout << std::setw(16) << errorNoTranslation;
+      std::cout << std::setw(16) << errorComplexTranslation;
+      std::cout << std::setw(16) << errorRealTranslation;
+      std::cout << std::setw(16) << errorLayersTranslationCPU;
+      std::cout << std::setw(16) << errorLayersTranslationGPU;
+      std::cout << std::setw(16) << errorMatricesTranslationCPU;
+      std::cout << std::setw(16) << errorMatricesTranslationGPU;
+      std::cout << std::endl;
 
-      sumError += error;
+      sumErrorNoTranslation += errorNoTranslation;
+      sumErrorComplexTranslation += errorComplexTranslation;
+      sumErrorRealTranslation += errorRealTranslation;
+      sumErrorLayersTranslationCPU += errorLayersTranslationCPU;
+      sumErrorLayersTranslationGPU += errorLayersTranslationGPU;
+      sumErrorMatricesTranslationCPU += errorMatricesTranslationCPU;
+      sumErrorMatricesTranslationGPU += errorMatricesTranslationGPU;
    }
 
-   std::cout << sumError / n << std::endl;
-}
-
-void comparisonToTelmaWithoutTranslation()
-{
-   Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
-   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-
-   auto telmaResults = readTelmaResults("results/telma_results.txt");
-   MultipoleSolver multipoleSolver(quadratures);
-   multipoleSolver.calcLocalMultipoles(M2MAlg::NoTranslation);
-   real sumError = 0;
-   size_t n = telmaResults.size();
-
-   for(size_t i = 0; i < n; i++)
-   {
-      auto point = telmaResults[i].first;
-      auto telmaB = telmaResults[i].second * math::mu0;
-
-      Vector3 myB = multipoleSolver.calcB(current, point);
-      real error = 100 * (myB - telmaB).length() / telmaB.length();
-
-      std::cout << std::fixed << std::setw(3) << i << " ";
-      point.printWithWidth(std::cout, 6);
-      std::cout << std::setw(16) << error << std::endl;
-
-      sumError += error;
-   }
-
-   std::cout << sumError / n << std::endl;
-}
-
-void comparisonToTelmaWithTranslation()
-{
-   Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
-   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-
-   auto telmaResults = readTelmaResults("results/telma_results.txt");
-   MultipoleSolver multipoleSolver(quadratures);
-   multipoleSolver.calcLocalMultipoles(M2MAlg::RealTranslation);
-   real sumError = 0;
-   size_t n = telmaResults.size();
-
-   for(size_t i = 0; i < n; i++)
-   {
-      auto point = telmaResults[i].first;
-      auto telmaB = telmaResults[i].second * math::mu0;
-
-      Vector3 myB = multipoleSolver.calcB(current, point);
-      real error = 100 * (myB - telmaB).length() / telmaB.length();
-
-      std::cout << std::fixed << std::setw(3) << i << " ";
-      point.printWithWidth(std::cout, 6);
-      std::cout << std::setw(16) << error << std::endl;
-
-      sumError += error;
-   }
-
-   std::cout << sumError / n << std::endl;
+   std::cout << sumErrorNoTranslation / n << std::endl;
+   std::cout << sumErrorComplexTranslation / n << std::endl;
+   std::cout << sumErrorRealTranslation / n << std::endl;
+   std::cout << sumErrorLayersTranslationCPU / n << std::endl;
+   std::cout << sumErrorLayersTranslationGPU / n << std::endl;
+   std::cout << sumErrorMatricesTranslationCPU / n << std::endl;
+   std::cout << sumErrorMatricesTranslationGPU / n << std::endl;
 }
 
 void comparisonBetweenMethodsOnPrecision()
@@ -642,17 +641,17 @@ int main()
 {
    //NMResearch();
    //timeResearchForMorePoints();
-   //comparisonToTelmaWithTranslation();
+   comparisonToTelmaIntegrals();
    //comparisonBetweenMethodsOnPrecision();
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   matrixCalculationsPrecision();
+   //matrixCalculationsPrecision();
 
    //layerCalculationTime();
    //matrixCalculationTime();
-   layerMatrixCalculationTime(M2MDevice::CPU);
-   layerMatrixCalculationTime(M2MDevice::GPU);
+   //layerMatrixCalculationTime(M2MDevice::CPU);
+   //layerMatrixCalculationTime(M2MDevice::GPU);
    //compareWithMatrixMultiplication();
 
    /*Vector3 point(3, 1, 2);
