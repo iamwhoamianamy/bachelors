@@ -1,6 +1,7 @@
 #include "translation_algorithms.hpp"
 #include "kernels.cuh"
 #include "cblas.h"
+#include <omp.h>
 
 void kernels::translateAllCPU(
    Vector3* result,
@@ -10,7 +11,8 @@ void kernels::translateAllCPU(
 {
    size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-   for(size_t harmonicId = 0; harmonicId < harmonicCount; harmonicId++)
+#pragma omp parallel for
+   for(int harmonicId = 0; harmonicId < harmonicCount; harmonicId++)
    {
       size_t harmonicBegin = harmonicLength * harmonicId;
       size_t harmonicEnd = harmonicBegin + harmonicLength;

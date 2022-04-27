@@ -305,6 +305,25 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                   }
                   case M2MDevice::Adaptive:
                   {
+                     if(expansionVectors[c].size() < adaptiveBorder)
+                     {
+                        kernels::translateAllCPUMatrixBLAS(
+                           t.data(),
+                           expansionVectors[c].data(),
+                           regularVectors[o].data(),
+                           nodesCount,
+                           harmonicOrder);
+                     }
+                     else
+                     {
+                        kernels::translateAllGPUMatrixCuBLAS(
+                           t.data(),
+                           expansionVectors[c].data(),
+                           regularVectors[o].data(),
+                           nodesCount,
+                           harmonicOrder);
+                     }
+
                      break;
                   }
                }
