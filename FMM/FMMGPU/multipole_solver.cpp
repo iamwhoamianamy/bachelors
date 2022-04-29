@@ -20,6 +20,12 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
 {
    octreeRoot = new OctreeNode(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
    octreeRoot->insert(_quadratures);
+
+   _realToComplexMatrix = Harmonics::calcRealToComplexMatrixTransposed1D(
+      harmonicOrder);
+
+   _complexToRealMatrix = Harmonics::calcComplexToRealMatrixTransposed1D(
+      harmonicOrder);
 }
 
 void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
@@ -403,23 +409,54 @@ ComplexMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
    const Matrix<OctreeNode*>& nodesByOrientation,
    size_t padding)
 {
-   ComplexMatrix res;
-   res.reserve(8);
+   ComplexMatrix res(
+      8, std::vector<Complex>(harmonicLength * harmonicLength));
 
    for(int i = 0; i < 8; i++)
    {
       auto parent = nodesByOrientation[i][0]->parent();
 
-      if(!nodesByOrientation[i].empty())
-      {
-         auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
+      auto translation = nodesByOrientation[i][0]->box().center -
+         parent->box().center;
 
-         auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
-            harmonicOrder, translation);
+      auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
+         harmonicOrder, translation);
 
-         res.emplace_back(formMatrixFromRegularHarmonicsAsVectors(
-            Harmonics::realToComplex(regularHarmonics), padding));
-      }
+      auto temp1 = formMatrixFromRegularHarmonicsAsVectors(
+         Harmonics::realToComplex(regularHarmonics));
+
+      Complex alpha = make_cuComplex(1, 0);
+      Complex beta = make_cuComplex(0, 0);
+
+      std::vector<Complex> temp2(harmonicLength * harmonicLength);
+
+      cblas_cgemm(
+         CBLAS_ORDER::CblasRowMajor,
+         CBLAS_TRANSPOSE::CblasNoTrans,
+         CBLAS_TRANSPOSE::CblasNoTrans,
+         121, 121, 121,
+         (float*)&alpha,
+         (float*)_realToComplexMatrix.data(),
+         121,
+         (float*)temp1.data(),
+         121,
+         (float*)&beta,
+         (float*)temp2.data(),
+         121);
+
+      cblas_cgemm(
+         CBLAS_ORDER::CblasRowMajor,
+         CBLAS_TRANSPOSE::CblasNoTrans,
+         CBLAS_TRANSPOSE::CblasNoTrans,
+         121, 121, 121,
+         (float*)&alpha,
+         (float*)temp2.data(),
+         121,
+         (float*)_complexToRealMatrix.data(),
+         121,
+         (float*)&beta,
+         (float*)res[i].data(),
+         121);
    }
 
    return res;
@@ -547,14 +584,11 @@ ComplexMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
       for(size_t c = 0; c < 3; c++)
       {
          auto separated = Harmonics::separateCoord(expansion, c);
-         auto complex = Harmonics::realToComplex(separated);
-         std::copy(complex.data().begin(), 
-                   complex.data().end(), 
-                   res[c].begin() + nodeId * width);
 
-         //cblas_ccopy(width,
-         //            (float*)(complex.data().data()), 1,
-         //            (float*)(res[c].data() + nodeId * width), 1);
+         cblas_scopy(
+            width,
+            (float*)(separated.data().data()), 1,
+            (float*)(res[c].data() + nodeId * width), 2);
       }
    }
 
@@ -594,29 +628,22 @@ void MultipoleSolver::accountChildrenContributions(
    {
       auto parent = nodesByOrientation[nodeId]->parent();
 
-      auto xComponent = Harmonics::complexToReal(
-         math::getRow(
-            contributions[0],
-            harmonicLength,
-            padding,
-            nodeId));
+      std::vector<Vector3> totalContribution(harmonicLength);
 
-      auto yComponent = Harmonics::complexToReal(
-         math::getRow(
-            contributions[1],
-            harmonicLength,
-            padding,
-            nodeId));
+      cblas_scopy(
+         harmonicLength,
+         (float*)(contributions[0].data() + harmonicLength * nodeId), 2,
+         (float*)(totalContribution.data()) + 0, 3);
 
-      auto zComponent = Harmonics::complexToReal(
-         math::getRow(
-            contributions[2],
-            harmonicLength,
-            padding,
-            nodeId));
+      cblas_scopy(
+         harmonicLength,
+         (float*)(contributions[1].data() + harmonicLength * nodeId), 2,
+         (float*)(totalContribution.data()) + 1, 3);
 
-      auto totalContribution = Harmonics::createFormXYZ(
-         xComponent, yComponent, zComponent);
+      cblas_scopy(
+         harmonicLength,
+         (float*)(contributions[2].data() + harmonicLength * nodeId), 2,
+         (float*)(totalContribution.data()) + 2, 3);
 
       parent->multipoleExpansion().add(totalContribution);
    }

@@ -623,8 +623,8 @@ void matrixCalculationsPrecision()
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    MultipoleSolver multipoleSolverCPU(quadratures);
-   MultipoleSolver multipoleSolverGPU(quadratures);
-   MultipoleSolver multipoleSolverAda(quadratures);
+   //MultipoleSolver multipoleSolverGPU(quadratures);
+   //MultipoleSolver multipoleSolverAda(quadratures);
 
    Vector3 point(3, 1, 2);
 
@@ -633,19 +633,19 @@ void matrixCalculationsPrecision()
    multipoleSolverCPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
    Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
 
-   multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
-   Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
+   //multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+   //Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
 
-   multipoleSolverAda.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::Adaptive);
-   Vector3 byMultipolesWithLayersAda = multipoleSolverAda.calcB(current, point);
+   //multipoleSolverAda.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::Adaptive);
+   //Vector3 byMultipolesWithLayersAda = multipoleSolverAda.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
    std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithLayersCPU << std::endl;
-   std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
-   std::cout << std::setw(40) << "multipoles with matrices Ada" << byMultipolesWithLayersAda << std::endl;
+   //std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
+   //std::cout << std::setw(40) << "multipoles with matrices Ada" << byMultipolesWithLayersAda << std::endl;
 }
 
 void translationTest()
@@ -689,13 +689,13 @@ int main()
    //timeResearchForMorePoints();
    //comparisonToTelmaIntegrals();
    //comparisonBetweenMethodsOnPrecision();
-   translationTest();
+   //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   //matrixCalculationsPrecision();
+   matrixCalculationsPrecision();
 
    //layerCalculationTime();
-   //matrixCalculationTime();
+   matrixCalculationTime();
    //layerMatrixCalculationTime(M2MDevice::CPU);
    //layerMatrixCalculationTime(M2MDevice::GPU);
    //compareWithMatrixMultiplication();

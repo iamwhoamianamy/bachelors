@@ -30,6 +30,8 @@ private:
    std::vector<Quadrature>& _quadratures;
    OctreeNode* octreeRoot;
    bool _multipolesAreReady = false;
+   std::vector<Complex> _realToComplexMatrix;
+   std::vector<Complex> _complexToRealMatrix;
 
 public:
    bool log = true;
