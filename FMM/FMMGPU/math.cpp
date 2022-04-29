@@ -1,5 +1,6 @@
 #include "math.hpp"
 #include "harmonics.hpp"
+#include "iomanip"
 
 namespace math
 {
@@ -57,5 +58,6 @@ Complex& operator+=(Complex& lhs, const Complex& rhs)
 
 std::ostream& operator<<(std::ostream& os, const Complex& val)
 {
+   os << "(" << std::setw(10) << val.x << ", " << std::setw(10) << val.y << ")";
    return os;
 }

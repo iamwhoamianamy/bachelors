@@ -52,6 +52,9 @@ public:
    static ComplexMatrix calcRealToComplexMatrix2D(size_t order);
    static ComplexMatrix calcComplexToRealMatrix2D(size_t order);
 
+   static std::vector<Complex> calcRealToComplexMatrixTransposed1D(size_t order);
+   static std::vector<Complex> calcComplexToRealMatrixTransposed1D(size_t order);
+
    static real getFactorial(size_t n);
    
    static RealHarmonicSeries separateCoord(

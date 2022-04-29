@@ -331,6 +331,61 @@ ComplexMatrix Harmonics::calcComplexToRealMatrix2D(size_t order)
    return res;
 }
 
+std::vector<Complex> Harmonics::calcRealToComplexMatrixTransposed1D(size_t order)
+{
+   size_t harmonicLen = (order + 1) * (order + 1);
+   std::vector<Complex> res(harmonicLen * harmonicLen);
+
+   for(int l = 0; l <= order; l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         real realPart = HarmonicSeries<real>::getRealFactor(l, m);
+         real imagPart = HarmonicSeries<real>::getImagFactor(l, m);
+
+         int realM = abs(m);
+         int imagM = -abs(m);
+
+         size_t currentIndex = HarmonicSeries<Complex>::lmToIndex(l, m);
+         size_t newRealIndex = HarmonicSeries<Complex>::lmToIndex(l, realM);
+         size_t newImagIndex = HarmonicSeries<Complex>::lmToIndex(l, imagM);
+
+         res[newRealIndex + currentIndex * harmonicLen] += 
+            make_cuComplex(realPart, 0);
+         res[newImagIndex + currentIndex * harmonicLen] += 
+            make_cuComplex(0, imagPart);
+      }
+   }
+
+   return res;
+}
+
+std::vector<Complex> Harmonics::calcComplexToRealMatrixTransposed1D(size_t order)
+{
+   size_t harmonicLen = (order + 1) * (order + 1);
+   std::vector<Complex> res(harmonicLen * harmonicLen);
+
+   for(int l = 0; l <= order; l++)
+   {
+      res[l * l + l + (l * l + l) * harmonicLen] = make_cuComplex(1, 0);
+
+      for(int m = 1; m <= l; m++)
+      {
+         res[l * l + l + m + (l * l + l + m) * harmonicLen] = 
+            make_cuComplex(math::R_SQRT_2, 0);
+         res[l * l + l - m + (l * l + l + m) * harmonicLen] = 
+            make_cuComplex(math::R_SQRT_2, 0);
+
+         res[l * l + l + m + (l * l + l - m) * harmonicLen] = 
+            make_cuComplex(0, -math::R_SQRT_2);
+         res[l * l + l - m + (l * l + l - m) * harmonicLen] = 
+            make_cuComplex(0, math::R_SQRT_2);
+      }
+   }
+
+   return res;
+}
+
 real Harmonics::getFactorial(size_t n)
 {
    return _factorials[n];

@@ -8,8 +8,8 @@ namespace test
       const double torusRadius = 2;
       const double torusSectionWidth = 0.2;
       
-      return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-      //return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
+      //return Torus(torusRadius, torusSectionWidth, 80, 16, 16);
+      return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
    }
 
    double getTime(void (*f)())
@@ -30,7 +30,8 @@ namespace test
    BasisQuadratures readBasisQuadratures()
    {
       BasisQuadratures bq;
-      std::string bqDir = "basis_quadratures/";
+      std::string bqDir = "E:/ÃÌ∏/¡Ë·‡/bachelors/FMM/FMMGPU/basis_quadratures/";
+      //std::string bqDir = "basis_quadratures/";
 
       try
       {

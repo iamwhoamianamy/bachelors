@@ -58,6 +58,24 @@ namespace math
    }
 
    template <class T>
+   std::vector<T> mult(
+      const std::vector<T>& a,
+      const Matrix<T>& b)
+   {
+      std::vector<T> res(b[0].size());
+
+      for(size_t column = 0; column < b[0].size(); column++)
+      {
+         for(size_t row = 0; row < a.size(); row++)
+         {
+            res[column] += a[row] * b[row][column];
+         }
+      }
+
+      return res;
+   }
+
+   template <class T>
    std::vector<T> multMatricesAsVectors(
       const std::vector<T>& a,
       const std::vector<T>& b,
@@ -73,7 +91,7 @@ namespace math
          {
             for(size_t k = 0; k < aWidth; k++)
             {
-               res[i * aWidth + j] += a[i * aWidth + k] * b[k * aWidth + j];
+               res[i * bWidth + j] += a[i * aWidth + k] * b[k * bWidth + j];
             }
          }
       }

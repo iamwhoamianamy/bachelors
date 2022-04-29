@@ -30,9 +30,9 @@ private:
    std::vector<Quadrature>& _quadratures;
    OctreeNode* octreeRoot;
    bool _multipolesAreReady = false;
-   bool _log = false;
 
 public:
+   bool log = true;
    float adaptiveBorder = 16e3;
    const int harmonicOrder = 10;
    const int harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);

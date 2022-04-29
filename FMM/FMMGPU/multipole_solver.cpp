@@ -4,6 +4,7 @@
 #include <fstream>
 #include <omp.h>
 
+#include "cblas.h"
 #include "multipole_solver.hpp"
 #include "math.hpp"
 #include "integration.hpp"
@@ -80,7 +81,7 @@ void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
    calcMultipolesAtLeaves(layers);
    octreeRoot->initAllMultipoleExpansions(harmonicOrder);
 
-   if(_log)
+   if(log)
    {
       if(useMatrices)
          std::cout << "-----------------------matrices------------------------" << std::endl;
@@ -147,7 +148,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
    {
       auto start = std::chrono::steady_clock::now();
 
-      if(_log)
+      if(log)
       {
          std::cout << std::setw(10) << l << std::setw(15) << layers[l].size();
       }
@@ -167,7 +168,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
       auto stop = std::chrono::steady_clock::now();
       double time = test::getTime(start, stop);
 
-      if(_log)
+      if(log)
       {
          std::cout << std::setw(15) << time << std::endl;
       }
@@ -232,7 +233,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
    auto stop = std::chrono::steady_clock::now();
    double layerTime = test::getTime(start, stop);
 
-   if(_log)
+   if(log)
    {
       std::cout << std::setw(15) << layerTime;
    }
@@ -250,7 +251,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
       auto start = std::chrono::steady_clock::now();
 
-      if(_log)
+      if(log)
       {
          std::cout << std::setw(10) << l << std::setw(15) << layers[l].size();
       }
@@ -344,7 +345,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
       auto stop = std::chrono::steady_clock::now();
       double layerTime = test::getTime(start, stop);
 
-      if(_log)
+      if(log)
       {
          std::cout << std::setw(15) << kernelTime;
          std::cout << std::setw(15) << layerTime << std::endl;
@@ -545,10 +546,15 @@ ComplexMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
 
       for(size_t c = 0; c < 3; c++)
       {
-         auto complex = Harmonics::realToComplex(Harmonics::separateCoord(expansion, c));
+         auto separated = Harmonics::separateCoord(expansion, c);
+         auto complex = Harmonics::realToComplex(separated);
          std::copy(complex.data().begin(), 
                    complex.data().end(), 
                    res[c].begin() + nodeId * width);
+
+         //cblas_ccopy(width,
+         //            (float*)(complex.data().data()), 1,
+         //            (float*)(res[c].data() + nodeId * width), 1);
       }
    }
 
