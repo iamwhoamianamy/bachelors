@@ -25,8 +25,13 @@ public:
    const T& getReal(int l, int m) const;
    const T& getImag(int l, int m) const;
 
+   static T getRealFactor(int l, int m);
+   static T getImagFactor(int l, int m);
+
    std::vector<T>& data();
    const std::vector<T>& data() const;
+
+   static size_t lmToIndex(int l, int m);
 
    HarmonicSeries<T>(HarmonicSeries<T>&& harmonicSeries) noexcept;
    HarmonicSeries<T>(const HarmonicSeries<T>& harmonicSeries);
@@ -108,6 +113,18 @@ inline const T& HarmonicSeries<T>::getImag(int l, int m) const
 }
 
 template<class T>
+inline T HarmonicSeries<T>::getRealFactor(int l, int m)
+{
+   return math::R_SQRT_2 * (m != 0) + (m == 0);
+}
+
+template<class T>
+inline T HarmonicSeries<T>::getImagFactor(int l, int m)
+{
+   return math::sign(m) * math::R_SQRT_2;
+}
+
+template<class T>
 inline std::vector<T>& HarmonicSeries<T>::data()
 {
    return _data;
@@ -117,6 +134,12 @@ template<class T>
 inline const std::vector<T>& HarmonicSeries<T>::data() const
 {
    return _data;
+}
+
+template<class T>
+inline size_t HarmonicSeries<T>::lmToIndex(int l, int m)
+{
+   return l * l + l + m;
 }
 
 template<class T>

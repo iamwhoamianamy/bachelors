@@ -282,6 +282,33 @@ HarmonicSeries<Vector3> Harmonics::translateWithReal(
                                    Harmonics::translate(regular, zComponent));
 }
 
+ComplexMatrix Harmonics::calcRealToComplexMatrix2D(size_t order)
+{
+   size_t harmonicLen = (order + 1) * (order + 1);
+   ComplexMatrix res(harmonicLen, std::vector<Complex>(harmonicLen));
+
+   for(int l = 0; l <= order; l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         real realPart = HarmonicSeries<real>::getRealFactor(l, m);
+         real imagPart = HarmonicSeries<real>::getImagFactor(l, m);
+
+         int realM = abs(m);
+         int imagM = -abs(m);
+
+         size_t currentIndex = HarmonicSeries<Complex>::lmToIndex(l, m);
+         size_t newRealIndex = HarmonicSeries<Complex>::lmToIndex(l, realM);
+         size_t newImagIndex = HarmonicSeries<Complex>::lmToIndex(l, imagM);
+
+         res[newRealIndex][currentIndex] += make_cuComplex(realPart, 0);
+         res[newImagIndex][currentIndex] += make_cuComplex(0, imagPart);
+      }
+   }
+
+   return res;
+}
+
 real Harmonics::getFactorial(size_t n)
 {
    return _factorials[n];

@@ -29,6 +29,7 @@ public:
 
    static ComplexHarmonicSeries realToComplex(
       const RealHarmonicSeries& harmonics);
+
    static RealHarmonicSeries complexToReal(
       const ComplexHarmonicSeries& harmonics);
 
@@ -47,6 +48,8 @@ public:
    static HarmonicSeries<Vector3> translateWithReal(
       const HarmonicSeries<Vector3>& expansion,
       const Vector3& translation);
+
+   static ComplexMatrix calcRealToComplexMatrix2D(size_t order);
 
    static real getFactorial(size_t n);
    
