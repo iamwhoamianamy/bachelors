@@ -678,9 +678,9 @@ void translationTest()
    );
 
    auto deb = math::multMatricesAsVectors(
-      matricesMultiplied,
       temp1,
-      121, 121, 1);
+      matricesMultiplied,
+      121, 1, 121);
 }
 
 int main()
