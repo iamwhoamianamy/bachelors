@@ -277,13 +277,10 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                getExpansionsInOneOrientationAsVectors(
                   nodesByOrientation[o]);
 
-            RealMatrix translated;
-            translated.reserve(3);
+            RealMatrix translated(3, std::vector<real>(harmonicLength * nodesCount));
 
             for(size_t c = 0; c < 3; c++)
             {
-               std::vector<real> t(harmonicLength * nodesCount);
-
                auto kernelStart = std::chrono::steady_clock::now();
 
                switch(device)
@@ -291,7 +288,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                   case M2MDevice::CPU:
                   {
                      kernels::translateAllCPUMatrixBLAS(
-                        t.data(),
+                        translated[c].data(),
                         expansionVectors[c].data(),
                         regularVectors[o].data(),
                         nodesCount,
@@ -302,7 +299,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                   case M2MDevice::GPU:
                   {
                     kernels::translateAllGPUMatrixCuBLAS(
-                        t.data(),
+                       translated[c].data(),
                         expansionVectors[c].data(),
                         regularVectors[o].data(),
                         nodesCount,
@@ -338,8 +335,6 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                auto kernelStop = std::chrono::steady_clock::now();
                kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
                   (kernelStop - kernelStart).count() * 1e-6;
-
-               translated.emplace_back(t);
             }
 
             accountChildrenContributions(
@@ -391,7 +386,8 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatricesForLayer(
 
       if(!nodesByOrientation[i].empty())
       {
-         auto translation = nodesByOrientation[i][0]->box().center - parent->box().center;
+         auto translation = 
+            nodesByOrientation[i][0]->box().center - parent->box().center;
 
          auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
             harmonicOrder,
@@ -406,11 +402,11 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatricesForLayer(
 }
 
 RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
-   const Matrix<OctreeNode*>& nodesByOrientation,
-   size_t padding)
+   const Matrix<OctreeNode*>& nodesByOrientation)
 {
-   RealMatrix res(
-      8, std::vector<real>(harmonicLength * harmonicLength));
+   size_t matrixElemCount = harmonicLength * harmonicLength;
+
+   RealMatrix result(8, std::vector<real>(matrixElemCount));
 
    for(int i = 0; i < 8; i++)
    {
@@ -428,7 +424,7 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
       Complex alpha = make_cuComplex(1, 0);
       Complex beta = make_cuComplex(0, 0);
 
-      std::vector<Complex> temp2(harmonicLength * harmonicLength);
+      std::vector<Complex> temp2(matrixElemCount);
 
       cblas_cgemm(
          CBLAS_ORDER::CblasRowMajor,
@@ -444,7 +440,7 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
          (float*)temp2.data(),
          121);
 
-      std::vector<Complex> temp3(harmonicLength * harmonicLength);
+      std::vector<Complex> temp3(matrixElemCount);
 
       cblas_cgemm(
          CBLAS_ORDER::CblasRowMajor,
@@ -461,12 +457,12 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
          121);
 
       cblas_scopy(
-         harmonicLength * harmonicLength,
+         matrixElemCount,
          (float*)(temp3.data()), 2,
-         res[i].data(), 1);
+         result[i].data(), 1);
    }
 
-   return res;
+   return result;
 }
 
 ComplexMatrix MultipoleSolver::formMatrixFromRegularHarmonics(
@@ -503,14 +499,9 @@ ComplexMatrix MultipoleSolver::formMatrixFromRegularHarmonics(
 }
 
 std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
-   const ComplexHarmonicSeries& regular,
-   size_t padding)
+   const ComplexHarmonicSeries& regular)
 {
-   size_t width = math::nextDevisible(
-      harmonicLength,
-      padding);
-
-   std::vector<Complex> res(width * width);
+   std::vector<Complex> res(harmonicLength * harmonicLength);
 
    for(int l = 0; l <= regular.order(); l++)
    {
@@ -526,7 +517,7 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
 
                if(-dl <= dm && dm <= dl)
                {
-                  res[(l * l + l + m) + (dl * dl + dl + dm) * width] =
+                  res[(l * l + l + m) + (dl * dl + dl + dm) * harmonicLength] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
                      Harmonics::strangeFactor(m, mu);
                }
@@ -538,51 +529,12 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
    return res;
 }
 
-std::vector<ComplexMatrix> MultipoleSolver::getExpansionsInOneOrientation(
+RealMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
    const std::vector<OctreeNode*>& nodesByOrientation)
 {
    size_t nodeCount = nodesByOrientation.size();
-   std::vector<ComplexMatrix> res(3, ComplexMatrix(nodeCount));
-   
-   for(size_t c = 0; c < 3; c++)
-   {
-      for(size_t i = 0; i < nodeCount; i++)
-      {
-         res[c][i].resize(harmonicLength);
-      }
-   }
 
-   for(size_t h = 0; h < nodeCount; h++)
-   {
-      auto& expansion = nodesByOrientation[h]->multipoleExpansion();
-
-      for(size_t c = 0; c < 3; c++)
-      {
-         auto ñomplex = Harmonics::realToComplex(Harmonics::separateCoord(expansion, c));
-
-         for(size_t i = 0; i < harmonicLength; i++)
-         {
-            res[c][h][i] = ñomplex.getHarmonic(i);
-         }
-      }
-   }
-
-   return res;
-}
-
-RealMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
-   const std::vector<OctreeNode*>& nodesByOrientation,
-   size_t padding)
-{
-   size_t width = math::nextDevisible(
-      harmonicLength,
-      padding);
-
-   size_t height = math::nextDevisible(
-      nodesByOrientation.size(),
-      padding);
-
-   RealMatrix res(3, std::vector<real>(width * height));
+   RealMatrix res(3, std::vector<real>(harmonicLength * nodeCount));
 
    for(int nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
    {
@@ -590,12 +542,10 @@ RealMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
 
       for(size_t c = 0; c < 3; c++)
       {
-         auto separated = Harmonics::separateCoord(expansion, c);
-
          cblas_scopy(
-            width,
-            (float*)(separated.data().data()), 1,
-            (float*)(res[c].data() + nodeId * width), 1);
+            harmonicLength,
+            (float*)expansion.data().data() + c, 3,
+            res[c].data() + nodeId * harmonicLength, 1);
       }
    }
 
@@ -604,32 +554,7 @@ RealMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
 
 void MultipoleSolver::accountChildrenContributions(
    const std::vector<OctreeNode*>& nodesByOrientation,
-   const std::vector<ComplexMatrix>& contributions)
-{
-   for(size_t nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
-   {
-      auto parent = nodesByOrientation[nodeId]->parent();
-
-      auto xComponent = Harmonics::complexToReal(
-         ComplexHarmonicSeries(contributions[0][nodeId]));
-
-      auto yComponent = Harmonics::complexToReal(
-         ComplexHarmonicSeries(contributions[1][nodeId]));
-
-      auto zComponent = Harmonics::complexToReal(
-         ComplexHarmonicSeries(contributions[2][nodeId]));
-      
-      auto totalContribution = Harmonics::createFormXYZ(
-         xComponent, yComponent, zComponent);
-
-      parent->multipoleExpansion().add(totalContribution);
-   }
-}
-
-void MultipoleSolver::accountChildrenContributions(
-   const std::vector<OctreeNode*>& nodesByOrientation,
-   const RealMatrix& contributions,
-   size_t padding)
+   const RealMatrix& contributions)
 {
    for(int nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
    {
@@ -637,22 +562,13 @@ void MultipoleSolver::accountChildrenContributions(
 
       std::vector<Vector3> totalContribution(harmonicLength);
 
-      cblas_scopy(
-         harmonicLength,
-         (float*)(contributions[0].data() + harmonicLength * nodeId), 1,
-         (float*)(totalContribution.data()) + 0, 3);
-
-      cblas_scopy(
-         harmonicLength,
-         (float*)(contributions[1].data() + harmonicLength * nodeId), 1,
-         (float*)(totalContribution.data()) + 1, 3);
-
-      cblas_scopy(
-         harmonicLength,
-         (float*)(contributions[2].data() + harmonicLength * nodeId), 1,
-         (float*)(totalContribution.data()) + 2, 3);
-
-      parent->multipoleExpansion().add(totalContribution);
+      for(size_t c = 0; c < 3; c++)
+      {
+         cblas_saxpy(
+            harmonicLength, 1, 
+            contributions[c].data() + harmonicLength * nodeId, 1,
+            (float*)(parent->multipoleExpansion().data().data()) + c, 3);
+      }
    }
 }
 

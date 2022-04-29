@@ -93,31 +93,20 @@ private:
       const Matrix<OctreeNode*>& nodesByOrientation);
 
    RealMatrix calcRegularMatricesForLayerAsVectors(
-      const Matrix<OctreeNode*>& nodesByOrientation,
-      size_t padding = 0);
+      const Matrix<OctreeNode*>& nodesByOrientation);
 
    ComplexMatrix formMatrixFromRegularHarmonics(
       const ComplexHarmonicSeries& regular);
 
    std::vector<Complex> formMatrixFromRegularHarmonicsAsVectors(
-      const ComplexHarmonicSeries& regular,
-      size_t padding = 0);
-
-   std::vector<ComplexMatrix> getExpansionsInOneOrientation(
-      const std::vector<OctreeNode*>& nodesByOrientation);
+      const ComplexHarmonicSeries& regular);
 
    RealMatrix getExpansionsInOneOrientationAsVectors(
-      const std::vector<OctreeNode*>& nodesByOrientation,
-      size_t padding = 0);
+      const std::vector<OctreeNode*>& nodesByOrientation);
 
    void accountChildrenContributions(
       const std::vector<OctreeNode*>& nodesByOrientation,
-      const std::vector<ComplexMatrix>& contributions);
-
-   void accountChildrenContributions(
-      const std::vector<OctreeNode*>& nodesByOrientation,
-      const RealMatrix& contributions,
-      size_t padding = 0);
+      const RealMatrix& contributions);
 
    void printMatrices(
       const std::vector<ComplexMatrix>& regularMatrices,

@@ -429,7 +429,7 @@ void matrixCalculationTime()
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
+      //MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
       //MultipoleSolver multipoleSolverAda(quadratures, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
@@ -441,7 +441,7 @@ void matrixCalculationTime()
       double timeWithCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+      //multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithGPU = getTime(start, stop);
 
@@ -692,7 +692,7 @@ int main()
    //translationTest();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
-   matrixCalculationsPrecision();
+   //matrixCalculationsPrecision();
 
    //layerCalculationTime();
    matrixCalculationTime();
