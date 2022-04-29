@@ -429,7 +429,7 @@ void matrixCalculationTime()
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
       //MultipoleSolver multipoleSolverAda(quadratures, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
@@ -441,7 +441,7 @@ void matrixCalculationTime()
       double timeWithCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+      multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithGPU = getTime(start, stop);
 
@@ -623,7 +623,7 @@ void matrixCalculationsPrecision()
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    MultipoleSolver multipoleSolverCPU(quadratures);
-   //MultipoleSolver multipoleSolverGPU(quadratures);
+   MultipoleSolver multipoleSolverGPU(quadratures);
    //MultipoleSolver multipoleSolverAda(quadratures);
 
    Vector3 point(3, 1, 2);
@@ -633,8 +633,8 @@ void matrixCalculationsPrecision()
    multipoleSolverCPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
    Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
 
-   //multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
-   //Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
+   multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+   Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
 
    //multipoleSolverAda.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::Adaptive);
    //Vector3 byMultipolesWithLayersAda = multipoleSolverAda.calcB(current, point);
@@ -644,7 +644,7 @@ void matrixCalculationsPrecision()
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
    std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithLayersCPU << std::endl;
-   //std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithLayersGPU << std::endl;
    //std::cout << std::setw(40) << "multipoles with matrices Ada" << byMultipolesWithLayersAda << std::endl;
 }
 

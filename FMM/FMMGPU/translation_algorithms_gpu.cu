@@ -101,32 +101,30 @@ namespace kernels
    }
 
    void translateAllGPUMatrixCuBLAS(
-      Complex* result,
-      const Complex* a,
-      const Complex* b,
+      real* result,
+      const real* a,
+      const real* b,
       size_t harmonicCount,
       size_t harmonicOrder)
    {
       size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-      cuda::DevPtr<Complex> aDev(a, harmonicCount * harmonicLength);
-      cuda::DevPtr<Complex> bDev(b, harmonicLength * harmonicLength);
-      cuda::DevPtr<Complex> cDev(harmonicCount * harmonicLength);
+      cuda::DevPtr<real> aDev(a, harmonicCount * harmonicLength);
+      cuda::DevPtr<real> bDev(b, harmonicLength * harmonicLength);
+      cuda::DevPtr<real> cDev(harmonicCount * harmonicLength);
 
       int m = harmonicLength;
       int k = harmonicLength;
       int n = harmonicCount;
       int lda = m, ldb = k, ldc = m;
-      const Complex alf = make_cuComplex(1, 0);
-      const Complex bet = make_cuComplex(0, 0);
-      const Complex* alpha = &alf;
-      const Complex* beta = &bet;
+      const real alpha = 1;
+      const real beta = 0;
       
       cublasHandle_t handle;
       cublasCreate(&handle);
       
-      cublasCgemm3m(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, 
-                  bDev.data(), ldb, aDev.data(), lda, beta, cDev.data(), ldc);
+      cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+                  bDev.data(), ldb, aDev.data(), lda, &beta, cDev.data(), ldc);
       
       cublasDestroy(handle);
 

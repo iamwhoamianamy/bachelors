@@ -301,12 +301,12 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                   }
                   case M2MDevice::GPU:
                   {
-                    /* kernels::translateAllGPUMatrixCuBLAS(
+                    kernels::translateAllGPUMatrixCuBLAS(
                         t.data(),
                         expansionVectors[c].data(),
                         regularVectors[o].data(),
                         nodesCount,
-                        harmonicOrder);*/
+                        harmonicOrder);
 
                      break;
                   }
