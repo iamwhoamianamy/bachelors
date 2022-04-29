@@ -39,9 +39,9 @@ namespace kernels
       size_t harmonicOrder);
 
    void translateAllCPUMatrixBLAS(
-      Complex* result,
-      const Complex* a,
-      const Complex* b,
+      real* result,
+      const real* a,
+      const real* b,
       size_t harmonicCount,
       size_t harmonicOrder);
 

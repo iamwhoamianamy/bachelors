@@ -106,9 +106,9 @@ void kernels::translateAllCPUMatrix(
 
 
 void kernels::translateAllCPUMatrixBLAS(
-   Complex* result,
-   const Complex* a,
-   const Complex* b,
+   real* result,
+   const real* a,
+   const real* b,
    size_t harmonicCount,
    size_t harmonicOrder)
 {
@@ -118,17 +118,15 @@ void kernels::translateAllCPUMatrixBLAS(
    int k = harmonicLength;
    int n = harmonicCount;
    int lda = m, ldb = k, ldc = m;
-   const Complex alf = make_cuComplex(1, 0);
-   const Complex bet = make_cuComplex(0, 0);
-   const Complex* alpha = &alf;
-   const Complex* beta = &bet;
+   const real alpha = 1;
+   const real beta = 0;
 
-   cblas_cgemm(CBLAS_ORDER::CblasColMajor,
+   cblas_sgemm(CBLAS_ORDER::CblasColMajor,
                CBLAS_TRANSPOSE::CblasNoTrans,
                CBLAS_TRANSPOSE::CblasNoTrans,
                m, n, k,
-               (float*)alpha, 
-               (float*)b, ldb, (float*)a, lda,
-               (float*)beta,
-               (float*)result, ldc);
+               alpha,
+               b, ldb, a, lda,
+               beta,
+               result, ldc);
 }
