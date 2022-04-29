@@ -309,6 +309,28 @@ ComplexMatrix Harmonics::calcRealToComplexMatrix2D(size_t order)
    return res;
 }
 
+ComplexMatrix Harmonics::calcComplexToRealMatrix2D(size_t order)
+{
+   size_t harmonicLen = (order + 1) * (order + 1);
+   ComplexMatrix res(harmonicLen, std::vector<Complex>(harmonicLen));
+
+   for(int l = 0; l <= order; l++)
+   {
+      res[l * l + l][l * l + l] = make_cuComplex(1, 0);
+
+      for(int m = 1; m <= l; m++)
+      {
+         res[l * l + l + m][l * l + l + m] = make_cuComplex(math::R_SQRT_2, 0);
+         res[l * l + l - m][l * l + l + m] = make_cuComplex(math::R_SQRT_2, 0);
+
+         res[l * l + l + m][l * l + l - m] = make_cuComplex(0, -math::R_SQRT_2);
+         res[l * l + l - m][l * l + l - m] = make_cuComplex(0, math::R_SQRT_2);
+      }
+   }
+
+   return res;
+}
+
 real Harmonics::getFactorial(size_t n)
 {
    return _factorials[n];

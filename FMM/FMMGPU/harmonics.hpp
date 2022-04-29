@@ -50,6 +50,7 @@ public:
       const Vector3& translation);
 
    static ComplexMatrix calcRealToComplexMatrix2D(size_t order);
+   static ComplexMatrix calcComplexToRealMatrix2D(size_t order);
 
    static real getFactorial(size_t n);
    
