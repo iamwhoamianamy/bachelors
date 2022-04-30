@@ -175,31 +175,55 @@ void comparisonBetweenMethodsOnPrecision()
    std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithMatricesGPU << std::endl;
 }
 
+void octreeFormingTime()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+
+   size_t w = 15;
+
+   for(size_t i = 1; i < 16; i++)
+   {
+      Torus torus(torusRadius, torusSectionWidth, 10 * i, 16, 16);
+      auto bq = readBasisQuadratures();
+      auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+      auto start = std::chrono::steady_clock::now();
+      MultipoleSolver multipoleSolver(quadratures, 1000);
+      auto stop = std::chrono::steady_clock::now();
+      double timeForOctreeForming = getTime(start, stop);
+
+      std::cout << quadratures.size() << " ";
+      std::cout << timeForOctreeForming << std::endl;
+   }
+}
+
 void calculationTimeForMultipolesInLeaves()
 {
-   auto torus = createTorus();
-   auto bq = readBasisQuadratures();
-   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
 
    size_t w = 15;
 
    for(size_t i = 1; i < 15; i++)
    {
-      int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+      Torus torus(torusRadius, torusSectionWidth, 10 * i, 16, 16);
+      auto bq = readBasisQuadratures();
+      auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+      MultipoleSolver multipoleSolver(quadratures, 16);
 
       auto start = std::chrono::steady_clock::now();
       multipoleSolver.calcMultipolesAtLeaves();
       auto stop = std::chrono::steady_clock::now();
       double timeForMultipolesInLeaves = getTime(start, stop);
 
-      std::cout << octreeLeafCapacity << " ";
       std::cout << multipoleSolver.getOctreeNodeCount() << " ";
       std::cout << timeForMultipolesInLeaves << std::endl;
    }
 }
 
-void calculationTimeForLocalMultipoles()
+void calculationTimeForLocalMultipolesByLeafCapacity()
 {
    auto torus = createTorus();
    auto bq = readBasisQuadratures();
@@ -268,6 +292,89 @@ void calculationTimeForLocalMultipoles()
       double timeWithMatricesAda = getTime(start, stop);
 
       std::cout << " " << octreeLeafCapacity;
+      std::cout << " " << timeWithoutTranslation;
+      std::cout << " " << timeWithComplexTranslation;
+      std::cout << " " << timeWithRealTranslation;
+      std::cout << " " << timeWithLayersCPU;
+      std::cout << " " << timeWithLayersGPU;
+      std::cout << " " << timeWithMatricesCPU;
+      std::cout << " " << timeWithMatricesGPU << std::endl;
+      //std::cout << " " << timeWithMatricesAda << std::endl;
+   }
+}
+
+
+void calculationTimeForLocalMultipolesByNodeCount()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+
+   size_t w = 15;
+
+   std::cout << std::setw(w) << "leaf capacity";
+   std::cout << std::setw(w) << "w/t";
+   std::cout << std::setw(w) << "Complex";
+   std::cout << std::setw(w) << "real";
+   std::cout << std::setw(w) << "layersCPU";
+   std::cout << std::setw(w) << "layersGPU";
+   std::cout << std::setw(w) << "matricesCPU";
+   std::cout << std::setw(w) << "matricesGPU";
+   //std::cout << std::setw(w) << "matricesAda";
+   std::cout << std::endl;
+
+   std::cout << std::fixed;
+
+   for(size_t i = 1; i < 15; i++)
+   {
+      Torus torus(torusRadius, torusSectionWidth, 40 * i, 16, 16);
+      auto bq = readBasisQuadratures();
+      auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+      MultipoleSolver multipoleSolver(quadratures, 8);
+      multipoleSolver.calcMultipolesAtLeaves();
+      multipoleSolver.log = false;
+
+      auto start = std::chrono::steady_clock::now();
+      //multipoleSolver.calcLocalMultipoles(M2MAlg::NoTranslation);
+      auto stop = std::chrono::steady_clock::now();
+      double timeWithoutTranslation = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      //multipoleSolver.calcLocalMultipoles(M2MAlg::ComplexTranslation);
+      stop = std::chrono::steady_clock::now();
+      double timeWithComplexTranslation = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      //multipoleSolver.calcLocalMultipoles(M2MAlg::RealTranslation);
+      stop = std::chrono::steady_clock::now();
+      double timeWithRealTranslation = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::CPU);
+      stop = std::chrono::steady_clock::now();
+      double timeWithLayersCPU = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::GPU);
+      stop = std::chrono::steady_clock::now();
+      double timeWithLayersGPU = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
+      stop = std::chrono::steady_clock::now();
+      double timeWithMatricesCPU = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+      stop = std::chrono::steady_clock::now();
+      double timeWithMatricesGPU = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      //multipoleSolverWithMatricesAda.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::Adaptive);
+      stop = std::chrono::steady_clock::now();
+      double timeWithMatricesAda = getTime(start, stop);
+
+      std::cout << " " << multipoleSolver.getOctreeNodeCount();
       std::cout << " " << timeWithoutTranslation;
       std::cout << " " << timeWithComplexTranslation;
       std::cout << " " << timeWithRealTranslation;
@@ -629,19 +736,19 @@ void matrixCalculationsPrecision()
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-   MultipoleSolver multipoleSolverCPU(quadratures);
-   MultipoleSolver multipoleSolverGPU(quadratures);
+   MultipoleSolver multipoleSolver(quadratures);
+   multipoleSolver.calcMultipolesAtLeaves();
    //MultipoleSolver multipoleSolverAda(quadratures);
 
    Vector3 point(3, 1, 2);
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
 
-   multipoleSolverCPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
-   Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
+   Vector3 byMultipolesWithLayersCPU = multipoleSolver.calcB(current, point);
 
-   multipoleSolverGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
-   Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+   Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
 
    //multipoleSolverAda.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::Adaptive);
    //Vector3 byMultipolesWithLayersAda = multipoleSolverAda.calcB(current, point);
@@ -695,9 +802,10 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaIntegrals();
+   //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
-   comparisonBetweenMethodsOnPrecision();
-   //calculationTimeForLocalMultipoles();
+   //comparisonBetweenMethodsOnPrecision();
+   calculationTimeForLocalMultipolesByNodeCount();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
 
