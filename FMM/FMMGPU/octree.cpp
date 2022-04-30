@@ -133,10 +133,10 @@ std::vector<Quadrature*> OctreeNode::getAllQuadratures() const
 
 void OctreeNode::calcLocalMultipolesWithoutTranslation(int n)
 {
-   _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center);
-
-   if(_isSubdivided)
+   if(!isLeafAndUseful())
    {
+      _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center);
+
       for(auto& child : _children)
       {
          child->calcLocalMultipolesWithoutTranslation(n);
@@ -146,11 +146,7 @@ void OctreeNode::calcLocalMultipolesWithoutTranslation(int n)
 
 void OctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
 {
-   if(!_isSubdivided && !_quadratures.empty())
-   {
-      _multipoleExpansion = math::calcIntegralContribution(_quadratures, n, _box.center);
-   }
-   else
+   if(!isLeafAndUseful())
    {
       _multipoleExpansion = HarmonicSeries<Vector3>(n);
 
@@ -171,11 +167,7 @@ void OctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
 
 void OctreeNode::calcLocalMultipolesWithRealTranslation(int n)
 {
-   if(!_isSubdivided && !_quadratures.empty())
-   {
-      _multipoleExpansion = math::calcIntegralContribution(_quadratures, n, _box.center);
-   }
-   else
+   if(!isLeafAndUseful())
    {
       _multipoleExpansion = HarmonicSeries<Vector3>(n);
 
@@ -187,7 +179,7 @@ void OctreeNode::calcLocalMultipolesWithRealTranslation(int n)
       for(auto child : _children)
       {
          if(!child->_quadratures.empty() && !child->_isSubdivided ||
-             child->_quadratures.empty() && child->_isSubdivided)
+            child->_quadratures.empty() && child->_isSubdivided)
             _multipoleExpansion.add(Harmonics::translateWithReal(
                child->multipoleExpansion(), child->box().center - _box.center));
       }
@@ -203,6 +195,22 @@ void OctreeNode::initAllMultipoleExpansions(size_t n)
       for(auto child : _children)
       {
          child->initAllMultipoleExpansions(n);
+      }
+   }
+}
+
+void OctreeNode::calcLocalMultipolesAtLeaves(size_t n)
+{
+   if(isLeafAndUseful())
+   {
+      _multipoleExpansion = math::calcIntegralContribution(
+         _quadratures, n, _box.center);
+   }
+   else
+   {
+      for(auto child : _children)
+      {
+         child->calcLocalMultipolesAtLeaves(n);
       }
    }
 }
@@ -294,6 +302,23 @@ Vector3 OctreeNode::caclRot(const Vector3& point) const
    return res;
 }
 
+size_t OctreeNode::getAllNodeCount() const
+{
+   size_t count = 1;
+
+   if(_isSubdivided)
+   {
+      count += 8;
+
+      for(auto child : _children)
+      {
+         count += child->getAllNodeCount();
+      }
+   }
+   
+   return count;
+}
+
 const Box& OctreeNode::box() const
 {
    return this->_box;
@@ -343,4 +368,9 @@ OctreeNode::~OctreeNode()
          delete child;
       }
    }
+}
+
+bool OctreeNode::isLeafAndUseful() const
+{
+   return !_isSubdivided && !_quadratures.empty();
 }

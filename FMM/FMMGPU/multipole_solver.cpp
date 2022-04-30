@@ -28,35 +28,53 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
       harmonicOrder);
 }
 
+void MultipoleSolver::calcMultipolesAtLeaves()
+{
+   octreeRoot->calcLocalMultipolesAtLeaves(harmonicOrder);
+   _multipolesAtLeavesAreReady = true;
+}
+
+size_t MultipoleSolver::getOctreeNodeCount() const
+{
+   return octreeRoot->getAllNodeCount();
+}
+
 void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
 {
-   switch(algorithm)
+   if(_multipolesAtLeavesAreReady)
    {
-      case M2MAlg::NoTranslation:
+      switch(algorithm)
       {
-         calcLocalMultipolesWithoutTranslation();
-         break;
+         case M2MAlg::NoTranslation:
+         {
+            calcLocalMultipolesWithoutTranslation();
+            break;
+         }
+         case M2MAlg::ComplexTranslation:
+         {
+            calcLocalMultipolesWithComplexTranslation();
+            break;
+         }
+         case M2MAlg::RealTranslation:
+         {
+            calcLocalMultipolesWithRealTranslation();
+            break;
+         }
+         case M2MAlg::Layers:
+         {
+            calcLocalMultipolesWithLayersOrMatrices(device, false);
+            break;
+         }
+         case M2MAlg::Matrices:
+         {
+            calcLocalMultipolesWithLayersOrMatrices(device, true);
+            break;
+         }
       }
-      case M2MAlg::ComplexTranslation:
-      {
-         calcLocalMultipolesWithComplexTranslation();
-         break;
-      }
-      case M2MAlg::RealTranslation:
-      {
-         calcLocalMultipolesWithRealTranslation();
-         break;
-      }
-      case M2MAlg::Layers:
-      {
-         calcLocalMultipolesWithLayersOrMatrices(device, false);
-         break;
-      }
-      case M2MAlg::Matrices:
-      {
-         calcLocalMultipolesWithLayersOrMatrices(device, true);
-         break;
-      }
+   }
+   else
+   {
+      throw std::exception("Multipoles at leaves are not ready!");
    }
 }
 
@@ -84,7 +102,6 @@ void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
 {
    std::vector<std::vector<OctreeNode*>> layers;
    enumerateNodes(octreeRoot, layers, 0);
-   calcMultipolesAtLeaves(layers);
    octreeRoot->initAllMultipoleExpansions(harmonicOrder);
 
    if(log)

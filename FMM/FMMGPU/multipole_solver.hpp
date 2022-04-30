@@ -30,6 +30,7 @@ private:
    std::vector<Quadrature>& _quadratures;
    OctreeNode* octreeRoot;
    bool _multipolesAreReady = false;
+   bool _multipolesAtLeavesAreReady = false;
    std::vector<Complex> _realToComplexMatrix;
    std::vector<Complex> _complexToRealMatrix;
 
@@ -43,6 +44,10 @@ public:
 
    MultipoleSolver(std::vector<Quadrature>& quadratures,
                    size_t octreeLeafCapacity = 1000);
+
+   void calcMultipolesAtLeaves();
+
+   size_t getOctreeNodeCount() const;
 
    void calcLocalMultipoles(
       M2MAlg algorithm,

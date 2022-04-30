@@ -135,57 +135,69 @@ void comparisonBetweenMethodsOnPrecision()
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    MultipoleSolver multipoleSolver(quadratures);
    multipoleSolver.log = false;
+   multipoleSolver.calcMultipolesAtLeaves();
 
    Vector3 point(3, 1, 2);
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
    
-   //multipoleSolver.calcLocalMultipoles(M2MAlg::NoTranslation);
-   //Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::NoTranslation);
+   Vector3 byMultipolesWithoutTranslation = multipoleSolver.calcB(current, point);
 
-   //multipoleSolver.calcLocalMultipoles(M2MAlg::ComplexTranslation);
-   //Vector3 byMultipolesWithComplexTranslation = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::ComplexTranslation);
+   Vector3 byMultipolesWithComplexTranslation = multipoleSolver.calcB(current, point);
 
    multipoleSolver.calcLocalMultipoles(M2MAlg::RealTranslation);
    Vector3 byMultipolesWithRealTranslation = multipoleSolver.calcB(current, point);
 
-   //multipoleSolver.calcLocalMultipoles(M2MAlg::Layers);
-   //Vector3 byMultipolesWithLayersCPU = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::Layers);
+   Vector3 byMultipolesWithLayersCPU = multipoleSolver.calcB(current, point);
 
-   //multipoleSolver.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::GPU);
-   //Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::GPU);
+   Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
 
-   //multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
-   //Vector3 byMultipolesWithMatricesCPU = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
+   Vector3 byMultipolesWithMatricesCPU = multipoleSolver.calcB(current, point);
 
-   //multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
-   //Vector3 byMultipolesWithMatricesGPU = multipoleSolver.calcB(current, point);
+   multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+   Vector3 byMultipolesWithMatricesGPU = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
    point.printWithWidth(std::cout, 6);
    std::cout << std::scientific << std::endl;
    std::cout << std::setw(40) << "integration " << byIntegration << std::endl;
-   //std::cout << std::setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << std::endl;
-   //std::cout << std::setw(40) << "multipoles with c translation " << byMultipolesWithComplexTranslation << std::endl;
+   std::cout << std::setw(40) << "multipoles w/t translation " << byMultipolesWithoutTranslation << std::endl;
+   std::cout << std::setw(40) << "multipoles with c translation " << byMultipolesWithComplexTranslation << std::endl;
    std::cout << std::setw(40) << "multipoles with r translation " << byMultipolesWithRealTranslation << std::endl;
-   //std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
-   //std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
-   //std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithMatricesCPU << std::endl;
-   //std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithMatricesGPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers CPU" << byMultipolesWithLayersCPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with layers GPU" << byMultipolesWithLayersGPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices CPU" << byMultipolesWithMatricesCPU << std::endl;
+   std::cout << std::setw(40) << "multipoles with matrices GPU" << byMultipolesWithMatricesGPU << std::endl;
 }
 
-//void translationTest()
-//{
-//   Vector3 point1(3, 1, 2);
-//   auto r1 = Harmonics::calcRegularSolidHarmonics(10, point1);
-//   auto c1 = Harmonics::realToComplex(r1);
-//
-//   Vector3 point2(4, 5, 1);
-//   auto r2 = Harmonics::calcRegularSolidHarmonics(10, point2);
-//   auto c2 = Harmonics::realToComplex(r2);
-//
-//   auto t =  Harmonics::complexToReal(Harmonics::translate(c1, c2));
-//}
+void calculationTimeForMultipolesInLeaves()
+{
+   auto torus = createTorus();
+   auto bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+   size_t w = 15;
+
+   for(size_t i = 1; i < 15; i++)
+   {
+      int octreeLeafCapacity = pow(2, i);
+      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+
+      auto start = std::chrono::steady_clock::now();
+      multipoleSolver.calcMultipolesAtLeaves();
+      auto stop = std::chrono::steady_clock::now();
+      double timeForMultipolesInLeaves = getTime(start, stop);
+
+      std::cout << octreeLeafCapacity << " ";
+      std::cout << multipoleSolver.getOctreeNodeCount() << " ";
+      std::cout << timeForMultipolesInLeaves << std::endl;
+   }
+}
 
 void calculationTimeForLocalMultipoles()
 {
@@ -196,11 +208,11 @@ void calculationTimeForLocalMultipoles()
    size_t w = 15;
 
    std::cout << std::setw(w) << "leaf capacity";
-   //std::cout << std::setw(w) << "w/t";
-   //std::cout << std::setw(w) << "Complex";
-   //std::cout << std::setw(w) << "real";
-   //std::cout << std::setw(w) << "layersCPU";
-   //std::cout << std::setw(w) << "layersGPU";
+   std::cout << std::setw(w) << "w/t";
+   std::cout << std::setw(w) << "Complex";
+   std::cout << std::setw(w) << "real";
+   std::cout << std::setw(w) << "layersCPU";
+   std::cout << std::setw(w) << "layersGPU";
    std::cout << std::setw(w) << "matricesCPU";
    std::cout << std::setw(w) << "matricesGPU";
    //std::cout << std::setw(w) << "matricesAda";
@@ -211,47 +223,42 @@ void calculationTimeForLocalMultipoles()
    for(size_t i = 3; i < 15; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      //MultipoleSolver multipoleSolverWithoutT(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverWithComplexT(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverWithRealT(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverWithLayersCPU(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverWithLayersGPU(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverWithMatricesCPU(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverWithMatricesGPU(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverWithMatricesAda(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+      multipoleSolver.calcMultipolesAtLeaves();
+      multipoleSolver.log = false;
 
       auto start = std::chrono::steady_clock::now();
-      //multipoleSolverWithoutT.calcLocalMultipoles(M2MAlg::NoTranslation);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::NoTranslation);
       auto stop = std::chrono::steady_clock::now();
       double timeWithoutTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverWithComplexT.calcLocalMultipoles(M2MAlg::ComplexTranslation);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::ComplexTranslation);
       stop = std::chrono::steady_clock::now();
       double timeWithComplexTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverWithRealT.calcLocalMultipoles(M2MAlg::RealTranslation);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::RealTranslation);
       stop = std::chrono::steady_clock::now();
       double timeWithRealTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverWithLayersCPU.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::CPU);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverWithLayersGPU.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::GPU);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Layers, M2MDevice::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverWithMatricesCPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverWithMatricesGPU.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
+      multipoleSolver.calcLocalMultipoles(M2MAlg::Matrices, M2MDevice::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesGPU = getTime(start, stop);
 
@@ -261,11 +268,11 @@ void calculationTimeForLocalMultipoles()
       double timeWithMatricesAda = getTime(start, stop);
 
       std::cout << " " << octreeLeafCapacity;
-      //std::cout << " " << timeWithoutTranslation;
-      //std::cout << " " << timeWithComplexTranslation;
-      //std::cout << " " << timeWithRealTranslation;
-      //std::cout << " " << timeWithLayersCPU;
-      //std::cout << " " << timeWithLayersGPU;
+      std::cout << " " << timeWithoutTranslation;
+      std::cout << " " << timeWithComplexTranslation;
+      std::cout << " " << timeWithRealTranslation;
+      std::cout << " " << timeWithLayersCPU;
+      std::cout << " " << timeWithLayersGPU;
       std::cout << " " << timeWithMatricesCPU;
       std::cout << " " << timeWithMatricesGPU << std::endl;
       //std::cout << " " << timeWithMatricesAda << std::endl;
@@ -688,14 +695,14 @@ int main()
    //NMResearch();
    //timeResearchForMorePoints();
    //comparisonToTelmaIntegrals();
-   //comparisonBetweenMethodsOnPrecision();
-   //translationTest();
+   //calculationTimeForMultipolesInLeaves();
+   comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipoles();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
 
    //layerCalculationTime();
-   matrixCalculationTime();
+   //matrixCalculationTime();
    //layerMatrixCalculationTime(M2MDevice::CPU);
    //layerMatrixCalculationTime(M2MDevice::GPU);
    //compareWithMatrixMultiplication();

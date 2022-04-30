@@ -40,9 +40,12 @@ public:
    void calcLocalMultipolesWithComplexTranslation(int n);
    void calcLocalMultipolesWithRealTranslation(int n);
    void initAllMultipoleExpansions(size_t n);
+   void calcLocalMultipolesAtLeaves(size_t n);
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
+   size_t getAllNodeCount() const;
 
    ~OctreeNode();
 private:
+   bool isLeafAndUseful() const;
 };
