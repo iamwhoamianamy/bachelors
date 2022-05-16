@@ -39,7 +39,7 @@ namespace test
 
       auto expansion = math::calcIntegralContribution(quadratures, n, childCenter);
 
-      auto translated1 = Harmonics::translateWithComplex(expansion, translation);
+      auto translated1 = Harmonics::translateMultipoleWithComplex(expansion, translation);
       auto translated2 = translateWithMatrix(expansion, translation);
    }
 

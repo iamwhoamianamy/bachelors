@@ -33,19 +33,19 @@ public:
    static RealHarmonicSeries complexToReal(
       const ComplexHarmonicSeries& harmonics);
 
-   static ComplexHarmonicSeries translate(
+   static ComplexHarmonicSeries translateMultipole(
       const ComplexHarmonicSeries& a,
       const ComplexHarmonicSeries& b);
 
-   static RealHarmonicSeries translate(
+   static RealHarmonicSeries translateMultipole(
       const RealHarmonicSeries& a,
       const RealHarmonicSeries& b);
 
-   static HarmonicSeries<Vector3> translateWithComplex(
+   static HarmonicSeries<Vector3> translateMultipoleWithComplex(
       const HarmonicSeries<Vector3>& expansion,
       const Vector3& translation);
 
-   static HarmonicSeries<Vector3> translateWithReal(
+   static HarmonicSeries<Vector3> translateMultipoleWithReal(
       const HarmonicSeries<Vector3>& expansion,
       const Vector3& translation);
 
@@ -60,15 +60,6 @@ public:
    static RealHarmonicSeries separateCoord(
       const HarmonicSeries<Vector3>& harmonics,
       size_t i);
-
-   static RealHarmonicSeries separateX(
-      const HarmonicSeries<Vector3>& harmonics);
-
-   static RealHarmonicSeries separateY(
-      const HarmonicSeries<Vector3>& harmonics);
-
-   static RealHarmonicSeries separateZ(
-      const HarmonicSeries<Vector3>& harmonics);
 
    static HarmonicSeries<Vector3> createFormXYZ(
       const RealHarmonicSeries& xs,

@@ -1,0 +1,4 @@
+namespace multipole_translator
+{
+
+}

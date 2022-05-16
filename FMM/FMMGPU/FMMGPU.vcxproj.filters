@@ -86,7 +86,12 @@
     <ClInclude Include="typedefs.hpp">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="tree_node.hpp" />
+    <ClInclude Include="calculation_point_octree.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="multipole_translator.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cuda_helper.cpp">
@@ -149,7 +154,12 @@
     <ClCompile Include="testing_helpers.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="tree_node.cpp" />
+    <ClCompile Include="calculation_point_octree.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="multipole_translator.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -144,7 +144,7 @@ real Harmonics::strangeFactor(int m, int mu)
    return pow(-1, -0.5 * (abs(m) - abs(mu) - abs(m - mu)));
 }
 
-ComplexHarmonicSeries Harmonics::translate(
+ComplexHarmonicSeries Harmonics::translateMultipole(
    const ComplexHarmonicSeries& a,
    const ComplexHarmonicSeries& b)
 {
@@ -175,7 +175,7 @@ ComplexHarmonicSeries Harmonics::translate(
    return res;
 }
 
-RealHarmonicSeries Harmonics::translate(
+RealHarmonicSeries Harmonics::translateMultipole(
    const RealHarmonicSeries& a,
    const RealHarmonicSeries& b)
 {
@@ -252,7 +252,7 @@ RealHarmonicSeries Harmonics::translate(
    return res;
 }
 
-HarmonicSeries<Vector3> Harmonics::translateWithComplex(
+HarmonicSeries<Vector3> Harmonics::translateMultipoleWithComplex(
    const HarmonicSeries<Vector3>& expansion,
    const Vector3& translation)
 {
@@ -262,12 +262,12 @@ HarmonicSeries<Vector3> Harmonics::translateWithComplex(
    auto yComponent = Harmonics::realToComplex(Harmonics::separateY(expansion));
    auto zComponent = Harmonics::realToComplex(Harmonics::separateZ(expansion));
 
-   return Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translate(regular, xComponent)),
-                                   Harmonics::complexToReal(Harmonics::translate(regular, yComponent)),
-                                   Harmonics::complexToReal(Harmonics::translate(regular, zComponent)));
+   return Harmonics::createFormXYZ(Harmonics::complexToReal(Harmonics::translateMultipole(regular, xComponent)),
+                                   Harmonics::complexToReal(Harmonics::translateMultipole(regular, yComponent)),
+                                   Harmonics::complexToReal(Harmonics::translateMultipole(regular, zComponent)));
 }
 
-HarmonicSeries<Vector3> Harmonics::translateWithReal(
+HarmonicSeries<Vector3> Harmonics::translateMultipoleWithReal(
    const HarmonicSeries<Vector3>& expansion,
    const Vector3& translation)
 {
@@ -277,9 +277,9 @@ HarmonicSeries<Vector3> Harmonics::translateWithReal(
    auto yComponent = Harmonics::separateY(expansion);
    auto zComponent = Harmonics::separateZ(expansion);
 
-   return Harmonics::createFormXYZ(Harmonics::translate(regular, xComponent),
-                                   Harmonics::translate(regular, yComponent),
-                                   Harmonics::translate(regular, zComponent));
+   return Harmonics::createFormXYZ(Harmonics::translateMultipole(regular, xComponent),
+                                   Harmonics::translateMultipole(regular, yComponent),
+                                   Harmonics::translateMultipole(regular, zComponent));
 }
 
 ComplexMatrix Harmonics::calcRealToComplexMatrix2D(size_t order)
