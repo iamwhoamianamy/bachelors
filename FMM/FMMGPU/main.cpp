@@ -12,7 +12,6 @@
 #include "harmonics.hpp"
 #include "multipole_solver.hpp"
 #include "translation_algorithms.hpp"
-#include "matrix_mult.hpp"
 #include "testing_helpers.hpp"
 #include "multipole_translator.hpp"
 
@@ -811,7 +810,7 @@ void multipoleToLocalTest()
    auto c2 = Harmonics::realToComplex(r2);
 
    auto t = Harmonics::complexToReal(
-      MultipoleTranslator::multipoleToLocal(c1, c2));
+      MultipoleTranslator::translateLocal(c1, c2));
 }
 
 int main()

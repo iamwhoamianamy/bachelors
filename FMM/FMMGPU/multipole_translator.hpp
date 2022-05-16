@@ -40,4 +40,18 @@ public:
    static real multipoleToLocalTranslationFactor(int m, int mu, int lambda);
 
 #pragma endregion
+
+#pragma region Local transaltion algorithms
+
+   static ComplexHarmonicSeries translateLocal(
+      const ComplexHarmonicSeries& a,
+      const ComplexHarmonicSeries& b);
+
+   static HarmonicSeries<Vector3> tranlsateLocalWithComplex(
+      const HarmonicSeries<Vector3>& expansion,
+      const Vector3& translation);
+
+   static real localTranslationFactor(int m, int mu, int lambda, int l);
+
+#pragma endregion
 };

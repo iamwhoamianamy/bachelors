@@ -203,3 +203,59 @@ real MultipoleTranslator::multipoleToLocalTranslationFactor(int m, int mu, int l
    return pow(-1, -0.5 * (abs(m - mu) - abs(m) - abs(mu))) * 
       pow(-1, abs(lambda));
 }
+
+ComplexHarmonicSeries MultipoleTranslator::translateLocal(
+   const ComplexHarmonicSeries& a,
+   const ComplexHarmonicSeries& b)
+{
+   ComplexHarmonicSeries res(a.order());
+
+   for(int l = 0; l <= a.order(); l++)
+   {
+      for(int lambda = 0; lambda <= a.order(); lambda++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            for(int mu = -lambda; mu <= lambda; mu++)
+            {
+               int dl = lambda - l;
+               int dm = m - mu;
+
+               if(dm >= -dl && dm <= +dl && dl <= a.order())
+               {
+                  res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) *
+                     b.getHarmonic(dl, dm) * localTranslationFactor(m, mu, lambda, l);
+               }
+            }
+         }
+      }
+   }
+
+   return res;
+}
+
+HarmonicSeries<Vector3> MultipoleTranslator::tranlsateLocalWithComplex(
+   const HarmonicSeries<Vector3>& expansion,
+   const Vector3& translation)
+{
+   auto regular = Harmonics::realToComplex(
+      Harmonics::calcRegularSolidHarmonics(expansion.order(), translation));
+
+   auto xComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 0));
+   auto yComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 1));
+   auto zComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 2));
+
+   return Harmonics::createFormXYZ(
+      Harmonics::complexToReal(
+         MultipoleTranslator::translateLocal(regular, xComponent)),
+      Harmonics::complexToReal(
+         MultipoleTranslator::translateLocal(regular, yComponent)),
+      Harmonics::complexToReal(
+         MultipoleTranslator::translateLocal(regular, zComponent)));
+}
+
+real MultipoleTranslator::localTranslationFactor(int m, int mu, int lambda, int l)
+{
+   return pow(-1, -0.5 * (abs(mu) - abs(m - mu) - abs(m))) *
+      pow(-1, abs(lambda) + abs(l));
+}
