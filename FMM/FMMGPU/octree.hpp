@@ -9,7 +9,6 @@
 class OctreeNode
 {
 private:
-   bool _isSubdivided = false;
    size_t _capacity = 0;
    Box _box;
    std::vector<Quadrature*> _quadratures;
