@@ -33,22 +33,6 @@ public:
    static RealHarmonicSeries complexToReal(
       const ComplexHarmonicSeries& harmonics);
 
-   static ComplexHarmonicSeries translateMultipole(
-      const ComplexHarmonicSeries& a,
-      const ComplexHarmonicSeries& b);
-
-   static RealHarmonicSeries translateMultipole(
-      const RealHarmonicSeries& a,
-      const RealHarmonicSeries& b);
-
-   static HarmonicSeries<Vector3> translateMultipoleWithComplex(
-      const HarmonicSeries<Vector3>& expansion,
-      const Vector3& translation);
-
-   static HarmonicSeries<Vector3> translateMultipoleWithReal(
-      const HarmonicSeries<Vector3>& expansion,
-      const Vector3& translation);
-
    static ComplexMatrix calcRealToComplexMatrix2D(size_t order);
    static ComplexMatrix calcComplexToRealMatrix2D(size_t order);
 
@@ -66,7 +50,6 @@ public:
       const RealHarmonicSeries& ys,
       const RealHarmonicSeries& zs);
 
-   static real strangeFactor(int m, int mu);
 private:
    void calcSphericalHarmonics(const Vector3& point);
    void fillWithLegendrePolynomials(real z);

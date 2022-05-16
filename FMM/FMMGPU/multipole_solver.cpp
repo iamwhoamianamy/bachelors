@@ -13,6 +13,7 @@
 #include "translation_algorithms.hpp"
 #include "kernels.cuh"
 #include "testing_helpers.hpp"
+#include "multipole_translator.hpp"
 
 MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
                                  size_t octreeLeafCapacity) :
@@ -505,7 +506,7 @@ ComplexMatrix MultipoleSolver::formMatrixFromRegularHarmonics(
                {
                   res[dl * dl + dl + dm][l * l + l + m] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
-                     Harmonics::strangeFactor(m, mu);
+                     MultipoleTranslator::multipoleTranslationFactor(m, mu);
                }
             }
          }
@@ -536,7 +537,7 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
                {
                   res[(l * l + l + m) + (dl * dl + dl + dm) * harmonicLength] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
-                     Harmonics::strangeFactor(m, mu);
+                     MultipoleTranslator::multipoleTranslationFactor(m, mu);
                }
             }
          }

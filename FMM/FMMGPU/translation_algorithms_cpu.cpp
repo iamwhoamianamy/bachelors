@@ -1,6 +1,8 @@
 #include "translation_algorithms.hpp"
 #include "kernels.cuh"
 #include "cblas.h"
+#include "multipole_translator.hpp"
+
 #include <omp.h>
 
 void kernels::translateAllCPU(
@@ -32,7 +34,7 @@ void kernels::translateAllCPU(
                {
                   zeroRes += getHarmonic(b, harmonicBegin, lambda, mu) *
                      getHarmonic(a, harmonicBegin, dl, mu) *
-                     Harmonics::strangeFactor(0, mu);
+                     MultipoleTranslator::multipoleTranslationFactor(0, mu);
                }
             }
          }
@@ -67,8 +69,8 @@ void kernels::translateAllCPU(
                      RM = getReal(a, harmonicBegin, dl, dm);
                      IM = getImag(a, harmonicBegin, dl, dm);
 
-                     realRes += (RR * RM - IR * IM) * Harmonics::strangeFactor(m, mu);
-                     imagRes += (RR * IM + IR * RM) * Harmonics::strangeFactor(m, mu);
+                     realRes += (RR * RM - IR * IM) * MultipoleTranslator::multipoleTranslationFactor(m, mu);
+                     imagRes += (RR * IM + IR * RM) * MultipoleTranslator::multipoleTranslationFactor(m, mu);
                   }
 
                   if(-dl <= dnm && dnm <= dl)
@@ -76,8 +78,8 @@ void kernels::translateAllCPU(
                      RnM = getReal(a, harmonicBegin, dl, dnm);
                      InM = getImag(a, harmonicBegin, dl, dnm);
 
-                     realRes += (RR * RnM - IR * InM) * Harmonics::strangeFactor(-m, mu);
-                     imagRes -= (RR * InM + IR * RnM) * Harmonics::strangeFactor(-m, mu);
+                     realRes += (RR * RnM - IR * InM) * MultipoleTranslator::multipoleTranslationFactor(-m, mu);
+                     imagRes -= (RR * InM + IR * RnM) * MultipoleTranslator::multipoleTranslationFactor(-m, mu);
                   }
                }
             }

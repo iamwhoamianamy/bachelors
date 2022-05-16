@@ -2,6 +2,8 @@
 #include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
+#include "multipole_translator.hpp"
+
 #include <thrust/complex.h>
 
 CalculationPointOctreeNode::CalculationPointOctreeNode() : 
@@ -161,7 +163,7 @@ void CalculationPointOctreeNode::calcLocalMultipolesWithComplexTranslation(int n
       {
          if(!child->_quadratures.empty() && !child->isSubdivided() ||
             child->_quadratures.empty() && child->isSubdivided())
-            _multipoleExpansion.add(Harmonics::translateMultipoleWithComplex(
+            _multipoleExpansion.add(MultipoleTranslator::translateMultipoleWithComplex(
                child->multipoleExpansion(), child->box().center - _box.center));
       }
    }
@@ -182,7 +184,7 @@ void CalculationPointOctreeNode::calcLocalMultipolesWithRealTranslation(int n)
       {
          if(!child->_quadratures.empty() && !child->isSubdivided() ||
             child->_quadratures.empty() && child->isSubdivided())
-            _multipoleExpansion.add(Harmonics::translateMultipoleWithReal(
+            _multipoleExpansion.add(MultipoleTranslator::translateMultipoleWithReal(
                child->multipoleExpansion(), child->box().center - _box.center));
       }
    }
