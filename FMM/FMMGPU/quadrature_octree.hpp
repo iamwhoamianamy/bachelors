@@ -6,19 +6,22 @@
 #include "quadrature.hpp"
 #include "harmonic_series.hpp"
 
-class OctreeNode
+class QuadratureOctreeNode
 {
 private:
    size_t _capacity = 0;
    Box _box;
    std::vector<Quadrature*> _quadratures;
-   std::vector<OctreeNode*> _children;
+   std::vector<QuadratureOctreeNode*> _children;
    HarmonicSeries<Vector3> _multipoleExpansion;
-   OctreeNode* _parent;
+   QuadratureOctreeNode* _parent;
 
 public:
-   OctreeNode();
-   OctreeNode(const Box& box, const size_t capacity, OctreeNode* parent = nullptr);
+   QuadratureOctreeNode();
+   QuadratureOctreeNode(
+      const Box& box,
+      const size_t capacity,
+      QuadratureOctreeNode* parent = nullptr);
 
    void insert(Quadrature& point);
    void insert(std::vector<Quadrature>& points);
@@ -27,10 +30,10 @@ public:
 
    const Box& box() const;
    bool isSubdivided() const;
-   OctreeNode* parent();
-   OctreeNode* parent() const;
-   std::vector<OctreeNode*>& children();
-   const std::vector<OctreeNode*>& children() const;
+   QuadratureOctreeNode* parent();
+   QuadratureOctreeNode* parent() const;
+   std::vector<QuadratureOctreeNode*>& children();
+   const std::vector<QuadratureOctreeNode*>& children() const;
    std::vector<Quadrature*> quadratures() const;
    HarmonicSeries<Vector3>& multipoleExpansion();
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
@@ -45,7 +48,7 @@ public:
    Vector3 caclRot(const Vector3& point) const;
    size_t getAllNodeCount() const;
 
-   ~OctreeNode();
+   ~QuadratureOctreeNode();
 private:
    bool isLeafAndUseful() const;
 };

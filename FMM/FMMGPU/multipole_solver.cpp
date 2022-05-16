@@ -18,8 +18,8 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
                                  size_t octreeLeafCapacity) :
    _quadratures(quadratures), octreeLeafCapacity(octreeLeafCapacity)
 {
-   octreeRoot = new OctreeNode(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
-   octreeRoot->insert(_quadratures);
+   quadratureOctreeRoot = new QuadratureOctreeNode(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
+   quadratureOctreeRoot->insert(_quadratures);
 
    _realToComplexMatrix = Harmonics::calcRealToComplexMatrixTransposed1D(
       harmonicOrder);
@@ -30,13 +30,13 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
 
 void MultipoleSolver::calcMultipolesAtLeaves()
 {
-   octreeRoot->calcLocalMultipolesAtLeaves(harmonicOrder);
+   quadratureOctreeRoot->calcLocalMultipolesAtLeaves(harmonicOrder);
    _multipolesAtLeavesAreReady = true;
 }
 
 size_t MultipoleSolver::getOctreeNodeCount() const
 {
-   return octreeRoot->getAllNodeCount();
+   return quadratureOctreeRoot->getAllNodeCount();
 }
 
 void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
@@ -80,19 +80,19 @@ void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
 
 void MultipoleSolver::calcLocalMultipolesWithoutTranslation()
 {
-   octreeRoot->calcLocalMultipolesWithoutTranslation(harmonicOrder);
+   quadratureOctreeRoot->calcLocalMultipolesWithoutTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcLocalMultipolesWithComplexTranslation()
 {
-   octreeRoot->calcLocalMultipolesWithComplexTranslation(harmonicOrder);
+   quadratureOctreeRoot->calcLocalMultipolesWithComplexTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
 {
-   octreeRoot->calcLocalMultipolesWithRealTranslation(harmonicOrder);
+   quadratureOctreeRoot->calcLocalMultipolesWithRealTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
@@ -100,9 +100,9 @@ void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
    M2MDevice device,
    bool useMatrices)
 {
-   std::vector<std::vector<OctreeNode*>> layers;
-   enumerateNodes(octreeRoot, layers, 0);
-   octreeRoot->initAllMultipoleExpansions(harmonicOrder);
+   std::vector<std::vector<QuadratureOctreeNode*>> layers;
+   enumerateNodes(quadratureOctreeRoot, layers, 0);
+   quadratureOctreeRoot->initAllMultipoleExpansions(harmonicOrder);
 
    if(log)
    {
@@ -122,14 +122,14 @@ void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
 }
 
 void MultipoleSolver::enumerateNodes(
-   OctreeNode* node,
-   std::vector<std::vector<OctreeNode*>>& layers,
+   QuadratureOctreeNode* node,
+   std::vector<std::vector<QuadratureOctreeNode*>>& layers,
    size_t currentLayerId)
 {
    if(!node->quadratures().empty() || node->isSubdivided())
    {
       if(layers.size() <= currentLayerId)
-         layers.push_back(std::vector<OctreeNode*>());
+         layers.push_back(std::vector<QuadratureOctreeNode*>());
 
       layers[currentLayerId].push_back(node);
 
@@ -141,7 +141,7 @@ void MultipoleSolver::enumerateNodes(
 }
 
 void MultipoleSolver::calcContributionsToHigherLayers(
-   const std::vector<std::vector<OctreeNode*>>& layers,
+   const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
    M2MDevice device,
    bool useMatrices)
 {
@@ -150,7 +150,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
 }
 
 void MultipoleSolver::calcMultipolesAtLeaves(
-   const std::vector<std::vector<OctreeNode*>>& layers)
+   const std::vector<std::vector<QuadratureOctreeNode*>>& layers)
 {
    for(auto &layer : layers)
    {
@@ -164,7 +164,7 @@ void MultipoleSolver::calcMultipolesAtLeaves(
 }
 
 void MultipoleSolver::calcContributionsToHigherLayers(
-   const std::vector<std::vector<OctreeNode*>>& layers,
+   const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
    M2MDevice device)
 {
    for(int l = layers.size() - 1; l >= 1; l--)
@@ -199,7 +199,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
 }
 
 std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
-   const std::vector<OctreeNode*>& layer,
+   const std::vector<QuadratureOctreeNode*>& layer,
    M2MDevice device)
 {
    std::vector<Vector3> harmonics(layer.size() * harmonicLength);
@@ -265,7 +265,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 }
 
 void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
-   const std::vector<std::vector<OctreeNode*>>& layers,
+   const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
    M2MDevice device)
 {
    for(size_t l = layers.size() - 1; l >= 1; l--)
@@ -371,10 +371,10 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
    }
 }
 
-Matrix<OctreeNode*> MultipoleSolver::separateNodesByOrientation(
-   const std::vector<OctreeNode*>& layer)
+Matrix<QuadratureOctreeNode*> MultipoleSolver::separateNodesByOrientation(
+   const std::vector<QuadratureOctreeNode*>& layer)
 {
-   Matrix<OctreeNode*> res(8);
+   Matrix<QuadratureOctreeNode*> res(8);
 
    for(auto node : layer)
    {
@@ -392,7 +392,7 @@ Matrix<OctreeNode*> MultipoleSolver::separateNodesByOrientation(
 }
 
 std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatricesForLayer(
-   const Matrix<OctreeNode*>& nodesByOrientation)
+   const Matrix<QuadratureOctreeNode*>& nodesByOrientation)
 {
    std::vector<ComplexMatrix> res;
    res.reserve(8);
@@ -419,7 +419,7 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatricesForLayer(
 }
 
 RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
-   const Matrix<OctreeNode*>& nodesByOrientation)
+   const Matrix<QuadratureOctreeNode*>& nodesByOrientation)
 {
    size_t matrixElemCount = harmonicLength * harmonicLength;
 
@@ -547,7 +547,7 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
 }
 
 RealMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
-   const std::vector<OctreeNode*>& nodesByOrientation)
+   const std::vector<QuadratureOctreeNode*>& nodesByOrientation)
 {
    size_t nodeCount = nodesByOrientation.size();
 
@@ -570,7 +570,7 @@ RealMatrix MultipoleSolver::getExpansionsInOneOrientationAsVectors(
 }
 
 void MultipoleSolver::accountChildrenContributions(
-   const std::vector<OctreeNode*>& nodesByOrientation,
+   const std::vector<QuadratureOctreeNode*>& nodesByOrientation,
    const RealMatrix& contributions)
 {
    for(int nodeId = 0; nodeId < nodesByOrientation.size(); nodeId++)
@@ -609,7 +609,7 @@ Vector3 MultipoleSolver::calcA(real current, const Vector3& point)
    if(!_multipolesAreReady)
       throw new std::exception("Multipoles are not ready!");
 
-   return octreeRoot->calcA(point) / (4.0 * math::PI) * current;
+   return quadratureOctreeRoot->calcA(point) / (4.0 * math::PI) * current;
 }
 
 Vector3 MultipoleSolver::calcB(real current, const Vector3& point)
@@ -617,10 +617,10 @@ Vector3 MultipoleSolver::calcB(real current, const Vector3& point)
    if(!_multipolesAreReady)
       throw new std::exception("Multipoles are not ready!");
 
-   return octreeRoot->caclRot(point) / (4.0 * math::PI) * current * math::mu0;
+   return quadratureOctreeRoot->caclRot(point) / (4.0 * math::PI) * current * math::mu0;
 }
 
 MultipoleSolver::~MultipoleSolver()
 {
-   delete octreeRoot;
+   delete quadratureOctreeRoot;
 }

@@ -108,13 +108,14 @@
     <ClInclude Include="translation_algorithms.hpp" />
     <ClInclude Include="math.hpp" />
     <ClInclude Include="multipole_solver.hpp" />
-    <ClInclude Include="octree.hpp" />
+    <ClInclude Include="quadrature_octree.hpp" />
     <ClInclude Include="quadrature.hpp" />
     <ClInclude Include="real.hpp" />
     <ClInclude Include="testing_helpers.hpp" />
     <ClInclude Include="tetrahedron.hpp" />
     <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />
+    <ClInclude Include="tree_node.hpp" />
     <ClInclude Include="typedefs.hpp" />
     <ClInclude Include="vector3.cuh" />
   </ItemGroup>
@@ -132,13 +133,14 @@
     <ClCompile Include="matrix_mult.cpp" />
     <ClCompile Include="matrix_mult.hpp" />
     <ClCompile Include="multipole_solver.cpp" />
-    <ClCompile Include="octree.cpp" />
+    <ClCompile Include="quadrature_octree.cpp" />
     <ClCompile Include="quadrature.cpp" />
     <ClCompile Include="testing_helpers.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
     <ClCompile Include="translation_algorithms_cpu.cpp" />
+    <ClCompile Include="tree_node.cpp" />
     <CudaCompile Include="vector3.cu">
       <FileType>Document</FileType>
     </CudaCompile>

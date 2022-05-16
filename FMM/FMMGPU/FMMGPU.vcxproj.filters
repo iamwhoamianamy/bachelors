@@ -32,7 +32,7 @@
     <ClInclude Include="multipole_solver.hpp">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="octree.hpp">
+    <ClInclude Include="quadrature_octree.hpp">
       <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="quadrature.hpp">
@@ -86,12 +86,13 @@
     <ClInclude Include="typedefs.hpp">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="tree_node.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cuda_helper.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="octree.cpp">
+    <ClCompile Include="quadrature_octree.cpp">
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="quadrature.cpp">
@@ -148,6 +149,7 @@
     <ClCompile Include="testing_helpers.cpp">
       <Filter>Code</Filter>
     </ClCompile>
+    <ClCompile Include="tree_node.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

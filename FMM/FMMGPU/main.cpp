@@ -804,8 +804,8 @@ int main()
    //comparisonToTelmaIntegrals();
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
-   //comparisonBetweenMethodsOnPrecision();
-   calculationTimeForLocalMultipolesByNodeCount();
+   comparisonBetweenMethodsOnPrecision();
+   //calculationTimeForLocalMultipolesByNodeCount();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
 

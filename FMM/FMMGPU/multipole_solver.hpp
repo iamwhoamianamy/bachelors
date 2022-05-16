@@ -5,7 +5,7 @@
 #include "basis_quadratures.hpp"
 #include "harmonics.hpp"
 #include "quadrature.hpp"
-#include "octree.hpp"
+#include "quadrature_octree.hpp"
 #include "typedefs.hpp"
 
 enum class M2MAlg
@@ -28,7 +28,7 @@ class MultipoleSolver
 {
 private:
    std::vector<Quadrature>& _quadratures;
-   OctreeNode* octreeRoot;
+   QuadratureOctreeNode* quadratureOctreeRoot;
    bool _multipolesAreReady = false;
    bool _multipolesAtLeavesAreReady = false;
    std::vector<Complex> _realToComplexMatrix;
@@ -67,38 +67,38 @@ private:
       bool useMatrices);
 
    void enumerateNodes(
-      OctreeNode* node,
-      std::vector<std::vector<OctreeNode*>>& layers, 
+      QuadratureOctreeNode* node,
+      std::vector<std::vector<QuadratureOctreeNode*>>& layers, 
       size_t currentLayerId);
 
    void calcContributionsToHigherLayers(
-      const std::vector<std::vector<OctreeNode*>>& layers,
+      const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device,
       bool useMatrices);
 
    void calcContributionsToHigherLayers(
-      const std::vector<std::vector<OctreeNode*>>& layers,
+      const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device);
 
    std::vector<Vector3> calcContributionsToHigherLayer(
-      const std::vector<OctreeNode*>& layer,
+      const std::vector<QuadratureOctreeNode*>& layer,
       M2MDevice device);
 
    void calcContributionsToHigherLevelsWithMatrices(
-      const std::vector<std::vector<OctreeNode*>>& layers,
+      const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device);
 
    void calcMultipolesAtLeaves(
-      const std::vector<std::vector<OctreeNode*>>& layers);
+      const std::vector<std::vector<QuadratureOctreeNode*>>& layers);
 
-   Matrix<OctreeNode*> separateNodesByOrientation(
-      const std::vector<OctreeNode*>& layer);
+   Matrix<QuadratureOctreeNode*> separateNodesByOrientation(
+      const std::vector<QuadratureOctreeNode*>& layer);
 
    std::vector<ComplexMatrix> calcRegularMatricesForLayer(
-      const Matrix<OctreeNode*>& nodesByOrientation);
+      const Matrix<QuadratureOctreeNode*>& nodesByOrientation);
 
    RealMatrix calcRegularMatricesForLayerAsVectors(
-      const Matrix<OctreeNode*>& nodesByOrientation);
+      const Matrix<QuadratureOctreeNode*>& nodesByOrientation);
 
    ComplexMatrix formMatrixFromRegularHarmonics(
       const ComplexHarmonicSeries& regular);
@@ -107,10 +107,10 @@ private:
       const ComplexHarmonicSeries& regular);
 
    RealMatrix getExpansionsInOneOrientationAsVectors(
-      const std::vector<OctreeNode*>& nodesByOrientation);
+      const std::vector<QuadratureOctreeNode*>& nodesByOrientation);
 
    void accountChildrenContributions(
-      const std::vector<OctreeNode*>& nodesByOrientation,
+      const std::vector<QuadratureOctreeNode*>& nodesByOrientation,
       const RealMatrix& contributions);
 
    void printMatrices(
