@@ -14,6 +14,7 @@
 #include "translation_algorithms.hpp"
 #include "matrix_mult.hpp"
 #include "testing_helpers.hpp"
+#include "multipole_translator.hpp"
 
 using namespace math;
 using namespace test;
@@ -797,6 +798,22 @@ void translationTest()
       121, 1, 121);
 }
 
+void multipoleToLocalTest()
+{
+   int n = 10;
+   Vector3 point1(3, 1, 2);
+   Vector3 point2(4, 5, 1);
+
+   auto r1 = Harmonics::calcRegularSolidHarmonics(n, point1);
+   auto c1 = Harmonics::realToComplex(r1);
+
+   auto r2 = Harmonics::calcRegularSolidHarmonics(n, point2);
+   auto c2 = Harmonics::realToComplex(r2);
+
+   auto t = Harmonics::complexToReal(
+      MultipoleTranslator::multipoleToLocal(c1, c2));
+}
+
 int main()
 {
    //NMResearch();
@@ -804,10 +821,12 @@ int main()
    //comparisonToTelmaIntegrals();
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
-   comparisonBetweenMethodsOnPrecision();
+   //comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipolesByNodeCount();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
+
+   multipoleToLocalTest();
 
    //layerCalculationTime();
    //matrixCalculationTime();

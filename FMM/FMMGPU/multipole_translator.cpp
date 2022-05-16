@@ -147,3 +147,59 @@ real MultipoleTranslator::multipoleTranslationFactor(int m, int mu)
 {
    return pow(-1, -0.5 * (abs(m) - abs(mu) - abs(m - mu)));
 }
+
+ComplexHarmonicSeries MultipoleTranslator::multipoleToLocal(
+   const ComplexHarmonicSeries& a,
+   const ComplexHarmonicSeries& b)
+{
+   ComplexHarmonicSeries res(a.order());
+
+   for(int l = 0; l <= a.order(); l++)
+   {
+      for(int lambda = 0; lambda <= a.order(); lambda++)
+      {
+         for(int m = -l; m <= l; m++)
+         {
+            for(int mu = -lambda; mu <= lambda; mu++)
+            {
+               int dl = l + lambda;
+               int dm = m - mu;
+
+               if(dm >= -dl && dm <= +dl && dl <= a.order())
+               {
+                  res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) *
+                     b.getHarmonic(dl, dm) * multipoleToLocalTranslationFactor(m, mu, lambda);
+               }
+            }
+         }
+      }
+   }
+
+   return res;
+}
+
+HarmonicSeries<Vector3> MultipoleTranslator::multipoleToLocalWithComplex(
+   const HarmonicSeries<Vector3>& expansion,
+   const Vector3& translation)
+{
+   auto regular = Harmonics::realToComplex(
+      Harmonics::calcRegularSolidHarmonics(expansion.order(), translation));
+
+   auto xComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 0));
+   auto yComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 1));
+   auto zComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 2));
+
+   return Harmonics::createFormXYZ(
+      Harmonics::complexToReal(
+         MultipoleTranslator::multipoleToLocal(regular, xComponent)),
+      Harmonics::complexToReal(
+         MultipoleTranslator::multipoleToLocal(regular, yComponent)),
+      Harmonics::complexToReal(
+         MultipoleTranslator::multipoleToLocal(regular, zComponent)));
+}
+
+real MultipoleTranslator::multipoleToLocalTranslationFactor(int m, int mu, int lambda)
+{
+   return pow(-1, -0.5 * (abs(m - mu) - abs(m) - abs(mu))) * 
+      pow(-1, abs(lambda));
+}

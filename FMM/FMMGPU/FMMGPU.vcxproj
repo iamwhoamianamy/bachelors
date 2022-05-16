@@ -132,8 +132,6 @@
     <ClCompile Include="integration.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math.cpp" />
-    <ClCompile Include="matrix_mult.cpp" />
-    <ClCompile Include="matrix_mult.hpp" />
     <ClCompile Include="multipole_solver.cpp" />
     <ClCompile Include="multipole_translator.cpp" />
     <ClCompile Include="quadrature_octree.cpp" />
