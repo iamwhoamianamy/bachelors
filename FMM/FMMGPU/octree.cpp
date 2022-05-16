@@ -339,7 +339,12 @@ OctreeNode* OctreeNode::parent() const
    return _parent;
 }
 
-std::vector<OctreeNode*> OctreeNode::children() const
+std::vector<OctreeNode*>& OctreeNode::children()
+{
+   return _children;
+}
+
+const std::vector<OctreeNode*>& OctreeNode::children() const
 {
    return _children;
 }

@@ -30,7 +30,8 @@ public:
    bool isSubdivided() const;
    OctreeNode* parent();
    OctreeNode* parent() const;
-   std::vector<OctreeNode*> children() const;
+   std::vector<OctreeNode*>& children();
+   const std::vector<OctreeNode*>& children() const;
    std::vector<Quadrature*> quadratures() const;
    HarmonicSeries<Vector3>& multipoleExpansion();
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
