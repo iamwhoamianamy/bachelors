@@ -27,11 +27,11 @@ public:
    void quarry(const Box& box, std::vector<Quadrature*>& found);
 
    const Box& box() const;
-   const bool isSubdivided() const;
+   bool isSubdivided() const;
    OctreeNode* parent();
-   const OctreeNode* parent() const;
-   const std::vector<OctreeNode*> children() const;
-   const std::vector<Quadrature*> quadratures() const;
+   OctreeNode* parent() const;
+   std::vector<OctreeNode*> children() const;
+   std::vector<Quadrature*> quadratures() const;
    HarmonicSeries<Vector3>& multipoleExpansion();
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
 

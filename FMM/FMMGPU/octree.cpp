@@ -324,7 +324,7 @@ const Box& OctreeNode::box() const
    return this->_box;
 }
 
-const bool OctreeNode::isSubdivided() const
+bool OctreeNode::isSubdivided() const
 {
    return _isSubdivided;
 }
@@ -334,17 +334,17 @@ OctreeNode* OctreeNode::parent()
    return _parent;
 }
 
-const OctreeNode* OctreeNode::parent() const
+OctreeNode* OctreeNode::parent() const
 {
    return _parent;
 }
 
-const std::vector<OctreeNode*> OctreeNode::children() const
+std::vector<OctreeNode*> OctreeNode::children() const
 {
    return _children;
 }
 
-const std::vector<Quadrature*> OctreeNode::quadratures() const
+std::vector<Quadrature*> OctreeNode::quadratures() const
 {
    return _quadratures;
 }

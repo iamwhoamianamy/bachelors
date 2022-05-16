@@ -18,7 +18,7 @@ public:
 
    int order() const;
    const Vector3& values(size_t i) const;
-   const real w(size_t i) const;
+   real w(size_t i) const;
 
 private:
    void InitCoordinatesFromTXT(std::string coordsFileName);

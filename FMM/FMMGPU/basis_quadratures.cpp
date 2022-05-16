@@ -25,7 +25,7 @@ const Vector3& BasisQuadratures::values(size_t i) const
    return _values[i];
 }
 
-const real BasisQuadratures::w(size_t i) const
+real BasisQuadratures::w(size_t i) const
 {
    return _w[i];
 }
