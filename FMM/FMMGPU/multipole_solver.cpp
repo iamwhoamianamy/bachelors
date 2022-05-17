@@ -436,13 +436,13 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
       auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
          harmonicOrder, translation);
 
-      auto temp1 = formMatrixFromRegularHarmonicsAsVectors(
+      auto regularHarmonicsMatrix = formMatrixFromRegularHarmonicsAsVectors(
          Harmonics::realToComplex(regularHarmonics));
 
       Complex alpha = make_cuComplex(1, 0);
       Complex beta = make_cuComplex(0, 0);
 
-      std::vector<Complex> temp2(matrixElemCount);
+      std::vector<Complex> temp1(matrixElemCount);
 
       cblas_cgemm(
          CBLAS_ORDER::CblasRowMajor,
@@ -452,13 +452,13 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
          (float*)&alpha,
          (float*)_realToComplexMatrix.data(),
          121,
-         (float*)temp1.data(),
+         (float*)regularHarmonicsMatrix.data(),
          121,
          (float*)&beta,
-         (float*)temp2.data(),
+         (float*)temp1.data(),
          121);
 
-      std::vector<Complex> temp3(matrixElemCount);
+      std::vector<Complex> temp2(matrixElemCount);
 
       cblas_cgemm(
          CBLAS_ORDER::CblasRowMajor,
@@ -466,17 +466,17 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
          CBLAS_TRANSPOSE::CblasNoTrans,
          121, 121, 121,
          (float*)&alpha,
-         (float*)temp2.data(),
+         (float*)temp1.data(),
          121,
          (float*)_complexToRealMatrix.data(),
          121,
          (float*)&beta,
-         (float*)temp3.data(),
+         (float*)temp2.data(),
          121);
 
       cblas_scopy(
          matrixElemCount,
-         (float*)(temp3.data()), 2,
+         (float*)(temp2.data()), 2,
          result[i].data(), 1);
    }
 
@@ -535,7 +535,7 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
 
                if(-dl <= dm && dm <= dl)
                {
-                  res[(l * l + l + m) + (dl * dl + dl + dm) * harmonicLength] =
+                  res[(l * l + l + m) * harmonicLength + (dl * dl + dl + dm)] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
                      MultipoleTranslator::multipoleTranslationFactor(m, mu);
                }
