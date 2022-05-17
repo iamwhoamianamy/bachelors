@@ -28,7 +28,6 @@ void kernels::translateAllCPU(
             int dl = l - lambda;
 
             for(int mu = -lambda; mu <= lambda; mu++)
-               //for(int mu = std::max(-(l - lambda), -lambda); mu <= std::min(l - lambda, lambda); mu++)
             {
                if(-dl <= mu && mu <= +dl)
                {
@@ -69,8 +68,10 @@ void kernels::translateAllCPU(
                      RM = getReal(a, harmonicBegin, dl, dm);
                      IM = getImag(a, harmonicBegin, dl, dm);
 
-                     realRes += (RR * RM - IR * IM) * MultipoleTranslator::multipoleTranslationFactor(m, mu);
-                     imagRes += (RR * IM + IR * RM) * MultipoleTranslator::multipoleTranslationFactor(m, mu);
+                     realRes += (RR * RM - IR * IM) * 
+                        MultipoleTranslator::multipoleTranslationFactor(m, mu);
+                     imagRes += (RR * IM + IR * RM) * 
+                        MultipoleTranslator::multipoleTranslationFactor(m, mu);
                   }
 
                   if(-dl <= dnm && dnm <= dl)
@@ -78,8 +79,10 @@ void kernels::translateAllCPU(
                      RnM = getReal(a, harmonicBegin, dl, dnm);
                      InM = getImag(a, harmonicBegin, dl, dnm);
 
-                     realRes += (RR * RnM - IR * InM) * MultipoleTranslator::multipoleTranslationFactor(-m, mu);
-                     imagRes -= (RR * InM + IR * RnM) * MultipoleTranslator::multipoleTranslationFactor(-m, mu);
+                     realRes += (RR * RnM - IR * InM) * 
+                        MultipoleTranslator::multipoleTranslationFactor(-m, mu);
+                     imagRes -= (RR * InM + IR * RnM) * 
+                        MultipoleTranslator::multipoleTranslationFactor(-m, mu);
                   }
                }
             }
