@@ -67,9 +67,9 @@ public:
    ~MultipoleSolver();
 
 private:
-   void calcLocalMultipolesWithoutTranslation();
-   void calcLocalMultipolesWithComplexTranslation();
-   void calcLocalMultipolesWithRealTranslation();
+   void calcMultipoleExpansionsWithoutTranslation();
+   void calcMultipoleExpansionsWithComplexTranslation();
+   void calcMultipoleExpansionsWithRealTranslation();
 
    void calcLocalMultipolesWithLayersOrMatrices(
       M2MDevice device,

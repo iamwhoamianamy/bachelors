@@ -23,7 +23,6 @@ MultipoleSolver::MultipoleSolver(
    octreeLeafCapacity(octreeLeafCapacity)
 {
    initTrees(std::vector<Vector3>(), quadratures, octreeLeafCapacity);
-
    initTransitionMatrices();
 }
 
@@ -58,17 +57,17 @@ void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
       {
          case M2MAlg::NoTranslation:
          {
-            calcLocalMultipolesWithoutTranslation();
+            calcMultipoleExpansionsWithoutTranslation();
             break;
          }
          case M2MAlg::ComplexTranslation:
          {
-            calcLocalMultipolesWithComplexTranslation();
+            calcMultipoleExpansionsWithComplexTranslation();
             break;
          }
          case M2MAlg::RealTranslation:
          {
-            calcLocalMultipolesWithRealTranslation();
+            calcMultipoleExpansionsWithRealTranslation();
             break;
          }
          case M2MAlg::Layers:
@@ -89,19 +88,19 @@ void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
    }
 }
 
-void MultipoleSolver::calcLocalMultipolesWithoutTranslation()
+void MultipoleSolver::calcMultipoleExpansionsWithoutTranslation()
 {
    quadratureOctreeRoot->calcMultipoleExpansionsWithoutTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcLocalMultipolesWithComplexTranslation()
+void MultipoleSolver::calcMultipoleExpansionsWithComplexTranslation()
 {
    quadratureOctreeRoot->calcMultipoleExpansionsWithComplexTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
+void MultipoleSolver::calcMultipoleExpansionsWithRealTranslation()
 {
    quadratureOctreeRoot->calcMultipoleExpansionsWithRealTranslation(harmonicOrder);
    _multipolesAreReady = true;
