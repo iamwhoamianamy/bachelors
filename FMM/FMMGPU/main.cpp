@@ -781,9 +781,9 @@ void translationTest()
    cblas_scopy(121, (float*)temp2.data(), 2, realSeriesA2.data(), 1);
 
    auto realToComplexMatrixTransposed1D =
-      Harmonics::calcRealToComplexMatrixTransposed1D(10);
+      Harmonics::calcRealToComplexTransitionMatrix1D(10);
    auto complexToRealMatrixTransposed1D =
-      Harmonics::calcComplexToRealMatrixTransposed1D(10);
+      Harmonics::calcComplexToRealTransitionMatrix1D(10);
 
    auto matricesMultiplied = math::multMatricesAsVectors(
       complexToRealMatrixTransposed1D,
@@ -820,12 +820,12 @@ int main()
    //comparisonToTelmaIntegrals();
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
-   //comparisonBetweenMethodsOnPrecision();
+   comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipolesByNodeCount();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
 
-   multipoleToLocalTest();
+   //multipoleToLocalTest();
 
    //layerCalculationTime();
    //matrixCalculationTime();

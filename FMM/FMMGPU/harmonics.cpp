@@ -188,7 +188,7 @@ ComplexMatrix Harmonics::calcComplexToRealMatrix2D(size_t order)
    return res;
 }
 
-std::vector<Complex> Harmonics::calcRealToComplexMatrixTransposed1D(size_t order)
+std::vector<Complex> Harmonics::calcRealToComplexTransitionMatrix1D(size_t order)
 {
    size_t harmonicLen = (order + 1) * (order + 1);
    std::vector<Complex> res(harmonicLen * harmonicLen);
@@ -217,7 +217,7 @@ std::vector<Complex> Harmonics::calcRealToComplexMatrixTransposed1D(size_t order
    return res;
 }
 
-std::vector<Complex> Harmonics::calcComplexToRealMatrixTransposed1D(size_t order)
+std::vector<Complex> Harmonics::calcComplexToRealTransitionMatrix1D(size_t order)
 {
    size_t harmonicLen = (order + 1) * (order + 1);
    std::vector<Complex> res(harmonicLen * harmonicLen);

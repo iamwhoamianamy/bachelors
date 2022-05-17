@@ -6,6 +6,7 @@
 #include "harmonics.hpp"
 #include "quadrature.hpp"
 #include "quadrature_octree.hpp"
+#include "calculation_point_octree.hpp"
 #include "typedefs.hpp"
 
 enum class M2MAlg
@@ -28,7 +29,9 @@ class MultipoleSolver
 {
 private:
    std::vector<Quadrature>& _quadratures;
+   std::vector<Vector3>& _points;
    QuadratureOctreeNode* quadratureOctreeRoot;
+   CalculationPointOctreeNode* calculationPointOctreeRoot;
    bool _multipolesAreReady = false;
    bool _multipolesAtLeavesAreReady = false;
    std::vector<Complex> _realToComplexMatrix;
@@ -42,8 +45,14 @@ public:
    const real eps = 1e-6;
    const size_t octreeLeafCapacity;
 
-   MultipoleSolver(std::vector<Quadrature>& quadratures,
-                   size_t octreeLeafCapacity = 1000);
+   MultipoleSolver(
+      std::vector<Quadrature>& quadratures,
+      size_t octreeLeafCapacity = 1000);
+
+   MultipoleSolver(
+      std::vector<Vector3>& points,
+      std::vector<Quadrature>& quadratures,
+      size_t octreeLeafCapacity = 1000);
 
    void calcMultipolesAtLeaves();
 
@@ -116,4 +125,11 @@ private:
    void printMatrices(
       const std::vector<ComplexMatrix>& regularMatrices,
       const std::vector<ComplexMatrix>& expansionMatrices);
+
+   void initTrees(
+      std::vector<Vector3>& points,
+      std::vector<Quadrature>& quadratures,
+      size_t octreeLeafCapacity);
+
+   void initTransitionMatrices();
 };

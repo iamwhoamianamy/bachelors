@@ -15,18 +15,28 @@
 #include "testing_helpers.hpp"
 #include "multipole_translator.hpp"
 
-MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
-                                 size_t octreeLeafCapacity) :
-   _quadratures(quadratures), octreeLeafCapacity(octreeLeafCapacity)
+MultipoleSolver::MultipoleSolver(
+   std::vector<Quadrature>& quadratures,
+   size_t octreeLeafCapacity) :
+   _points(std::vector<Vector3>()),
+   _quadratures(quadratures), 
+   octreeLeafCapacity(octreeLeafCapacity)
 {
-   quadratureOctreeRoot = new QuadratureOctreeNode(Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
-   quadratureOctreeRoot->insert(_quadratures);
+   initTrees(std::vector<Vector3>(), quadratures, octreeLeafCapacity);
 
-   _realToComplexMatrix = Harmonics::calcRealToComplexMatrixTransposed1D(
-      harmonicOrder);
+   initTransitionMatrices();
+}
 
-   _complexToRealMatrix = Harmonics::calcComplexToRealMatrixTransposed1D(
-      harmonicOrder);
+MultipoleSolver::MultipoleSolver(
+   std::vector<Vector3>& points,
+   std::vector<Quadrature>& quadratures,
+   size_t octreeLeafCapacity) :
+   _points(points),
+   _quadratures(quadratures),
+   octreeLeafCapacity(octreeLeafCapacity)
+{
+   initTrees(points, quadratures, octreeLeafCapacity);
+   initTransitionMatrices();
 }
 
 void MultipoleSolver::calcMultipolesAtLeaves()
@@ -603,6 +613,29 @@ void MultipoleSolver::printMatrices(
    operator<<(std::ofstream("matrices/expansion_x.txt"), expansionMatrices[0]);
    operator<<(std::ofstream("matrices/expansion_y.txt"), expansionMatrices[1]);
    operator<<(std::ofstream("matrices/expansion_z.txt"), expansionMatrices[2]);
+}
+
+void MultipoleSolver::initTrees(
+   std::vector<Vector3>& points,
+   std::vector<Quadrature>& quadratures,
+   size_t octreeLeafCapacity)
+{
+   quadratureOctreeRoot = new QuadratureOctreeNode(
+      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
+   quadratureOctreeRoot->insert(_quadratures);
+
+   calculationPointOctreeRoot = new CalculationPointOctreeNode(
+      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
+   calculationPointOctreeRoot->insert(points);
+}
+
+void MultipoleSolver::initTransitionMatrices()
+{
+   _realToComplexMatrix = Harmonics::calcRealToComplexTransitionMatrix1D(
+      harmonicOrder);
+
+   _complexToRealMatrix = Harmonics::calcComplexToRealTransitionMatrix1D(
+      harmonicOrder);
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)
