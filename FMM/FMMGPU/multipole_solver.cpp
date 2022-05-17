@@ -38,7 +38,7 @@ MultipoleSolver::MultipoleSolver(
    initTransitionMatrices();
 }
 
-void MultipoleSolver::calcMultipolesAtLeaves()
+void MultipoleSolver::calcMultipoleExpansionsAtLeaves()
 {
    quadratureOctreeRoot->calcMultipoleExpansionsAtLeaves(harmonicOrder);
    _multipolesAtLeavesAreReady = true;
@@ -49,7 +49,7 @@ size_t MultipoleSolver::getOctreeNodeCount() const
    return quadratureOctreeRoot->getAllNodeCount();
 }
 
-void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
+void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice device)
 {
    if(_multipolesAtLeavesAreReady)
    {
@@ -159,7 +159,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
       calcContributionsToHigherLayers(layers, device);
 }
 
-void MultipoleSolver::calcMultipolesAtLeaves(
+void MultipoleSolver::calcMultipoleExpansionsAtLeaves(
    const std::vector<std::vector<QuadratureOctreeNode*>>& layers)
 {
    for(auto &layer : layers)

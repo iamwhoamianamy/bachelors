@@ -54,11 +54,11 @@ public:
       std::vector<Quadrature>& quadratures,
       size_t octreeLeafCapacity = 1000);
 
-   void calcMultipolesAtLeaves();
+   void calcMultipoleExpansionsAtLeaves();
 
    size_t getOctreeNodeCount() const;
 
-   void calcLocalMultipoles(
+   void calclMultipoleExpansions(
       M2MAlg algorithm,
       M2MDevice device = M2MDevice::CPU);
 
@@ -97,7 +97,7 @@ private:
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device);
 
-   void calcMultipolesAtLeaves(
+   void calcMultipoleExpansionsAtLeaves(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers);
 
    Matrix<QuadratureOctreeNode*> separateNodesByOrientation(
