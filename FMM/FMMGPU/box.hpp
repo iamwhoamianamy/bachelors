@@ -1,14 +1,19 @@
 #pragma once
 #include "vector3.cuh"
 
-struct Box
+class Box
 {
-   Vector3 center;
-   Vector3 halfDimensions;
+private:
+   Vector3 _center;
+   Vector3 _halfDimensions;
 
+public:
    Box();
    Box(const Vector3& center, const Vector3& halfDimensions);
    bool contains(const Vector3& point) const;
    bool intersects(const Box& _box) const;
    real radius() const;
+
+   const Vector3& center() const;
+   const Vector3& halfDimensions() const;
 };

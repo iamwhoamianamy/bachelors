@@ -69,13 +69,13 @@ void CalculationPointOctreeNode::insert(Vector3& point)
 
 void CalculationPointOctreeNode::subdivide()
 {
-   float x = _box.center.x;
-   float y = _box.center.y;
-   float z = _box.center.z;
+   float x = _box.center().x;
+   float y = _box.center().y;
+   float z = _box.center().z;
 
-   float w = _box.halfDimensions.x;
-   float h = _box.halfDimensions.y;
-   float d = _box.halfDimensions.z;
+   float w = _box.halfDimensions().x;
+   float h = _box.halfDimensions().y;
+   float d = _box.halfDimensions().z;
 
    Vector3 childrenHalfDimensions = { w / 2, h / 2, d / 2 };
 

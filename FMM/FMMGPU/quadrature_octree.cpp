@@ -69,13 +69,13 @@ void QuadratureOctreeNode::insert(Quadrature& point)
 
 void QuadratureOctreeNode::subdivide()
 {
-   float x = _box.center.x;
-   float y = _box.center.y;
-   float z = _box.center.z;
+   float x = _box.center().x;
+   float y = _box.center().y;
+   float z = _box.center().z;
 
-   float w = _box.halfDimensions.x;
-   float h = _box.halfDimensions.y;
-   float d = _box.halfDimensions.z;
+   float w = _box.halfDimensions().x;
+   float h = _box.halfDimensions().y;
+   float d = _box.halfDimensions().z;
 
    Vector3 childrenHalfDimensions = { w / 2, h / 2, d / 2 };
 
@@ -139,7 +139,7 @@ void QuadratureOctreeNode::calcMultipoleExpansionsWithoutTranslation(int n)
 {
    if(!isLeafAndUseful())
    {
-      _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center);
+      _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center());
 
       for(auto& child : _children)
       {
@@ -164,7 +164,7 @@ void QuadratureOctreeNode::calcMultipoleExpansionsWithComplexTranslation(int n)
          if(!child->_quadratures.empty() && !child->isSubdivided() ||
             child->_quadratures.empty() && child->isSubdivided())
             _multipoleExpansion.add(MultipoleTranslator::translateMultipoleWithComplex(
-               child->multipoleExpansion(), child->box().center - _box.center));
+               child->multipoleExpansion(), child->box().center() - _box.center()));
       }
    }
 }
@@ -185,7 +185,7 @@ void QuadratureOctreeNode::calcMultipoleExpansionsWithRealTranslation(int n)
          if(!child->_quadratures.empty() && !child->isSubdivided() ||
             child->_quadratures.empty() && child->isSubdivided())
             _multipoleExpansion.add(MultipoleTranslator::translateMultipoleWithReal(
-               child->multipoleExpansion(), child->box().center - _box.center));
+               child->multipoleExpansion(), child->box().center() - _box.center()));
       }
    }
 }
@@ -208,7 +208,7 @@ void QuadratureOctreeNode::calcMultipoleExpansionsAtLeaves(size_t n)
    if(isLeafAndUseful())
    {
       _multipoleExpansion = math::calcIntegralContribution(
-         _quadratures, n, _box.center);
+         _quadratures, n, _box.center());
    }
    else
    {
@@ -225,9 +225,9 @@ Vector3 QuadratureOctreeNode::calcA(const Vector3& point) const
 
    Vector3 res;
 
-   if(2 * _box.radius() < (point - _box.center).length())
+   if(2 * _box.radius() < (point - _box.center()).length())
    {
-      auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center);
+      auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center());
 
       for(int l = 0; l < n; l++)
       {
@@ -255,21 +255,21 @@ Vector3 QuadratureOctreeNode::caclRot(const Vector3& point) const
 
    Vector3 res;
 
-   if(2 * _box.radius() < (point - _box.center).length())
+   if(2 * _box.radius() < (point - _box.center()).length())
    {
-      auto hx1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center + 
+      auto hx1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() +
                                                         Vector3::xAxis() * eps);
-      auto hx2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center -
+      auto hx2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() -
                                                         Vector3::xAxis() * eps);
 
-      auto hy1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center +
+      auto hy1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() +
                                                         Vector3::yAxis() * eps);
-      auto hy2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center -
+      auto hy2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() -
                                                         Vector3::yAxis() * eps);
 
-      auto hz1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center +
+      auto hz1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() +
                                                         Vector3::zAxis() * eps);
-      auto hz2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center -
+      auto hz2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() -
                                                         Vector3::zAxis() * eps);
 
       hx1.subtract(hx2);

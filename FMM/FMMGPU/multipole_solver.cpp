@@ -168,7 +168,7 @@ void MultipoleSolver::calcMultipolesAtLeaves(
       {
          if(!node->quadratures().empty())
             node->multipoleExpansion() = math::calcIntegralContribution(
-               node->quadratures(), harmonicOrder, node->box().center);
+               node->quadratures(), harmonicOrder, node->box().center());
       }
    }
 }
@@ -217,7 +217,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
    for(size_t i = 0; i < layer.size(); i++)
    {
-      Vector3 translation = layer[i]->box().center - layer[i]->parent()->box().center;
+      Vector3 translation = layer[i]->box().center() - layer[i]->parent()->box().center();
       auto regular = Harmonics::calcRegularSolidHarmonics(harmonicOrder, translation);
 
       std::copy(regular.data().begin(), 
@@ -414,7 +414,7 @@ std::vector<ComplexMatrix> MultipoleSolver::calcRegularMatricesForLayer(
       if(!nodesByOrientation[i].empty())
       {
          auto translation = 
-            nodesByOrientation[i][0]->box().center - parent->box().center;
+            nodesByOrientation[i][0]->box().center() - parent->box().center();
 
          auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
             harmonicOrder,
@@ -439,8 +439,8 @@ RealMatrix MultipoleSolver::calcRegularMatricesForLayerAsVectors(
    {
       auto parent = nodesByOrientation[i][0]->parent();
 
-      auto translation = nodesByOrientation[i][0]->box().center -
-         parent->box().center;
+      auto translation = nodesByOrientation[i][0]->box().center() -
+         parent->box().center();
 
       auto regularHarmonics = Harmonics::calcRegularSolidHarmonics(
          harmonicOrder, translation);
