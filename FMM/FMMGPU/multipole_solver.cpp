@@ -535,7 +535,7 @@ std::vector<Complex> MultipoleSolver::formMatrixFromRegularHarmonicsAsVectors(
 
                if(-dl <= dm && dm <= dl)
                {
-                  res[(l * l + l + m) * harmonicLength + (dl * dl + dl + dm)] =
+                  res[(l * l + l + m) + (dl * dl + dl + dm) * harmonicLength] =
                      regular.getHarmonic(lambda * lambda + lambda + mu) *
                      MultipoleTranslator::multipoleTranslationFactor(m, mu);
                }
