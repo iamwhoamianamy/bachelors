@@ -31,7 +31,8 @@ bool Box::intersects(const Box& _box) const
 real Box::radius() const
 {
     return sqrt(_halfDimensions.x * _halfDimensions.x + 
-                _halfDimensions.y * _halfDimensions.y);
+                _halfDimensions.y * _halfDimensions.y + 
+                _halfDimensions.z * _halfDimensions.z);
 }
 
 const Vector3& Box::center() const
