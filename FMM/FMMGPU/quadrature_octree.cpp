@@ -135,7 +135,7 @@ std::vector<Quadrature*> QuadratureOctreeNode::getAllQuadratures() const
    return result;
 }
 
-void QuadratureOctreeNode::calcLocalMultipolesWithoutTranslation(int n)
+void QuadratureOctreeNode::calcMultipoleExpansionsWithoutTranslation(int n)
 {
    if(!isLeafAndUseful())
    {
@@ -143,12 +143,12 @@ void QuadratureOctreeNode::calcLocalMultipolesWithoutTranslation(int n)
 
       for(auto& child : _children)
       {
-         child->calcLocalMultipolesWithoutTranslation(n);
+         child->calcMultipoleExpansionsWithoutTranslation(n);
       }
    }
 }
 
-void QuadratureOctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
+void QuadratureOctreeNode::calcMultipoleExpansionsWithComplexTranslation(int n)
 {
    if(!isLeafAndUseful())
    {
@@ -156,7 +156,7 @@ void QuadratureOctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
 
       for(auto child : _children)
       {
-         child->calcLocalMultipolesWithComplexTranslation(n);
+         child->calcMultipoleExpansionsWithComplexTranslation(n);
       }
 
       for(auto child : _children)
@@ -169,7 +169,7 @@ void QuadratureOctreeNode::calcLocalMultipolesWithComplexTranslation(int n)
    }
 }
 
-void QuadratureOctreeNode::calcLocalMultipolesWithRealTranslation(int n)
+void QuadratureOctreeNode::calcMultipoleExpansionsWithRealTranslation(int n)
 {
    if(!isLeafAndUseful())
    {
@@ -177,7 +177,7 @@ void QuadratureOctreeNode::calcLocalMultipolesWithRealTranslation(int n)
 
       for(auto child : _children)
       {
-         child->calcLocalMultipolesWithRealTranslation(n);
+         child->calcMultipoleExpansionsWithRealTranslation(n);
       }
 
       for(auto child : _children)
@@ -203,7 +203,7 @@ void QuadratureOctreeNode::initAllMultipoleExpansions(size_t n)
    }
 }
 
-void QuadratureOctreeNode::calcLocalMultipolesAtLeaves(size_t n)
+void QuadratureOctreeNode::calcMultipoleExpansionsAtLeaves(size_t n)
 {
    if(isLeafAndUseful())
    {
@@ -214,7 +214,7 @@ void QuadratureOctreeNode::calcLocalMultipolesAtLeaves(size_t n)
    {
       for(auto child : _children)
       {
-         child->calcLocalMultipolesAtLeaves(n);
+         child->calcMultipoleExpansionsAtLeaves(n);
       }
    }
 }

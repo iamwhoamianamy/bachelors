@@ -5,7 +5,7 @@ class MultipoleTranslator
 {
 public:
 
-#pragma region Multipole to multipole algorithms
+#pragma region Multipole to multipole translation algorithms
 
    static ComplexHarmonicSeries translateMultipole(
       const ComplexHarmonicSeries& a,
@@ -41,7 +41,7 @@ public:
 
 #pragma endregion
 
-#pragma region Local transaltion algorithms
+#pragma region Local to local transaltion algorithms
 
    static ComplexHarmonicSeries translateLocal(
       const ComplexHarmonicSeries& a,

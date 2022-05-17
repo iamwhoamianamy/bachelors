@@ -39,11 +39,11 @@ public:
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
 
    std::vector<Quadrature*> getAllQuadratures() const;
-   void calcLocalMultipolesWithoutTranslation(int n);
-   void calcLocalMultipolesWithComplexTranslation(int n);
-   void calcLocalMultipolesWithRealTranslation(int n);
+   void calcMultipoleExpansionsWithoutTranslation(int n);
+   void calcMultipoleExpansionsWithComplexTranslation(int n);
+   void calcMultipoleExpansionsWithRealTranslation(int n);
    void initAllMultipoleExpansions(size_t n);
-   void calcLocalMultipolesAtLeaves(size_t n);
+   void calcMultipoleExpansionsAtLeaves(size_t n);
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
    size_t getAllNodeCount() const;

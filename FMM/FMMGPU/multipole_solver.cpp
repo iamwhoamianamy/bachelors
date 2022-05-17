@@ -31,7 +31,7 @@ MultipoleSolver::MultipoleSolver(std::vector<Quadrature>& quadratures,
 
 void MultipoleSolver::calcMultipolesAtLeaves()
 {
-   quadratureOctreeRoot->calcLocalMultipolesAtLeaves(harmonicOrder);
+   quadratureOctreeRoot->calcMultipoleExpansionsAtLeaves(harmonicOrder);
    _multipolesAtLeavesAreReady = true;
 }
 
@@ -81,19 +81,19 @@ void MultipoleSolver::calcLocalMultipoles(M2MAlg algorithm, M2MDevice device)
 
 void MultipoleSolver::calcLocalMultipolesWithoutTranslation()
 {
-   quadratureOctreeRoot->calcLocalMultipolesWithoutTranslation(harmonicOrder);
+   quadratureOctreeRoot->calcMultipoleExpansionsWithoutTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcLocalMultipolesWithComplexTranslation()
 {
-   quadratureOctreeRoot->calcLocalMultipolesWithComplexTranslation(harmonicOrder);
+   quadratureOctreeRoot->calcMultipoleExpansionsWithComplexTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcLocalMultipolesWithRealTranslation()
 {
-   quadratureOctreeRoot->calcLocalMultipolesWithRealTranslation(harmonicOrder);
+   quadratureOctreeRoot->calcMultipoleExpansionsWithRealTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
