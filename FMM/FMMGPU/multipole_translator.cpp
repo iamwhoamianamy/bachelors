@@ -234,7 +234,7 @@ ComplexHarmonicSeries MultipoleTranslator::translateLocal(
    return res;
 }
 
-HarmonicSeries<Vector3> MultipoleTranslator::tranlsateLocalWithComplex(
+HarmonicSeries<Vector3> MultipoleTranslator::translateLocalWithComplex(
    const HarmonicSeries<Vector3>& expansion,
    const Vector3& translation)
 {

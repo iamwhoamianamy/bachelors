@@ -47,7 +47,7 @@ public:
       const ComplexHarmonicSeries& a,
       const ComplexHarmonicSeries& b);
 
-   static HarmonicSeries<Vector3> tranlsateLocalWithComplex(
+   static HarmonicSeries<Vector3> translateLocalWithComplex(
       const HarmonicSeries<Vector3>& expansion,
       const Vector3& translation);
 
