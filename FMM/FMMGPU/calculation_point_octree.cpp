@@ -154,6 +154,29 @@ size_t CalculationPointOctreeNode::getAllNodeCount() const
    return count;
 }
 
+void CalculationPointOctreeNode::propagateLocalExpansions()
+{
+   if(_localExpansion.order() != 0)
+   {
+      for(auto child : _children)
+      {
+         if(child->isSubdivided() || !child->points().empty())
+         {
+            auto translation = _box.center() - child->box().center();
+            child->_localExpansion.add(
+               MultipoleTranslator::translateLocalWithComplex(
+                  _localExpansion,
+                  translation));
+         }
+      }
+   }
+
+   for(auto child : _children)
+   {
+      child->propagateLocalExpansions();
+   }
+}
+
 const Box& CalculationPointOctreeNode::box() const
 {
    return this->_box;

@@ -341,11 +341,10 @@ void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
             nodesToVisit.erase(found);
 
             auto translation = _box.center() - interactionNode->box().center();
-            auto localExpansionContribution =
+            interactionNode->localExpansion().add(
                MultipoleTranslator::multipoleToLocalWithComplex(
                   _multipoleExpansion,
-                  translation);
-            interactionNode->localExpansion().add(localExpansionContribution);
+                  translation));
          }
       }
 

@@ -14,7 +14,6 @@ private:
    Box _box;
    std::vector<Vector3*> _points;
    std::vector<CalculationPointOctreeNode*> _children;
-   HarmonicSeries<Vector3> _multipoleExpansion;
    HarmonicSeries<Vector3> _localExpansion;
    CalculationPointOctreeNode* _parent;
  
@@ -43,6 +42,8 @@ public:
    std::set<CalculationPointOctreeNode*> getAllNodesAsSet();
    std::vector<Vector3*> getAllPoints() const;
    size_t getAllNodeCount() const;
+
+   void propagateLocalExpansions();
 
    ~CalculationPointOctreeNode();
 };
