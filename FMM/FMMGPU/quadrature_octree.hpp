@@ -53,10 +53,10 @@ public:
 
    void translateMultipoleExpansionsToLocal(
       CalculationPointOctreeNode* calculationPointOctreeRoot,
-      std::set<CalculationPointOctreeNode*>& nodesToVisit);
+      std::set<CalculationPointOctreeNode*>& nodesToVisit) const;
 
    std::vector<CalculationPointOctreeNode*> getInteractionList(
-      CalculationPointOctreeNode* calculationPointOctreeNode);
+      CalculationPointOctreeNode* calculationPointOctreeNode) const;
 
    ~QuadratureOctreeNode();
 private:

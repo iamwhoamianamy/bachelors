@@ -300,7 +300,7 @@ size_t QuadratureOctreeNode::getAllNodeCount() const
 
 void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
    CalculationPointOctreeNode* calculationPointOctreeRoot,
-   std::set<CalculationPointOctreeNode*>& nodesToVisit)
+   std::set<CalculationPointOctreeNode*>& nodesToVisit) const
 {
    auto interactionList = getInteractionList(calculationPointOctreeRoot);
 
@@ -352,7 +352,7 @@ void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
 }
 
 std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionList(
-   CalculationPointOctreeNode* calculationPointOctreeNode)
+   CalculationPointOctreeNode* calculationPointOctreeNode) const
 {
    std::vector<CalculationPointOctreeNode*> res;
 
