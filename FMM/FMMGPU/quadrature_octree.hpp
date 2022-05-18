@@ -36,7 +36,7 @@ public:
    QuadratureOctreeNode* parent() const;
    std::vector<QuadratureOctreeNode*>& children();
    const std::vector<QuadratureOctreeNode*>& children() const;
-   std::vector<Quadrature*> quadratures() const;
+   const std::vector<Quadrature*>& quadratures() const;
    HarmonicSeries<Vector3>& multipoleExpansion();
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
 

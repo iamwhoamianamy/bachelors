@@ -34,7 +34,7 @@ public:
    CalculationPointOctreeNode* parent() const;
    std::vector<CalculationPointOctreeNode*>& children();
    const std::vector<CalculationPointOctreeNode*>& children() const;
-   std::vector<Vector3*> points() const;
+   const std::vector<Vector3*>& points() const;
    HarmonicSeries<Vector3>& localExpansion();
    const HarmonicSeries<Vector3>& localExpansion() const;
 

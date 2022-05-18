@@ -1,5 +1,4 @@
 #include "calculation_point_octree.hpp"
-#include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_translator.hpp"
@@ -204,7 +203,7 @@ const std::vector<CalculationPointOctreeNode*>& CalculationPointOctreeNode::chil
    return _children;
 }
 
-std::vector<Vector3*> CalculationPointOctreeNode::points() const
+const std::vector<Vector3*>& CalculationPointOctreeNode::points() const
 {
    return _points;
 }

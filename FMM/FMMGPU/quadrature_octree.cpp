@@ -464,7 +464,7 @@ const std::vector<QuadratureOctreeNode*>& QuadratureOctreeNode::children() const
    return _children;
 }
 
-std::vector<Quadrature*> QuadratureOctreeNode::quadratures() const
+const std::vector<Quadrature*>& QuadratureOctreeNode::quadratures() const
 {
    return _quadratures;
 }
