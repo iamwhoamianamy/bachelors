@@ -125,13 +125,10 @@ std::vector<Vector3*> CalculationPointOctreeNode::getAllPoints() const
    std::vector<Vector3*> result;
    result.insert(result.end(), _points.begin(), _points.end());
 
-   if(isSubdivided())
+   for(auto child : _children)
    {
-      for(auto child : _children)
-      {
-         auto childPoints = child->getAllPoints();
-         result.insert(result.end(), childPoints.begin(), childPoints.end());
-      }
+      auto childPoints = child->getAllPoints();
+      result.insert(result.end(), childPoints.begin(), childPoints.end());
    }
 
    return result;
@@ -224,11 +221,8 @@ const HarmonicSeries<Vector3>& CalculationPointOctreeNode::localExpansion() cons
 
 CalculationPointOctreeNode::~CalculationPointOctreeNode()
 {
-   if(isSubdivided())
+   for(auto child : _children)
    {
-      for(auto child : _children)
-      {
-         delete child;
-      }
+      delete child;
    }
 }
