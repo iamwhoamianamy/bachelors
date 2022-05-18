@@ -97,7 +97,7 @@ namespace math
          bioSavartLaplaceFunction,
          point,
          quadratures) *
-         mu0 / (4 * PI) * current;
+         MU0 / (4 * PI) * current;
    }
 
    Vector3 bioSavartLaplaceFunction(

@@ -74,7 +74,7 @@ void comparisonToTelmaIntegrals()
    for(size_t i = 0; i < n; i++)
    {
       auto point = telmaResults[i].first;
-      auto telmaB = telmaResults[i].second * math::mu0;
+      auto telmaB = telmaResults[i].second * math::MU0;
 
       Vector3 integration = math::calcBioSavartLaplace(current, point, quadratures);
       Vector3 noTranslation = multipoleSolver.calcB(current, point);

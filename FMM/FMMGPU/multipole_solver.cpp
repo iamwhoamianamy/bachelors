@@ -40,13 +40,13 @@ MultipoleSolver::MultipoleSolver(
 
 void MultipoleSolver::calcMultipoleExpansionsAtLeaves()
 {
-   quadratureOctreeRoot->calcMultipoleExpansionsAtLeaves(harmonicOrder);
+   _quadratureOctreeRoot->calcMultipoleExpansionsAtLeaves(harmonicOrder);
    _multipolesAtLeavesAreReady = true;
 }
 
 size_t MultipoleSolver::getOctreeNodeCount() const
 {
-   return quadratureOctreeRoot->getAllNodeCount();
+   return _quadratureOctreeRoot->getAllNodeCount();
 }
 
 void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice device)
@@ -114,19 +114,19 @@ void MultipoleSolver::calclLocalMultipoleExpansions(M2LAlg algorithm, M2MDevice 
 
 void MultipoleSolver::calcMultipoleExpansionsWithoutTranslation()
 {
-   quadratureOctreeRoot->calcMultipoleExpansionsWithoutTranslation(harmonicOrder);
+   _quadratureOctreeRoot->calcMultipoleExpansionsWithoutTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcMultipoleExpansionsWithComplexTranslation()
 {
-   quadratureOctreeRoot->calcMultipoleExpansionsWithComplexTranslation(harmonicOrder);
+   _quadratureOctreeRoot->calcMultipoleExpansionsWithComplexTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcMultipoleExpansionsWithRealTranslation()
 {
-   quadratureOctreeRoot->calcMultipoleExpansionsWithRealTranslation(harmonicOrder);
+   _quadratureOctreeRoot->calcMultipoleExpansionsWithRealTranslation(harmonicOrder);
    _multipolesAreReady = true;
 }
 
@@ -135,8 +135,8 @@ void MultipoleSolver::calcMultipoleExpanstionsWithLayersOrMatrices(
    bool useMatrices)
 {
    std::vector<std::vector<QuadratureOctreeNode*>> layers;
-   enumerateNodes(quadratureOctreeRoot, layers, 0);
-   quadratureOctreeRoot->initAllMultipoleExpansions(harmonicOrder);
+   enumerateNodes(_quadratureOctreeRoot, layers, 0);
+   _quadratureOctreeRoot->initAllMultipoleExpansions(harmonicOrder);
 
    if(log)
    {
@@ -643,13 +643,13 @@ void MultipoleSolver::initTrees(
    std::vector<Quadrature>& quadratures,
    size_t octreeLeafCapacity)
 {
-   quadratureOctreeRoot = new QuadratureOctreeNode(
+   _quadratureOctreeRoot = new QuadratureOctreeNode(
       Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
-   quadratureOctreeRoot->insert(_quadratures);
+   _quadratureOctreeRoot->insert(_quadratures);
 
-   calculationPointOctreeRoot = new CalculationPointOctreeNode(
+   _calculationPointOctreeRoot = new CalculationPointOctreeNode(
       Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
-   calculationPointOctreeRoot->insert(points);
+   _calculationPointOctreeRoot->insert(points);
 }
 
 void MultipoleSolver::initTransitionMatrices()
@@ -668,10 +668,10 @@ void MultipoleSolver::calcLocalMultipoleExpansionsWithoutTranslation()
 
 void MultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation()
 {
-   auto nodesToVisit = calculationPointOctreeRoot->getAllNodesAsSet();
+   auto nodesToVisit = _calculationPointOctreeRoot->getAllNodesAsSet();
 
-   quadratureOctreeRoot->translateMultipoleExpansionsToLocal(
-      calculationPointOctreeRoot,
+   _quadratureOctreeRoot->translateMultipoleExpansionsToLocal(
+      _calculationPointOctreeRoot,
       nodesToVisit);
 
 
@@ -682,7 +682,7 @@ Vector3 MultipoleSolver::calcA(real current, const Vector3& point)
    if(!_multipolesAreReady)
       throw new std::exception("Multipoles are not ready!");
 
-   return quadratureOctreeRoot->calcA(point) / (4.0 * math::PI) * current;
+   return _quadratureOctreeRoot->calcA(point) / (4.0 * math::PI) * current;
 }
 
 Vector3 MultipoleSolver::calcB(real current, const Vector3& point)
@@ -690,10 +690,10 @@ Vector3 MultipoleSolver::calcB(real current, const Vector3& point)
    if(!_multipolesAreReady)
       throw new std::exception("Multipoles are not ready!");
 
-   return quadratureOctreeRoot->caclRot(point) / (4.0 * math::PI) * current * math::mu0;
+   return _quadratureOctreeRoot->caclRot(point) / (4.0 * math::PI) * current * math::MU0;
 }
 
 MultipoleSolver::~MultipoleSolver()
 {
-   delete quadratureOctreeRoot;
+   delete _quadratureOctreeRoot;
 }

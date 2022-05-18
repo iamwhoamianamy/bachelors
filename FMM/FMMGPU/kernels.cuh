@@ -5,6 +5,10 @@
 
 namespace kernels
 {
+   constexpr uint THREADS_PER_BLOCK = 32;
+   constexpr uint HARMONIC_ORDER = 10;
+   constexpr uint HARMONIC_LENGTH = 121;
+
    template<class T>
    __global__ void addingKernel(T* c, const T* a, const T* b)
    {
@@ -63,7 +67,7 @@ namespace kernels
    __all__ size_t lmToIndex(int l, int m);
 
    template <typename T>
-   inline __all__ T& getHarmonic(T* harmonics,
+   __all__ T& getHarmonic(T* harmonics,
                   int harmonicBegin,
                   int l, int m)
    {
@@ -71,14 +75,14 @@ namespace kernels
    }
 
    template <typename T>
-   inline __all__ T& getHarmonic(T* harmonics,
+   __all__ T& getHarmonic(T* harmonics,
                           int l, int m)
    {
       return harmonics[l * l + l + m];
    }
 
    template <typename T>
-   inline __all__ T getReal(const T* harmonics,
+   __all__ T getReal(const T* harmonics,
              int harmonicBegin,
              int l, int m)
    {
@@ -87,7 +91,7 @@ namespace kernels
    }
 
    template <typename T>
-   inline __all__ T getReal(const T* harmonics,
+   __all__ T getReal(const T* harmonics,
                      int l, int m)
    {
       return harmonics[lmToIndex(l, abs(m))] *
@@ -95,7 +99,7 @@ namespace kernels
    }
 
    template <typename T>
-   inline __all__ T getImag(const T* harmonics,
+   __all__ T getImag(const T* harmonics,
              int harmonicBegin,
              int l, int m)
    {
@@ -104,7 +108,7 @@ namespace kernels
    }
 
    template <typename T>
-   inline __all__ T getImag(const T* harmonics,
+   __all__ T getImag(const T* harmonics,
                      int l, int m)
    {
       return harmonics[lmToIndex(l, -abs(m))] *
@@ -112,8 +116,4 @@ namespace kernels
    }
 
    __all__ real strangeFactor(int m, int mu);
-
-   const uint THREADS_PER_BLOCK = 32;
-   const uint HARMONIC_ORDER = 10;
-   const uint HARMONIC_LENGTH = 121;
 }

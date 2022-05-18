@@ -180,7 +180,7 @@ const Box& CalculationPointOctreeNode::box() const
 
 bool CalculationPointOctreeNode::isSubdivided() const
 {
-   return _children.size();
+   return !_children.empty();
 }
 
 CalculationPointOctreeNode* CalculationPointOctreeNode::parent()

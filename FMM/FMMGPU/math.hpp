@@ -3,15 +3,13 @@
 #include <ostream>
 #include "real.hpp"
 #include "cuda_runtime.h"
-#include "device_launch_parameters.h"
 #include "typedefs.hpp"
-
 namespace math
 {
-   const real PI = 3.14159265359;
-   const real mu0 = 1.2566370614e-6;
+   constexpr real PI = 3.14159265359;
+   constexpr real MU0 = 1.2566370614e-6;
    const real SQRT_2 = sqrt(2.0);
-   __device__ const real R_SQRT_2 = 0.70710678118;
+   __device__ constexpr real R_SQRT_2 = 0.70710678118;
 
    real calcFactorial(int n);
    real calcBinomial(int k, int n);
@@ -19,7 +17,7 @@ namespace math
    size_t nextDevisible(const size_t number, const size_t devidor);
 
    template <class T>
-   __all__ int sign(T val)
+   constexpr __all__ int sign(T val)
    {
       return (T(0) < val) - (val < T(0));
    }
@@ -35,7 +33,7 @@ namespace math
       {
          res += a[i] * b[i];
       }
-
+      
       return res;
    }
 
@@ -136,12 +134,12 @@ namespace math
    template<class T>
    std::vector<T> getColumn(
       const std::vector<T>& matrix,
-      size_t width,
-      size_t height,
-      size_t padding,
-      int idx)
+      const size_t width,
+      const size_t height,
+      const size_t padding,
+      const int idx)
    {
-      size_t currentWidth = nextDevisible(width, padding);
+      const size_t currentWidth = nextDevisible(width, padding);
       std::vector<T> res(height);
 
       for(size_t i = 0; i < height; i++)
@@ -155,11 +153,11 @@ namespace math
    template<class T>
    std::vector<T> getRow(
       const std::vector<T>& matrix,
-      size_t width,
-      size_t padding,
-      int idx)
+      const size_t width,
+      const size_t padding,
+      const int idx)
    {
-      size_t currentWidth = nextDevisible(width, padding);
+      const size_t currentWidth = nextDevisible(width, padding);
       std::vector<T> res(matrix.begin() + idx * currentWidth,
           matrix.begin() + idx * currentWidth + width);
 
@@ -167,10 +165,10 @@ namespace math
    }
 
    template<class T>
-   std::vector<T> matrixToVector(const Matrix<T>& matrix, size_t padding)
+   std::vector<T> matrixToVector(const Matrix<T>& matrix, const size_t padding)
    {
-      size_t height = math::nextDevisible(matrix.size(), padding);
-      size_t width = math::nextDevisible(matrix[0].size(), padding);
+      const size_t height = math::nextDevisible(matrix.size(), padding);
+      const size_t width = math::nextDevisible(matrix[0].size(), padding);
       std::vector<T> res(height * width);
 
       for(size_t i = 0; i < matrix.size(); i++)
@@ -187,11 +185,11 @@ namespace math
    template<class T>
    Matrix<T> vectorToMatrix(
       const std::vector<T>& vector,
-      size_t height,
-      size_t width,
-      size_t padding)
+      const size_t height,
+      const size_t width,
+      const size_t padding)
    {
-      size_t currentWidth = math::nextDevisible(width, padding);
+      const size_t currentWidth = math::nextDevisible(width, padding);
       Matrix<T> res(height, std::vector<T>(width));
 
       for(size_t i = 0; i < height; i++)
@@ -241,7 +239,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
 }
 
 __all__ Complex& operator*(const Complex& lhs, const Complex& rhs);
-__all__ Complex& operator*(const Complex& lhs, const real rhs);
+__all__ Complex& operator*(const Complex& lhs, real rhs);
 __all__ Complex& operator+(const Complex& lhs, const Complex& rhs);
 __all__ Complex& operator-(const Complex& lhs, const Complex& rhs);
 __all__ Complex& operator*=(Complex& lhs, const Complex& rhs);

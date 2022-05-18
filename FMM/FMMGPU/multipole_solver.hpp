@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "vector3.cuh"
-#include "tetrahedron.hpp"
 #include "basis_quadratures.hpp"
 #include "harmonics.hpp"
 #include "quadrature.hpp"
@@ -38,8 +37,8 @@ class MultipoleSolver
 private:
    std::vector<Quadrature>& _quadratures;
    std::vector<Vector3>& _points;
-   QuadratureOctreeNode* quadratureOctreeRoot;
-   CalculationPointOctreeNode* calculationPointOctreeRoot;
+   QuadratureOctreeNode* _quadratureOctreeRoot;
+   CalculationPointOctreeNode* _calculationPointOctreeRoot;
    bool _multipolesAreReady = false;
    bool _multipolesAtLeavesAreReady = false;
    std::vector<Complex> _realToComplexMatrix;
