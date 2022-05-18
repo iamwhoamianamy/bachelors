@@ -28,7 +28,6 @@ public:
    void insert(Quadrature& point);
    void insert(std::vector<Quadrature>& points);
    void subdivide();
-   void quarry(const Box& box, std::vector<Quadrature*>& found);
 
    const Box& box() const;
    bool isSubdivided() const;

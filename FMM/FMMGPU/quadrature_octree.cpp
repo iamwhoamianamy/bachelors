@@ -93,32 +93,6 @@ void QuadratureOctreeNode::subdivide()
    _children.emplace_back(new QuadratureOctreeNode(Box({ x - w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity, this));
 }
 
-void QuadratureOctreeNode::quarry(const Box& range, std::vector<Quadrature*>& found)
-{
-   if(!this->_box.intersects(range))
-   {
-      return;
-   }
-   else
-   {
-      for(auto point : _quadratures)
-      {
-         if(range.contains(point->coordinates))
-         {
-            found.push_back(point);
-         }
-      }
-
-      if(isSubdivided())
-      {
-         for(auto& child : _children)
-         {
-            child->quarry(range, found);
-         }
-      }
-   }
-}
-
 std::vector<Quadrature*> QuadratureOctreeNode::getAllQuadratures() const
 {
    std::vector<Quadrature*> result;
