@@ -5,6 +5,7 @@
 #include "multipole_translator.hpp"
 
 #include <thrust/complex.h>
+#include <queue>
 
 QuadratureOctreeNode::QuadratureOctreeNode() : 
    _parent(nullptr)
@@ -323,6 +324,117 @@ size_t QuadratureOctreeNode::getAllNodeCount() const
    return count;
 }
 
+void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
+   CalculationPointOctreeNode* calculationPointOctreeRoot,
+   std::set<CalculationPointOctreeNode*>& nodesToVisit)
+{
+   auto interactionList = getInteractionList(calculationPointOctreeRoot);
+
+   if(!interactionList.empty())
+   {
+      for(auto interactionNode : interactionList)
+      {
+         auto found = nodesToVisit.find(interactionNode);
+
+         if(found != nodesToVisit.end())
+         {
+            nodesToVisit.erase(found);
+
+            auto translation = _box.center() - interactionNode->box().center();
+            auto localExpansionContribution =
+               MultipoleTranslator::multipoleToLocalWithComplex(
+                  _multipoleExpansion,
+                  translation);
+            interactionNode->localExpansion().add(localExpansionContribution);
+         }
+      }
+
+      if(!nodesToVisit.empty())
+      {
+         for(auto child : _children)
+         {
+            child->translateMultipoleExpansionsToLocal(
+               calculationPointOctreeRoot,
+               nodesToVisit);
+         }
+      }
+   }
+   else
+   {
+      if(!nodesToVisit.empty())
+      {
+         for(auto child : _children)
+         {
+            if(child->isSubdivided() || !child->quadratures().empty())
+            {
+               auto newNodesToVisit = calculationPointOctreeRoot->getAllNodesAsSet();
+
+               child->translateMultipoleExpansionsToLocal(
+                  calculationPointOctreeRoot,
+                  newNodesToVisit);
+            }
+         }
+      }
+   }
+}
+
+std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionList(
+   CalculationPointOctreeNode* calculationPointOctreeNode)
+{
+   std::vector<CalculationPointOctreeNode*> res;
+
+   /*if(calculationPointOctreeNode && 
+      calculationPointOctreeNode->parent())
+   {
+      auto grandparent = calculationPointOctreeNode->parent()->parent();
+
+      if(grandparent)
+      {
+         auto &parentNearNeighbours = grandparent->children();
+
+         for(auto parentNearNeighbour : parentNearNeighbours)
+         {
+            for(auto parentNearNeighbourChild : parentNearNeighbour->children())
+            {
+               if(4 * _box.radius() * _box.radius() < 
+                  Vector3::distanceSquared(
+                     parentNearNeighbourChild->box().center(),
+                     _box.center()))
+               {
+                  res.push_back(parentNearNeighbourChild);
+               }
+            }
+         }
+      }
+   }*/
+
+   std::queue< CalculationPointOctreeNode*> queue;
+   queue.push(calculationPointOctreeNode);
+
+   while(!queue.empty())
+   {
+      auto currentNode = queue.front();
+
+      if(4 * _box.radius() * _box.radius() <
+         Vector3::distanceSquared(
+            currentNode->box().center(),
+            _box.center()) && 
+         !_box.intersects(currentNode->box()) &&
+         !_box.contains(currentNode->box().center()) &&
+         !currentNode->box().contains(_box.center()))
+      {
+         res.push_back(currentNode);
+      }
+      else
+      {
+         for(auto child : currentNode->children())
+            queue.push(child);
+      }
+   }
+
+   return res;
+}
+
 const Box& QuadratureOctreeNode::box() const
 {
    return this->_box;
@@ -330,7 +442,7 @@ const Box& QuadratureOctreeNode::box() const
 
 bool QuadratureOctreeNode::isSubdivided() const
 {
-   return _children.size();
+   return !_children.empty();
 }
 
 QuadratureOctreeNode* QuadratureOctreeNode::parent()

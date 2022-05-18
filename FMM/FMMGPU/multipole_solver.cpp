@@ -72,12 +72,12 @@ void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice devic
          }
          case M2MAlg::Layers:
          {
-            calcLocalMultipolesWithLayersOrMatrices(device, false);
+            calcMultipoleExpanstionsWithLayersOrMatrices(device, false);
             break;
          }
          case M2MAlg::Matrices:
          {
-            calcLocalMultipolesWithLayersOrMatrices(device, true);
+            calcMultipoleExpanstionsWithLayersOrMatrices(device, true);
             break;
          }
       }
@@ -85,6 +85,30 @@ void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice devic
    else
    {
       throw std::exception("Multipoles at leaves are not ready!");
+   }
+}
+
+void MultipoleSolver::calclLocalMultipoleExpansions(M2LAlg algorithm, M2MDevice device)
+{
+   if(_multipolesAreReady)
+   {
+      switch(algorithm)
+      {
+         case M2LAlg::NoTranslation:
+         {
+            calcLocalMultipoleExpansionsWithoutTranslation();
+            break;
+         }
+         case M2LAlg::ComplexTranslation:
+         {
+            calcLocalMultipoleExpansionsWithComplexTranslation();
+            break;
+         }
+      }
+   }
+   else
+   {
+      throw std::exception("Multipoles are not ready!");
    }
 }
 
@@ -106,7 +130,7 @@ void MultipoleSolver::calcMultipoleExpansionsWithRealTranslation()
    _multipolesAreReady = true;
 }
 
-void MultipoleSolver::calcLocalMultipolesWithLayersOrMatrices(
+void MultipoleSolver::calcMultipoleExpanstionsWithLayersOrMatrices(
    M2MDevice device,
    bool useMatrices)
 {
@@ -635,6 +659,22 @@ void MultipoleSolver::initTransitionMatrices()
 
    _complexToRealMatrix = Harmonics::calcComplexToRealTransitionMatrix1D(
       harmonicOrder);
+}
+
+void MultipoleSolver::calcLocalMultipoleExpansionsWithoutTranslation()
+{
+   // Ä
+}
+
+void MultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation()
+{
+   auto nodesToVisit = calculationPointOctreeRoot->getAllNodesAsSet();
+
+   quadratureOctreeRoot->translateMultipoleExpansionsToLocal(
+      calculationPointOctreeRoot,
+      nodesToVisit);
+
+
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)

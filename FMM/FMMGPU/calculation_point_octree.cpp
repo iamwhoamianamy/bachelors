@@ -92,6 +92,34 @@ void CalculationPointOctreeNode::subdivide()
    _children.emplace_back(new CalculationPointOctreeNode(Box({ x - w / 2, y + h / 2, z + d / 2 }, childrenHalfDimensions), _capacity, this));
 }
 
+std::vector<CalculationPointOctreeNode*> CalculationPointOctreeNode::getAllNodes()
+{
+   std::vector<CalculationPointOctreeNode*> result;
+   result.push_back(this);
+
+   for(auto child : _children)
+   {
+      auto childChildren = child->getAllNodes();
+      result.insert(result.end(), childChildren.begin(), childChildren.end());
+   }
+
+   return result;
+}
+
+std::set<CalculationPointOctreeNode*> CalculationPointOctreeNode::getAllNodesAsSet()
+{
+   std::set<CalculationPointOctreeNode*> result;
+   result.insert(this);
+
+   for(auto child : _children)
+   {
+      auto childChildren = child->getAllNodes();
+      result.insert(childChildren.begin(), childChildren.end());
+   }
+
+   return result;
+}
+
 std::vector<Vector3*> CalculationPointOctreeNode::getAllPoints() const
 {
    std::vector<Vector3*> result;
@@ -159,6 +187,16 @@ const std::vector<CalculationPointOctreeNode*>& CalculationPointOctreeNode::chil
 std::vector<Vector3*> CalculationPointOctreeNode::points() const
 {
    return _points;
+}
+
+HarmonicSeries<Vector3>& CalculationPointOctreeNode::localExpansion()
+{
+   return _localExpansion;
+}
+
+const HarmonicSeries<Vector3>& CalculationPointOctreeNode::localExpansion() const
+{
+   return _localExpansion;
 }
 
 CalculationPointOctreeNode::~CalculationPointOctreeNode()

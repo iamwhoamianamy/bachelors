@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <set>
 
 #include "vector3.cuh"
 #include "box.hpp"
@@ -50,6 +51,13 @@ public:
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
    size_t getAllNodeCount() const;
+
+   void translateMultipoleExpansionsToLocal(
+      CalculationPointOctreeNode* calculationPointOctreeRoot,
+      std::set<CalculationPointOctreeNode*>& nodesToVisit);
+
+   std::vector<CalculationPointOctreeNode*> getInteractionList(
+      CalculationPointOctreeNode* calculationPointOctreeNode);
 
    ~QuadratureOctreeNode();
 private:

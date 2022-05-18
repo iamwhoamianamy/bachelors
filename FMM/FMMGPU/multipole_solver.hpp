@@ -25,6 +25,14 @@ enum class M2MDevice
    Adaptive
 };
 
+
+enum class M2LAlg
+{
+   NoTranslation = 0,
+   ComplexTranslation,
+   Matrices,
+};
+
 class MultipoleSolver
 {
 private:
@@ -62,6 +70,10 @@ public:
       M2MAlg algorithm,
       M2MDevice device = M2MDevice::CPU);
 
+   void calclLocalMultipoleExpansions(
+      M2LAlg algorithm,
+      M2MDevice device = M2MDevice::CPU);
+
    Vector3 calcA(real current, const Vector3& point);
    Vector3 calcB(real current, const Vector3& point);
    ~MultipoleSolver();
@@ -71,7 +83,7 @@ private:
    void calcMultipoleExpansionsWithComplexTranslation();
    void calcMultipoleExpansionsWithRealTranslation();
 
-   void calcLocalMultipolesWithLayersOrMatrices(
+   void calcMultipoleExpanstionsWithLayersOrMatrices(
       M2MDevice device,
       bool useMatrices);
 
@@ -132,4 +144,7 @@ private:
       size_t octreeLeafCapacity);
 
    void initTransitionMatrices();
+
+   void calcLocalMultipoleExpansionsWithoutTranslation();
+   void calcLocalMultipoleExpansionsWithComplexTranslation();
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <set>
 
 #include "vector3.cuh"
 #include "box.hpp"
@@ -16,7 +17,7 @@ private:
    HarmonicSeries<Vector3> _multipoleExpansion;
    HarmonicSeries<Vector3> _localExpansion;
    CalculationPointOctreeNode* _parent;
-
+ 
 public:
    CalculationPointOctreeNode();
    CalculationPointOctreeNode(
@@ -35,7 +36,11 @@ public:
    std::vector<CalculationPointOctreeNode*>& children();
    const std::vector<CalculationPointOctreeNode*>& children() const;
    std::vector<Vector3*> points() const;
+   HarmonicSeries<Vector3>& localExpansion();
+   const HarmonicSeries<Vector3>& localExpansion() const;
 
+   std::vector<CalculationPointOctreeNode*> getAllNodes();
+   std::set<CalculationPointOctreeNode*> getAllNodesAsSet();
    std::vector<Vector3*> getAllPoints() const;
    size_t getAllNodeCount() const;
 
