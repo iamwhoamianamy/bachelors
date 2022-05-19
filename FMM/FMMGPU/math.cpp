@@ -26,22 +26,26 @@ namespace math
 
 Complex& operator*(const Complex& lhs, const Complex& rhs)
 {
-   return cuCmulf(lhs, rhs);
+   auto res = cuCmulf(lhs, rhs);
+   return res;
 }
 
 __all__ Complex& operator*(const Complex& lhs, const real rhs)
 {
-   return make_cuComplex(cuCrealf(lhs) * rhs, cuCimagf(lhs) * rhs);
+   auto res = make_cuComplex(cuCrealf(lhs) * rhs, cuCimagf(lhs) * rhs);
+   return res;
 }
 
 Complex& operator+(const Complex& lhs, const Complex& rhs)
 {
-   return cuCaddf(lhs, rhs);
+   auto res = cuCaddf(lhs, rhs);
+   return res;
 }
 
 __all__ Complex& operator-(const Complex& lhs, const Complex& rhs)
 {
-   return cuCsubf(lhs, rhs);
+   auto res = cuCsubf(lhs, rhs);
+   return res;
 }
 
 Complex& operator*=(Complex& lhs, const Complex& rhs)
