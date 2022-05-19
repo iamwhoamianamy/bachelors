@@ -1,15 +1,17 @@
+#include <iostream>
+
 #include "testing_helpers.hpp"
 
 namespace test
 {
-
    Torus createTorus()
    {
-      const double torusRadius = 2;
-      const double torusSectionWidth = 0.2;
+      constexpr double torusRadius = 2;
+      constexpr double torusSectionWidth = 0.2;
       
       //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-      return Torus(torusRadius, torusSectionWidth, 20, 4, 4);
+      return { torusRadius, torusSectionWidth, 40, 8, 8 };
+      //return { torusRadius, torusSectionWidth, 20, 4, 4 };
    }
 
    double getTime(void (*f)())
@@ -57,5 +59,15 @@ namespace test
       }
 
       return res;
+   }
+
+   void printSeparateLine(std::ostream& os, size_t count)
+   {
+      for (int i = 0; i < count; ++i)
+      {
+         os << "-";
+      }
+
+      os << std::endl;
    }
 }
