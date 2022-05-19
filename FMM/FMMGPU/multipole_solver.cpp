@@ -17,24 +17,11 @@
 
 MultipoleSolver::MultipoleSolver(
    std::vector<Quadrature>& quadratures,
-   size_t octreeLeafCapacity) :
-   _points(std::vector<Vector3>()),
+   size_t quadratureOctreeLeafCapacity) :
    _quadratures(quadratures), 
-   octreeLeafCapacity(octreeLeafCapacity)
+   quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity)
 {
-   initTrees(std::vector<Vector3>(), quadratures, octreeLeafCapacity);
-   initTransitionMatrices();
-}
-
-MultipoleSolver::MultipoleSolver(
-   std::vector<Vector3>& points,
-   std::vector<Quadrature>& quadratures,
-   size_t octreeLeafCapacity) :
-   _points(points),
-   _quadratures(quadratures),
-   octreeLeafCapacity(octreeLeafCapacity)
-{
-   initTrees(points, quadratures, octreeLeafCapacity);
+   initTrees();
    initTransitionMatrices();
 }
 
@@ -85,30 +72,6 @@ void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice devic
    else
    {
       throw std::exception("Multipoles at leaves are not ready!");
-   }
-}
-
-void MultipoleSolver::calclLocalMultipoleExpansions(M2LAlg algorithm, M2MDevice device)
-{
-   if(_multipolesAreReady)
-   {
-      switch(algorithm)
-      {
-         case M2LAlg::NoTranslation:
-         {
-            calcLocalMultipoleExpansionsWithoutTranslation();
-            break;
-         }
-         case M2LAlg::ComplexTranslation:
-         {
-            calcLocalMultipoleExpansionsWithComplexTranslation();
-            break;
-         }
-      }
-   }
-   else
-   {
-      throw std::exception("Multipoles are not ready!");
    }
 }
 
@@ -638,18 +601,11 @@ void MultipoleSolver::printMatrices(
    operator<<(std::ofstream("matrices/expansion_z.txt"), expansionMatrices[2]);
 }
 
-void MultipoleSolver::initTrees(
-   std::vector<Vector3>& points,
-   std::vector<Quadrature>& quadratures,
-   size_t octreeLeafCapacity)
+void MultipoleSolver::initTrees()
 {
    _quadratureOctreeRoot = new QuadratureOctreeNode(
-      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
+      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), quadratureOctreeLeafCapacity);
    _quadratureOctreeRoot->insert(_quadratures);
-
-   _calculationPointOctreeRoot = new CalculationPointOctreeNode(
-      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), octreeLeafCapacity);
-   _calculationPointOctreeRoot->insert(points);
 }
 
 void MultipoleSolver::initTransitionMatrices()
@@ -659,22 +615,6 @@ void MultipoleSolver::initTransitionMatrices()
 
    _complexToRealMatrix = Harmonics::calcComplexToRealTransitionMatrix1D(
       harmonicOrder);
-}
-
-void MultipoleSolver::calcLocalMultipoleExpansionsWithoutTranslation()
-{
-   // Ä
-}
-
-void MultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation()
-{
-   auto nodesToVisit = _calculationPointOctreeRoot->getAllNodesAsSet();
-
-   _quadratureOctreeRoot->translateMultipoleExpansionsToLocal(
-      _calculationPointOctreeRoot,
-      nodesToVisit);
-
-
 }
 
 Vector3 MultipoleSolver::calcA(real current, const Vector3& point)

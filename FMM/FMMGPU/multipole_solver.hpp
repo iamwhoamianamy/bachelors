@@ -11,11 +11,9 @@
 
 class MultipoleSolver
 {
-private:
+protected:
    std::vector<Quadrature>& _quadratures;
-   std::vector<Vector3>& _points;
-   QuadratureOctreeNode* _quadratureOctreeRoot;
-   CalculationPointOctreeNode* _calculationPointOctreeRoot;
+   QuadratureOctreeNode* _quadratureOctreeRoot = nullptr;
    bool _multipolesAreReady = false;
    bool _multipolesAtLeavesAreReady = false;
    std::vector<Complex> _realToComplexMatrix;
@@ -27,100 +25,84 @@ public:
    const int harmonicOrder = 10;
    const int harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
    const real eps = 1e-6;
-   const size_t octreeLeafCapacity;
+   const size_t quadratureOctreeLeafCapacity;
 
    MultipoleSolver(
       std::vector<Quadrature>& quadratures,
-      size_t octreeLeafCapacity = 1000);
+      size_t quadratureOctreeLeafCapacity = 1000);
 
-   MultipoleSolver(
-      std::vector<Vector3>& points,
-      std::vector<Quadrature>& quadratures,
-      size_t octreeLeafCapacity = 1000);
+   virtual void calcMultipoleExpansionsAtLeaves();
 
-   void calcMultipoleExpansionsAtLeaves();
+   virtual size_t getOctreeNodeCount() const;
 
-   size_t getOctreeNodeCount() const;
-
-   void calclMultipoleExpansions(
+   virtual void calclMultipoleExpansions(
       M2MAlg algorithm,
       M2MDevice device = M2MDevice::CPU);
+   
+   virtual Vector3 calcA(real current, const Vector3& point);
+   virtual Vector3 calcB(real current, const Vector3& point);
+   virtual ~MultipoleSolver();
 
-   void calclLocalMultipoleExpansions(
-      M2LAlg algorithm,
-      M2MDevice device = M2MDevice::CPU);
+protected:
+   virtual void calcMultipoleExpansionsWithoutTranslation();
+   virtual void calcMultipoleExpansionsWithComplexTranslation();
+   virtual void calcMultipoleExpansionsWithRealTranslation();
 
-   Vector3 calcA(real current, const Vector3& point);
-   Vector3 calcB(real current, const Vector3& point);
-   ~MultipoleSolver();
-
-private:
-   void calcMultipoleExpansionsWithoutTranslation();
-   void calcMultipoleExpansionsWithComplexTranslation();
-   void calcMultipoleExpansionsWithRealTranslation();
-
-   void calcMultipoleExpanstionsWithLayersOrMatrices(
+   virtual void calcMultipoleExpanstionsWithLayersOrMatrices(
       M2MDevice device,
       bool useMatrices);
 
-   void enumerateNodes(
+   virtual void enumerateNodes(
       QuadratureOctreeNode* node,
       std::vector<std::vector<QuadratureOctreeNode*>>& layers, 
       size_t currentLayerId);
 
-   void calcContributionsToHigherLayers(
+   virtual void calcContributionsToHigherLayers(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device,
       bool useMatrices);
 
-   void calcContributionsToHigherLayers(
+   virtual void calcContributionsToHigherLayers(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device);
 
-   std::vector<Vector3> calcContributionsToHigherLayer(
+   virtual std::vector<Vector3> calcContributionsToHigherLayer(
       const std::vector<QuadratureOctreeNode*>& layer,
       M2MDevice device);
 
-   void calcContributionsToHigherLevelsWithMatrices(
+   virtual void calcContributionsToHigherLevelsWithMatrices(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       M2MDevice device);
 
-   void calcMultipoleExpansionsAtLeaves(
+   virtual void calcMultipoleExpansionsAtLeaves(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers);
 
-   Matrix<QuadratureOctreeNode*> separateNodesByOrientation(
+   virtual Matrix<QuadratureOctreeNode*> separateNodesByOrientation(
       const std::vector<QuadratureOctreeNode*>& layer);
 
-   std::vector<ComplexMatrix> calcRegularMatricesForLayer(
+   virtual std::vector<ComplexMatrix> calcRegularMatricesForLayer(
       const Matrix<QuadratureOctreeNode*>& nodesByOrientation);
 
-   RealMatrix calcRegularMatricesForLayerAsVectors(
+   virtual RealMatrix calcRegularMatricesForLayerAsVectors(
       const Matrix<QuadratureOctreeNode*>& nodesByOrientation);
 
-   ComplexMatrix formMatrixFromRegularHarmonics(
+   virtual ComplexMatrix formMatrixFromRegularHarmonics(
       const ComplexHarmonicSeries& regular);
 
-   std::vector<Complex> formMatrixFromRegularHarmonicsAsVectors(
+   virtual std::vector<Complex> formMatrixFromRegularHarmonicsAsVectors(
       const ComplexHarmonicSeries& regular);
 
-   RealMatrix getExpansionsInOneOrientationAsVectors(
+   virtual RealMatrix getExpansionsInOneOrientationAsVectors(
       const std::vector<QuadratureOctreeNode*>& nodesByOrientation);
 
-   void accountChildrenContributions(
+   virtual void accountChildrenContributions(
       const std::vector<QuadratureOctreeNode*>& nodesByOrientation,
       const RealMatrix& contributions);
 
-   void printMatrices(
+   virtual void printMatrices(
       const std::vector<ComplexMatrix>& regularMatrices,
       const std::vector<ComplexMatrix>& expansionMatrices);
 
-   void initTrees(
-      std::vector<Vector3>& points,
-      std::vector<Quadrature>& quadratures,
-      size_t octreeLeafCapacity);
-
-   void initTransitionMatrices();
-
-   void calcLocalMultipoleExpansionsWithoutTranslation();
-   void calcLocalMultipoleExpansionsWithComplexTranslation();
+   virtual void initTrees();
+   virtual void initTransitionMatrices();
 };
