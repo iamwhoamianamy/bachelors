@@ -92,6 +92,12 @@
     <ClInclude Include="multipole_translator.hpp">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="fast_multipole_solver.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="multipole_solver_enums.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cuda_helper.cpp">
@@ -152,6 +158,9 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="multipole_translator.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="fast_multipole_solver.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>

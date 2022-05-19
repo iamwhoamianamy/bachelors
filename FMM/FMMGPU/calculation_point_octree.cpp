@@ -1,4 +1,7 @@
 #include "calculation_point_octree.hpp"
+
+#include <iostream>
+
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_translator.hpp"
@@ -62,7 +65,7 @@ void CalculationPointOctreeNode::insert(Vector3& point)
          }
       }
 
-      _points.clear();
+      _points.resize(0);
    }
 }
 
@@ -150,15 +153,67 @@ size_t CalculationPointOctreeNode::getAllNodeCount() const
    return count;
 }
 
-void CalculationPointOctreeNode::propagateLocalExpansions()
+std::vector<Vector3> CalculationPointOctreeNode::calcA(size_t pointCount) const
+{
+   std::vector<Vector3> res;
+   res.reserve(pointCount);
+   calcA(res);
+
+   return res;
+}
+
+void CalculationPointOctreeNode::initAllLocalExpansions(size_t order)
+{
+   if(isSubdivided() || !_points.empty())
+   {
+      _localExpansion = HarmonicSeries<Vector3>(order);
+
+      for(auto child : _children)
+      {
+         child->initAllLocalExpansions(order);
+      }
+   }
+}
+
+void CalculationPointOctreeNode::calcA(std::vector<Vector3>& result) const
+{
+   if(!_points.empty())
+   {
+      for(auto point : _points)
+      {
+         size_t order = _localExpansion.order();
+         auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(order, *point);
+
+         Vector3 aInPoint;
+
+         for(int i = 0; i < _localExpansion.elemCount(); ++i)
+         {
+            aInPoint += _localExpansion.getHarmonic(i) * regularHarmonic.getHarmonic(i);
+         }
+
+         result.emplace_back(aInPoint);
+      }
+   }
+   else
+   {
+      for (auto child : _children)
+      {
+         child->calcA(result);
+      }
+   }
+}
+
+void CalculationPointOctreeNode::propagateLocalExpansions() const
 {
    if(_localExpansion.order() != 0)
    {
       for(auto child : _children)
       {
-         if(child->isSubdivided() || !child->points().empty())
+         if(child->localExpansion().order() !=0 &&
+            (child->isSubdivided() || !child->points().empty()))
          {
-            auto translation = _box.center() - child->box().center();
+            //auto translation = _box.center() - child->box().center();
+            auto translation = child->box().center() - _box.center();
             child->_localExpansion.add(
                MultipoleTranslator::translateLocalWithComplex(
                   _localExpansion,

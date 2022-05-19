@@ -11,13 +11,14 @@
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_solver.hpp"
+#include "fast_multipole_solver.hpp"
 #include "translation_algorithms.hpp"
 #include "testing_helpers.hpp"
 #include "multipole_translator.hpp"
 
 using namespace math;
 using namespace test;
-const real current = 5;
+constexpr real current = 5;
 
 std::vector<std::pair<Vector3, Vector3>> readTelmaResults(const std::string& filename)
 {
@@ -173,8 +174,8 @@ void comparisonBetweenMethodsOnPrecision()
 
 void octreeFormingTime()
 {
-   const double torusRadius = 2;
-   const double torusSectionWidth = 0.2;
+   constexpr double torusRadius = 2;
+   constexpr double torusSectionWidth = 0.2;
 
    size_t w = 15;
 
@@ -196,8 +197,8 @@ void octreeFormingTime()
 
 void calculationTimeForMultipolesInLeaves()
 {
-   const double torusRadius = 2;
-   const double torusSectionWidth = 0.2;
+   constexpr double torusRadius = 2;
+   constexpr double torusSectionWidth = 0.2;
 
    size_t w = 15;
 
@@ -302,8 +303,8 @@ void calculationTimeForLocalMultipolesByLeafCapacity()
 
 void calculationTimeForLocalMultipolesByNodeCount()
 {
-   const double torusRadius = 2;
-   const double torusSectionWidth = 0.2;
+   constexpr double torusRadius = 2;
+   constexpr double torusSectionWidth = 0.2;
 
    size_t w = 15;
 
@@ -420,7 +421,7 @@ std::pair<double, Vector3>  timeForMultipoles(
 
    auto stop = std::chrono::steady_clock::now();
 
-   return std::pair<double, Vector3>(getTime(start, stop), res);
+   return { getTime(start, stop), res };
 }
 
 void NMResearch()
@@ -539,8 +540,8 @@ void matrixCalculationTime()
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
-      //MultipoleSolver multipoleSolverAda(quadratures, octreeLeafCapacity);
+      //MultipoleSolver multipoleSolverGPU(quadratures, quadratureOctreeLeafCapacity);
+      //MultipoleSolver multipoleSolverAda(quadratures, quadratureOctreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
@@ -809,6 +810,36 @@ void multipoleToLocalTest()
       MultipoleTranslator::translateLocal(c1, c2));
 }
 
+void FMMPrecisionTest()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   Vector3 begin(2.5, 2.5, 2.5);
+   Vector3 end(-2.5, -2.5, -2.5);
+   auto points = createPoints(begin, end, 500);
+
+   FastMultipoleSolver multipoleSolver(quadratures, points, 10, 1);
+   multipoleSolver.log = false;
+   multipoleSolver.calcMultipoleExpansionsAtLeaves();
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+   multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, M2MDevice::CPU);
+
+   auto fmmResults = multipoleSolver.calcA(current);
+
+   for(size_t i = 0; i < points.size(); ++i)
+   {
+      auto byMultipolesWithMatricesGPU = multipoleSolver.calcA(current, points[i]);
+
+      test::printSeparateLine(std::cout, 50);
+      std::cout << std::scientific;
+      std::cout << std::setw(40) << "point: " << points[i] << "\n";
+      std::cout << std::setw(40) << "multipoles with matrices GPU: " << byMultipolesWithMatricesGPU << "\n";
+      std::cout << std::setw(40) << "fmm: " << fmmResults[i] << "\n";
+   }
+
+}
+
 int main()
 {
    //NMResearch();
@@ -816,7 +847,7 @@ int main()
    //comparisonToTelmaIntegrals();
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
-   comparisonBetweenMethodsOnPrecision();
+   //comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipolesByNodeCount();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
@@ -829,13 +860,5 @@ int main()
    //layerMatrixCalculationTime(M2MDevice::GPU);
    //compareWithMatrixMultiplication();
 
-   /*Vector3 point(3, 1, 2);
-   auto a = Harmonics::calcRegularSolidHarmonics(10, point);
-   auto b = Harmonics::calcRegularSolidHarmonics(10, point);
-
-   auto ac = Harmonics::realToComplex(a);
-   auto bc = Harmonics::realToComplex(b);
-
-   Harmonics::mult(ac, 1.0 / Complex(0, 1));
-   Harmonics::multToIDiv(bc);*/
+   FMMPrecisionTest();
 }

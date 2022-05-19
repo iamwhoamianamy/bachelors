@@ -101,11 +101,13 @@
     <ClInclude Include="dev_ptr.hpp" />
     <ClInclude Include="exeptions.hpp" />
     <ClInclude Include="factorials.hpp" />
+    <ClInclude Include="fast_multipole_solver.hpp" />
     <ClInclude Include="harmonics.hpp" />
     <ClInclude Include="harmonic_series.hpp" />
     <ClInclude Include="hexahedron.hpp" />
     <ClInclude Include="integration.hpp" />
     <ClInclude Include="kernels.cuh" />
+    <ClInclude Include="multipole_solver_enums.hpp" />
     <ClInclude Include="multipole_translator.hpp" />
     <ClInclude Include="translation_algorithms.hpp" />
     <ClInclude Include="math.hpp" />
@@ -127,6 +129,7 @@
     <ClCompile Include="cuda_helper.cpp" />
     <ClCompile Include="exeptions.cpp" />
     <ClCompile Include="factorials.cpp" />
+    <ClCompile Include="fast_multipole_solver.cpp" />
     <ClCompile Include="harmonics.cpp" />
     <ClCompile Include="hexahedron.cpp" />
     <ClCompile Include="integration.cpp" />

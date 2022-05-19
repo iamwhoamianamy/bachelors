@@ -41,8 +41,13 @@ public:
    std::set<CalculationPointOctreeNode*> getAllNodesAsSet();
    std::vector<Vector3*> getAllPoints() const;
    size_t getAllNodeCount() const;
+   std::vector<Vector3> calcA(size_t pointCount) const;
 
-   void propagateLocalExpansions();
+   void initAllLocalExpansions(size_t order);
+   void propagateLocalExpansions() const;
 
    ~CalculationPointOctreeNode();
+private:
+   void calcA(std::vector<Vector3>& result) const;
+
 };
