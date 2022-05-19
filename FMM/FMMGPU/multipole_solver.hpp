@@ -7,30 +7,7 @@
 #include "quadrature_octree.hpp"
 #include "calculation_point_octree.hpp"
 #include "typedefs.hpp"
-
-enum class M2MAlg
-{
-   NoTranslation = 0,
-   ComplexTranslation,
-   RealTranslation,
-   Layers,
-   Matrices,
-};
-
-enum class M2MDevice
-{
-   CPU = 0,
-   GPU,
-   Adaptive
-};
-
-
-enum class M2LAlg
-{
-   NoTranslation = 0,
-   ComplexTranslation,
-   Matrices,
-};
+#include "multipole_solver_enums.hpp"
 
 class MultipoleSolver
 {
