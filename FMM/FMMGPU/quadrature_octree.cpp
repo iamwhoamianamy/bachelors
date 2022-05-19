@@ -64,7 +64,7 @@ void QuadratureOctreeNode::insert(Quadrature& point)
          }
       }
 
-      _quadratures.clear();
+      _quadratures.resize(0);
    }
 }
 
@@ -314,11 +314,14 @@ void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
          {
             nodesToVisit.erase(found);
 
-            auto translation = _box.center() - interactionNode->box().center();
-            interactionNode->localExpansion().add(
+            //auto translation = _box.center() - interactionNode->box().center();
+            auto translation = interactionNode->box().center() - _box.center();
+            auto contributionToLocalExpansion =
                MultipoleTranslator::multipoleToLocalWithComplex(
                   _multipoleExpansion,
-                  translation));
+                  translation);
+            interactionNode->localExpansion().add(
+               contributionToLocalExpansion);
          }
       }
 
@@ -387,11 +390,14 @@ std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionLis
    while(!queue.empty())
    {
       auto currentNode = queue.front();
+      queue.pop();
 
-      if(4 * _box.radius() * _box.radius() <
-         Vector3::distanceSquared(
-            currentNode->box().center(),
-            _box.center()) && 
+      real twoRadiuses = 2 * _box.radius();
+      real distance = sqrt(Vector3::distanceSquared(
+         currentNode->box().center(),
+         _box.center()));
+
+      if((twoRadiuses < distance) &&
          !_box.intersects(currentNode->box()) &&
          !_box.contains(currentNode->box().center()) &&
          !currentNode->box().contains(_box.center()))
