@@ -43,6 +43,8 @@ public:
 
    void add(const HarmonicSeries<T>& harmonicSeries);
    void subtract(const HarmonicSeries<T>& harmonicSeries);
+
+   static T mult(const HarmonicSeries<T>& a, const HarmonicSeries<T>& b);
 };
 
 template<class T>
@@ -210,4 +212,19 @@ inline HarmonicSeries<T>::HarmonicSeries(
 {
    _order = sqrt(harmonicData.size() - 1);
    _data = harmonicData;
+}
+
+template <class T>
+T HarmonicSeries<T>::mult(
+   const HarmonicSeries<T>& a, 
+   const HarmonicSeries<T>& b)
+{
+   T res = res(0);
+
+   for(int i = 0; i < a.elemCount(); ++i)
+   {
+      res += a.getHarmonic(i) * b.getHarmonic(i);
+   }
+
+   return res;
 }
