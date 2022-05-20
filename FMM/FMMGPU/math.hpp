@@ -240,10 +240,10 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
    return os;
 }
 
-__all__ Complex& operator*(const Complex& lhs, const Complex& rhs);
-__all__ Complex& operator*(const Complex& lhs, real rhs);
-__all__ Complex& operator+(const Complex& lhs, const Complex& rhs);
-__all__ Complex& operator-(const Complex& lhs, const Complex& rhs);
+__all__ Complex operator*(const Complex& lhs, const Complex& rhs);
+__all__ Complex operator*(const Complex& lhs, real rhs);
+__all__ Complex operator+(const Complex& lhs, const Complex& rhs);
+__all__ Complex operator-(const Complex& lhs, const Complex& rhs);
 __all__ Complex& operator*=(Complex& lhs, const Complex& rhs);
 __all__ Complex& operator+=(Complex& lhs, const Complex& rhs);
 

@@ -29,28 +29,24 @@ namespace math
    }
 }
 
-Complex& operator*(const Complex& lhs, const Complex& rhs)
+Complex operator*(const Complex& lhs, const Complex& rhs)
 {
-   auto res = cuCmulf(lhs, rhs);
-   return res;
+   return cuCmulf(lhs, rhs);
 }
 
-__all__ Complex& operator*(const Complex& lhs, const real rhs)
+__all__ Complex operator*(const Complex& lhs, const real rhs)
 {
-   auto res = make_cuComplex(cuCrealf(lhs) * rhs, cuCimagf(lhs) * rhs);
-   return res;
+   return make_cuComplex(cuCrealf(lhs) * rhs, cuCimagf(lhs) * rhs);
 }
 
-Complex& operator+(const Complex& lhs, const Complex& rhs)
+Complex operator+(const Complex& lhs, const Complex& rhs)
 {
-   auto res = cuCaddf(lhs, rhs);
-   return res;
+   return cuCaddf(lhs, rhs);
 }
 
-__all__ Complex& operator-(const Complex& lhs, const Complex& rhs)
+__all__ Complex operator-(const Complex& lhs, const Complex& rhs)
 {
-   auto res = cuCsubf(lhs, rhs);
-   return res;
+   return cuCsubf(lhs, rhs);
 }
 
 Complex& operator*=(Complex& lhs, const Complex& rhs)
