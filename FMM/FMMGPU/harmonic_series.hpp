@@ -11,7 +11,7 @@ private:
    size_t _order;
 public:
    HarmonicSeries();
-   HarmonicSeries(int order);
+   explicit HarmonicSeries(size_t order);
 
    T& getHarmonic(int order);
    const T& getHarmonic(int order) const;
@@ -53,7 +53,7 @@ inline HarmonicSeries<T>::HarmonicSeries()
 }
 
 template<class T>
-inline HarmonicSeries<T>::HarmonicSeries(int order)
+inline HarmonicSeries<T>::HarmonicSeries(size_t order)
 {
    _order = order;
    _data = std::vector<T>((order + 1) * (order + 1));

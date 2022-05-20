@@ -16,12 +16,12 @@ private:
    RealHarmonicSeries _sphericalHarmonics;
    static Factorials _factorials;
 public:   
-   Harmonics(int order, const Vector3& point);
+   Harmonics(size_t order, const Vector3& point);
 
    const RealHarmonicSeries& sphericalHarmonics() const;
 
    static RealHarmonicSeries calcSolidHarmonics(
-      size_t order,Vector3 point, bool isRegular);
+      size_t order, Vector3 point, bool isRegular);
    static RealHarmonicSeries calcRegularSolidHarmonics(
       size_t order, Vector3 point);
    static RealHarmonicSeries calcIrregularSolidHarmonics(

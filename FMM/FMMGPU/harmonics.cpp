@@ -6,7 +6,7 @@
 
 Factorials Harmonics::_factorials;
 
-Harmonics::Harmonics(int order, const Vector3& point) :
+Harmonics::Harmonics(size_t order, const Vector3& point) :
    _order(order)
 {
    calcSphericalHarmonics(point);
