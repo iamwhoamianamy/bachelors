@@ -15,6 +15,11 @@ namespace math
                                             Harmonics::getFactorial(n - k));
    }
 
+   real randBetween(real min, real max)
+   {
+      return (real)std::rand() / RAND_MAX * (max - min) + min;
+   }
+
    size_t nextDevisible(const size_t number, const size_t devidor)
    {
       if(devidor == 0)

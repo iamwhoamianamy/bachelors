@@ -14,6 +14,8 @@ namespace math
    real calcFactorial(int n);
    real calcBinomial(int k, int n);
 
+   real randBetween(real min, real max);
+
    size_t nextDevisible(const size_t number, const size_t devidor);
 
    template <class T>
