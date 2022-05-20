@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "testing_helpers.hpp"
+#include "math.hpp"
+#include "exeptions.hpp"
 
 namespace test
 {
@@ -9,9 +11,9 @@ namespace test
       constexpr double torusRadius = 2;
       constexpr double torusSectionWidth = 0.2;
       
-      //return Torus(torusRadius, torusSectionWidth, 80, 8, 8);
-      return { torusRadius, torusSectionWidth, 40, 8, 8 };
-      //return { torusRadius, torusSectionWidth, 20, 4, 4 };
+      //return { torusRadius, torusSectionWidth, 80, 8, 8 };
+      //return { torusRadius, torusSectionWidth, 40, 8, 8 };
+      return { torusRadius, torusSectionWidth, 20, 4, 4 };
    }
 
    double getTime(void (*f)())
@@ -50,16 +52,51 @@ namespace test
 
    std::vector<Vector3> createPoints(const Vector3& begin, const Vector3& end, int n)
    {
-      Vector3 step = (end - begin) / (n - 1);
-      std::vector<Vector3> res(n);
-
-      for(size_t i = 0; i < n; i++)
+      if(n == 1)
       {
-         res[i] = begin + step * i;
+         return { (end + begin) / 2 };
+      }
+      else
+      {
+         Vector3 step = (end - begin) / (n - 1);
+         std::vector<Vector3> res(n);
+
+         for(size_t i = 0; i < n; i++)
+         {
+            res[i] = begin + step * i;
+         }
+
+         return res;
+      }
+   }
+
+
+
+   std::vector<Vector3> createRandomPoints(const Box& box, int n)
+   {
+      std::vector<Vector3> res(n);
+      std::srand(std::time(0));
+
+      for (int i = 0; i < n; ++i)
+      {
+         real x = math::randBetween(
+            box.center().x - box.halfDimensions().x,
+            box.center().x + box.halfDimensions().x);
+
+         real y = math::randBetween(
+            box.center().y - box.halfDimensions().y,
+            box.center().y + box.halfDimensions().y);
+
+         real z = math::randBetween(
+            box.center().z - box.halfDimensions().z,
+            box.center().z + box.halfDimensions().z);
+
+         res[i] = { x, y, z };
       }
 
       return res;
    }
+   
 
    void printSeparateLine(std::ostream& os, size_t count)
    {
