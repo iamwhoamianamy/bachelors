@@ -134,7 +134,7 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
 
-   Vector3 point(3, 1, 2);
+   Vector3 point(10, 5, 8);
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
    
@@ -815,11 +815,14 @@ void FMMPrecisionTest()
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-   Vector3 begin(2.5, 2.5, 2.5);
-   Vector3 end(-2.5, -2.5, -2.5);
-   auto points = createPoints(begin, end, 500);
+   Vector3 begin(10.3, 5.7, 8.5);
+   Vector3 end(10.4, 5.7, 8.5);
+   //auto points = createPoints(begin, end, 8);
+   //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2.5, 2.5, 2.5 }), 100);
+   auto points = createRandomPoints(Box({ 10, 5, 8 }, { 1, 1, 1 }), 100);
+   //auto points = std::vector<Vector3>({ Vector3(10.5, 5, 8) });
 
-   FastMultipoleSolver multipoleSolver(quadratures, points, 10, 1);
+   FastMultipoleSolver multipoleSolver(quadratures, points, 2, 1);
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
@@ -827,17 +830,20 @@ void FMMPrecisionTest()
 
    auto fmmResults = multipoleSolver.calcA(current);
 
+   //for(size_t i = 0; i < 5; ++i)
    for(size_t i = 0; i < points.size(); ++i)
    {
-      auto byMultipolesWithMatricesGPU = multipoleSolver.calcA(current, points[i]);
+      //auto [point, aInPointByFmm] = fmmResults[i];
+      auto point = fmmResults[i].first;
+      auto aInPointByFmm = fmmResults[i].second;
+      auto byMultipolesWithMatricesGPU = multipoleSolver.calcA(current, point);
 
       test::printSeparateLine(std::cout, 50);
       std::cout << std::scientific;
-      std::cout << std::setw(40) << "point: " << points[i] << "\n";
+      std::cout << std::setw(40) << "point: " << point << "\n";
       std::cout << std::setw(40) << "multipoles with matrices GPU: " << byMultipolesWithMatricesGPU << "\n";
-      std::cout << std::setw(40) << "fmm: " << fmmResults[i] << "\n";
+      std::cout << std::setw(40) << "fmm: " << aInPointByFmm << "\n";
    }
-
 }
 
 int main()

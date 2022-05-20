@@ -19,7 +19,6 @@ enum class M2MDevice
 
 enum class M2LAlg
 {
-   NoTranslation = 0,
-   ComplexTranslation,
+   ComplexTranslation = 0,
    Matrices,
 };

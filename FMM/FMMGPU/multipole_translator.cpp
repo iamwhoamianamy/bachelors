@@ -187,14 +187,9 @@ HarmonicSeries<Vector3> MultipoleTranslator::multipoleToLocalWithComplex(
    auto zComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 2));
 
    return Harmonics::createFormXYZ(
-      Harmonics::complexToReal(multipoleToLocal(irregular, xComponent)),
-      Harmonics::complexToReal(multipoleToLocal(irregular, yComponent)),
-      Harmonics::complexToReal(multipoleToLocal(irregular, zComponent)));
-
-   //return Harmonics::createFormXYZ(
-   //   Harmonics::complexToReal(multipoleToLocal(xComponent, irregular)),
-   //   Harmonics::complexToReal(multipoleToLocal(yComponent, irregular)),
-   //   Harmonics::complexToReal(multipoleToLocal(zComponent, irregular)));
+      Harmonics::complexToReal(multipoleToLocal(xComponent, irregular)),
+      Harmonics::complexToReal(multipoleToLocal(yComponent, irregular)),
+      Harmonics::complexToReal(multipoleToLocal(zComponent, irregular)));
 }
 
 real MultipoleTranslator::multipoleToLocalTranslationFactor(int m, int mu, int lambda)
@@ -245,14 +240,9 @@ HarmonicSeries<Vector3> MultipoleTranslator::translateLocalWithComplex(
    auto zComponent = Harmonics::realToComplex(Harmonics::separateCoord(expansion, 2));
 
    return Harmonics::createFormXYZ(
-      Harmonics::complexToReal(translateLocal(regular, xComponent)),
-      Harmonics::complexToReal(translateLocal(regular, yComponent)),
-      Harmonics::complexToReal(translateLocal(regular, zComponent)));
-
-   //return Harmonics::createFormXYZ(
-   //   Harmonics::complexToReal(translateLocal(xComponent, regular)),
-   //   Harmonics::complexToReal(translateLocal(yComponent, regular)),
-   //   Harmonics::complexToReal(translateLocal(zComponent, regular)));
+      Harmonics::complexToReal(translateLocal(xComponent, regular)),
+      Harmonics::complexToReal(translateLocal(yComponent, regular)),
+      Harmonics::complexToReal(translateLocal(zComponent, regular)));
 }
 
 real MultipoleTranslator::localTranslationFactor(int m, int mu, int lambda, int l)

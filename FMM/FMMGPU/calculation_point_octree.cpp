@@ -153,9 +153,10 @@ size_t CalculationPointOctreeNode::getAllNodeCount() const
    return count;
 }
 
-std::vector<Vector3> CalculationPointOctreeNode::calcA(size_t pointCount) const
+std::vector<std::pair<Vector3, Vector3>> CalculationPointOctreeNode::calcA(
+   size_t pointCount) const
 {
-   std::vector<Vector3> res;
+   std::vector<std::pair<Vector3, Vector3>> res;
    res.reserve(pointCount);
    calcA(res);
 
@@ -175,23 +176,19 @@ void CalculationPointOctreeNode::initAllLocalExpansions(size_t order)
    }
 }
 
-void CalculationPointOctreeNode::calcA(std::vector<Vector3>& result) const
+void CalculationPointOctreeNode::calcA(
+   std::vector<std::pair<Vector3, Vector3>>& result) const
 {
    if(!_points.empty())
    {
       for(auto point : _points)
       {
-         size_t order = _localExpansion.order();
-         auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(order, *point);
-
-         Vector3 aInPoint;
-
-         for(int i = 0; i < _localExpansion.elemCount(); ++i)
-         {
-            aInPoint += _localExpansion.getHarmonic(i) * regularHarmonic.getHarmonic(i);
-         }
-
-         result.emplace_back(aInPoint);
+         auto translation = *point - _box.center();
+         auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(
+            _localExpansion.order(), translation);
+         Vector3 aInPoint = mult(_localExpansion, regularHarmonic);
+         auto res = std::make_pair(*point, aInPoint);
+         result.emplace_back(res);
       }
    }
    else
@@ -212,8 +209,7 @@ void CalculationPointOctreeNode::propagateLocalExpansions() const
          if(child->localExpansion().order() !=0 &&
             (child->isSubdivided() || !child->points().empty()))
          {
-            //auto translation = _box.center() - child->box().center();
-            auto translation = child->box().center() - _box.center();
+            auto translation = _box.center() - child->box().center();
             child->_localExpansion.add(
                MultipoleTranslator::translateLocalWithComplex(
                   _localExpansion,
@@ -225,6 +221,16 @@ void CalculationPointOctreeNode::propagateLocalExpansions() const
    for(auto child : _children)
    {
       child->propagateLocalExpansions();
+   }
+}
+
+void CalculationPointOctreeNode::removeAllDescendantsFromSet(
+   std::set<CalculationPointOctreeNode*>& set) const
+{
+   for (auto child : _children)
+   {
+      set.erase(child);
+      child->removeAllDescendantsFromSet(set);
    }
 }
 

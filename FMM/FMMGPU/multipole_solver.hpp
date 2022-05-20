@@ -5,7 +5,6 @@
 #include "harmonics.hpp"
 #include "quadrature.hpp"
 #include "quadrature_octree.hpp"
-#include "calculation_point_octree.hpp"
 #include "typedefs.hpp"
 #include "multipole_solver_enums.hpp"
 

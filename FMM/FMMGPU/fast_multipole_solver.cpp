@@ -22,16 +22,12 @@ void FastMultipoleSolver::initTrees()
    MultipoleSolver::initTrees();
 
    _calculationPointOctreeRoot = new CalculationPointOctreeNode(
-      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), calculationPointOctreeLeafCapacity);
+      //Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), calculationPointOctreeLeafCapacity);
+      Box(Vector3(10, 5, 8), Vector3(1, 1, 1)), calculationPointOctreeLeafCapacity);
    _calculationPointOctreeRoot->insert(_points);
 }
 
-void FastMultipoleSolver::calcLocalMultipoleExpansionsWithoutTranslation()
-{
-   // Д
-}
-
-void FastMultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation()
+void FastMultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation() const
 {
    auto nodesToVisit = _calculationPointOctreeRoot->getAllNodesAsSet();
 
@@ -55,11 +51,6 @@ void FastMultipoleSolver::calclLocalMultipoleExpansions(
 
       switch(algorithm)
       {
-         case M2LAlg::NoTranslation:
-         {
-            calcLocalMultipoleExpansionsWithoutTranslation();
-            break;
-         }
          case M2LAlg::ComplexTranslation:
          {
             calcLocalMultipoleExpansionsWithComplexTranslation();
@@ -87,13 +78,13 @@ Vector3 FastMultipoleSolver::calcB(real current, const Vector3& point)
    return MultipoleSolver::calcB(current, point);
 }
 
-std::vector<Vector3> FastMultipoleSolver::calcA(real current)
+std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcA(real current)
 {
    auto res = _calculationPointOctreeRoot->calcA(_points.size());
 
    for (auto &re : res)
    {
-      re = re / (4.0 * math::PI) * current;
+      re.second = re.second / (4.0 * math::PI) * current;
    }
 
    return res;

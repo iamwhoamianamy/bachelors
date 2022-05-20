@@ -313,9 +313,9 @@ void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
          if(found != nodesToVisit.end())
          {
             nodesToVisit.erase(found);
-
-            //auto translation = _box.center() - interactionNode->box().center();
-            auto translation = interactionNode->box().center() - _box.center();
+            interactionNode->removeAllDescendantsFromSet(nodesToVisit);
+            
+            auto translation = _box.center() - interactionNode->box().center();
             auto contributionToLocalExpansion =
                MultipoleTranslator::multipoleToLocalWithComplex(
                   _multipoleExpansion,
@@ -392,12 +392,13 @@ std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionLis
       auto currentNode = queue.front();
       queue.pop();
 
-      real twoRadiuses = 2 * _box.radius();
+      real twoRadiuses = 2 * currentNode->box().radius();
+      //real twoRadiuses = 2 * box().radius();
       real distance = sqrt(Vector3::distanceSquared(
          currentNode->box().center(),
          _box.center()));
 
-      if((twoRadiuses < distance) &&
+      if(twoRadiuses < distance &&
          !_box.intersects(currentNode->box()) &&
          !_box.contains(currentNode->box().center()) &&
          !currentNode->box().contains(_box.center()))
