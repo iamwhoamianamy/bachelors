@@ -43,6 +43,7 @@ public:
 
    void add(const HarmonicSeries<T>& harmonicSeries);
    void subtract(const HarmonicSeries<T>& harmonicSeries);
+   T sum() const;
 
    static T mult(const HarmonicSeries<T>& a, const HarmonicSeries<T>& b);
 };
@@ -182,6 +183,19 @@ inline void HarmonicSeries<T>::subtract(
    }
 }
 
+template <class T>
+T HarmonicSeries<T>::sum() const
+{
+   T res = 0;
+
+   for(size_t i = 0; i < _data.size(); i++)
+   {
+      res += _data[i];
+   }
+
+   return res;
+}
+
 template<class T>
 inline HarmonicSeries<T>::HarmonicSeries(
    HarmonicSeries<T>&& harmonicSeries) noexcept
@@ -219,7 +233,21 @@ T HarmonicSeries<T>::mult(
    const HarmonicSeries<T>& a, 
    const HarmonicSeries<T>& b)
 {
-   T res = res(0);
+   T res = 0;
+
+   for(int i = 0; i < a.elemCount(); ++i)
+   {
+      res += a.getHarmonic(i) * b.getHarmonic(i);
+   }
+
+   return res;
+}
+
+template<class T1, class T2> T1 mult(
+   const HarmonicSeries<T1>& a,
+   const HarmonicSeries<T2>& b)
+{
+   T1 res = 0;
 
    for(int i = 0; i < a.elemCount(); ++i)
    {
