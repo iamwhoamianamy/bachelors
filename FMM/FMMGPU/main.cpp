@@ -815,11 +815,16 @@ void FMMPrecisionTest()
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-   Vector3 begin(10.3, 5.7, 8.5);
-   Vector3 end(10.4, 5.7, 8.5);
-   //auto points = createPoints(begin, end, 8);
-   //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2.5, 2.5, 2.5 }), 100);
-   auto points = createRandomPoints(Box({ 10, 5, 8 }, { 1, 1, 1 }), 100);
+   //Vector3 begin(4.5, 4.5, 4.5);
+   //Vector3 end(7.5, 7.5, 7.5);
+   Vector3 begin(4, 4, 4);
+   Vector3 end(2, 2, 2);
+   //auto points = createPoints(begin, end, 2);
+   //std::vector<Vector3> points = {{2, 2, 0}};
+   //std::vector<Vector3> points = {{3, 3, 3}};
+   //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), 4);
+   auto points = createRandomPoints(Box({ 2, 2, 2 }, { 2, 2, 2 }), 100);
+   //auto points = createRandomPoints(Box({ 10, 5, 8 }, { 1, 1, 1 }), 10);
    //auto points = std::vector<Vector3>({ Vector3(10.5, 5, 8) });
 
    FastMultipoleSolver multipoleSolver(quadratures, points, 2, 1);
@@ -829,21 +834,32 @@ void FMMPrecisionTest()
    multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, M2MDevice::CPU);
 
    auto fmmResults = multipoleSolver.calcA(current);
+   
+   real averageAbsoluteError = 0;
+   real averageRelativeError = 0;
 
-   //for(size_t i = 0; i < 5; ++i)
    for(size_t i = 0; i < points.size(); ++i)
    {
-      //auto [point, aInPointByFmm] = fmmResults[i];
       auto point = fmmResults[i].first;
       auto aInPointByFmm = fmmResults[i].second;
       auto byMultipolesWithMatricesGPU = multipoleSolver.calcA(current, point);
 
-      test::printSeparateLine(std::cout, 50);
+      real absoluteError = (aInPointByFmm - byMultipolesWithMatricesGPU).length();
+      real relativeError = 100 * absoluteError / byMultipolesWithMatricesGPU.length();
+
+      averageAbsoluteError += absoluteError;
+      averageRelativeError += relativeError;
+
+      test::printSeparateLine(std::cout, 100);
       std::cout << std::scientific;
       std::cout << std::setw(40) << "point: " << point << "\n";
       std::cout << std::setw(40) << "multipoles with matrices GPU: " << byMultipolesWithMatricesGPU << "\n";
-      std::cout << std::setw(40) << "fmm: " << aInPointByFmm << "\n";
+      std::cout << std::setw(40) << "fmm: " << aInPointByFmm << " ";
+      std::cout << std::setw(10) << absoluteError << "\n";
    }
+
+   std::cout << "averageAbsoluteError: " << averageAbsoluteError / points.size() << "\n";
+   std::cout << "averageRelativeError: " << averageRelativeError / points.size() << "\n";
 }
 
 int main()

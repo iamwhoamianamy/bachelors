@@ -6,6 +6,16 @@
 #include "box.hpp"
 #include "harmonic_series.hpp"
 
+class QuadratureOctreeNode;
+class CalculationPointOctreeNode;
+
+struct FFMResult
+{
+   Vector3 point;
+   Vector3 answer;
+   CalculationPointOctreeNode* node;
+};
+
 class CalculationPointOctreeNode
 {
 private:
@@ -17,6 +27,8 @@ private:
    CalculationPointOctreeNode* _parent;
  
 public:
+   std::set<QuadratureOctreeNode*> leftToInteractWith;
+
    CalculationPointOctreeNode();
    CalculationPointOctreeNode(
       const Box& box,
@@ -41,15 +53,17 @@ public:
    std::set<CalculationPointOctreeNode*> getAllNodesAsSet();
    std::vector<Vector3*> getAllPoints() const;
    size_t getAllNodeCount() const;
-   std::vector<std::pair<Vector3, Vector3>> calcA(size_t pointCount) const;
+   std::vector<FFMResult> calcA(size_t pointCount) ;
 
    void initAllLocalExpansions(size_t order);
    void propagateLocalExpansions() const;
-
-   void removeAllDescendantsFromSet(std::set<CalculationPointOctreeNode*>& set) const;
+   std::set<CalculationPointOctreeNode*> addMeAndAllParentsToSet(
+      std::set<CalculationPointOctreeNode*>& res);
+   void removeAllDescendantsFromSet(
+      std::set<CalculationPointOctreeNode*>& set) const;
 
    ~CalculationPointOctreeNode();
 private:
-   void calcA(std::vector<std::pair<Vector3, Vector3>>& result) const;
+   void calcA(std::vector<FFMResult>& result);
 
 };

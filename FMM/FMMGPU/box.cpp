@@ -23,6 +23,16 @@ bool Box::contains(const Vector3& point) const
            isInRange(point.z, _center.z, _halfDimensions.z));
 }
 
+bool Box::contains(const Box& box) const
+{
+   return isInRange(box.center().x - box.halfDimensions().x, _center.x, _halfDimensions.x) &&
+          isInRange(box.center().x + box.halfDimensions().x, _center.x, _halfDimensions.x) &&
+          isInRange(box.center().y - box.halfDimensions().y, _center.y, _halfDimensions.y) &&
+          isInRange(box.center().y + box.halfDimensions().y, _center.y, _halfDimensions.y) &&
+          isInRange(box.center().z - box.halfDimensions().z, _center.z, _halfDimensions.z) &&
+          isInRange(box.center().z + box.halfDimensions().z, _center.z, _halfDimensions.z);
+}
+
 bool Box::intersects(const Box& _box) const
 {
    return Box(_box.center(), _halfDimensions + _box.halfDimensions()).contains(center());

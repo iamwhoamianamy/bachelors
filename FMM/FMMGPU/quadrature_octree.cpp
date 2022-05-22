@@ -1,4 +1,7 @@
 #include "quadrature_octree.hpp"
+
+#include <iostream>
+
 #include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
@@ -298,23 +301,57 @@ size_t QuadratureOctreeNode::getAllNodeCount() const
    return count;
 }
 
+std::set<QuadratureOctreeNode*> QuadratureOctreeNode::getAllUsefulNodes()
+{
+   std::set<QuadratureOctreeNode*>res;
+   getAllUsefulNodes(res);
+   return res;
+}
+
+void QuadratureOctreeNode::getAllUsefulNodes(
+   std::set<QuadratureOctreeNode*>& res)
+{
+   if(isSubdivided() || !_quadratures.empty())
+   {
+      res.insert(this);
+
+      for (auto child : _children)
+      {
+         child->getAllUsefulNodes(res);
+      }
+   }
+}
+
 void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
    CalculationPointOctreeNode* calculationPointOctreeRoot,
-   std::set<CalculationPointOctreeNode*>& nodesToVisit) const
+   std::set<CalculationPointOctreeNode*>& nodesToVisit,
+   std::set<CalculationPointOctreeNode*>& nodesToAvoid)
 {
-   auto interactionList = getInteractionList(calculationPointOctreeRoot);
+   auto interactionList = getInteractionList(calculationPointOctreeRoot, nodesToAvoid);
 
    if(!interactionList.empty())
    {
       for(auto interactionNode : interactionList)
       {
-         auto found = nodesToVisit.find(interactionNode);
+         auto foundToVisit = nodesToVisit.find(interactionNode);
 
-         if(found != nodesToVisit.end())
+         if(foundToVisit != nodesToVisit.end())
          {
-            nodesToVisit.erase(found);
+            nodesToVisit.erase(foundToVisit);
             interactionNode->removeAllDescendantsFromSet(nodesToVisit);
-            
+
+            std::set<CalculationPointOctreeNode*> nodesToErase;
+            interactionNode->addMeAndAllParentsToSet(nodesToErase);
+
+            for (auto toErase : nodesToErase)
+            {
+               auto foundToErase = nodesToVisit.find(toErase);
+               if(foundToErase != nodesToVisit.end())
+                  nodesToVisit.erase(foundToErase);
+            }
+
+            nodesToAvoid.insert(nodesToErase.begin(), nodesToErase.end());
+
             auto translation = _box.center() - interactionNode->box().center();
             auto contributionToLocalExpansion =
                MultipoleTranslator::multipoleToLocalWithComplex(
@@ -324,45 +361,146 @@ void QuadratureOctreeNode::translateMultipoleExpansionsToLocal(
                contributionToLocalExpansion);
          }
       }
+   }
 
-      if(!nodesToVisit.empty())
+   if(!nodesToVisit.empty())
+   {
+      for(auto child : _children)
       {
-         for(auto child : _children)
+         if(child->isSubdivided() || !child->quadratures().empty())
          {
+            std::set<CalculationPointOctreeNode*> newNodesToVisit(nodesToVisit);
+            std::set<CalculationPointOctreeNode*> newNodesToAvoid(nodesToAvoid);
+
             child->translateMultipoleExpansionsToLocal(
                calculationPointOctreeRoot,
-               nodesToVisit);
+               newNodesToVisit,
+               newNodesToAvoid);
          }
       }
    }
+
+   for (auto node : nodesToVisit)
+   {
+      if(!node->points().empty())
+         node->leftToInteractWith.insert(this);
+   }
+}
+
+std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionList(
+   CalculationPointOctreeNode* calculationPointOctreeNode,
+   const std::set<CalculationPointOctreeNode*>& nodesToAvoid) const
+{
+   std::vector<CalculationPointOctreeNode*> res;
+   std::queue<CalculationPointOctreeNode*> queue;
+   queue.push(calculationPointOctreeNode);
+
+   while(!queue.empty())
+   {
+      auto calcPointTreeNode = queue.front();
+      queue.pop();
+
+      if(!nodesToAvoid.contains(calcPointTreeNode))
+      {
+         real radius1 = box().radius();
+         real radius2 = calcPointTreeNode->box().radius();
+
+         real minRadius = std::min(radius1, radius2);
+         real maxRadius = std::max(radius1, radius2);
+
+         real minimalDistance = 2 * minRadius + maxRadius;
+         real distance = sqrt(Vector3::distanceSquared(
+            calcPointTreeNode->box().center(),
+            _box.center()));
+      
+         if(minimalDistance < distance)
+         {
+            res.push_back(calcPointTreeNode);
+         }
+         else
+         {
+            for(auto child : calcPointTreeNode->children())
+            {
+               if(child->isSubdivided() || !child->points().empty())
+               {
+                  queue.push(child);
+               }
+            }
+         }
+      }
+      else
+      {
+         for(auto child : calcPointTreeNode->children())
+         {
+            if(child->isSubdivided() || !child->points().empty())
+            {
+               queue.push(child);
+            }
+         }
+      }
+   }
+
+   return res;
+}
+
+std::vector<QuadratureOctreeNode*> QuadratureOctreeNode::getBiggestNodesInBox(
+   const Box& box)
+{
+   std::vector<QuadratureOctreeNode*> res;
+   getBiggestNodesInBox(box, res);
+   return res;
+}
+
+std::vector<QuadratureOctreeNode*> QuadratureOctreeNode::getBiggestNearNodes(
+   const Vector3& point,
+   real radius)
+{
+   std::vector<QuadratureOctreeNode*> res;
+   getBiggestNearNodes(res, point, radius);
+
+   return res;
+}
+
+void QuadratureOctreeNode::removeAllDescendantsFromSet(
+   std::set<QuadratureOctreeNode*>& set) const
+{
+   for(auto child : _children)
+   {
+      set.erase(child);
+      child->removeAllDescendantsFromSet(set);
+   }
+}
+
+void QuadratureOctreeNode::getBiggestNearNodes(
+   std::vector<QuadratureOctreeNode*>& res,
+   const Vector3& point,
+   real radius)
+{
+   real distance = (point - box().center()).length();
+
+   if(distance < 2 * radius && 2 * box().radius() < distance)
+   {
+      res.push_back(this);
+   }
    else
    {
-      if(!nodesToVisit.empty())
+      for(auto child : _children)
       {
-         for(auto child : _children)
+         if(child->isSubdivided() || !child->quadratures().empty())
          {
-            if(child->isSubdivided() || !child->quadratures().empty())
-            {
-               auto newNodesToVisit = calculationPointOctreeRoot->getAllNodesAsSet();
-
-               child->translateMultipoleExpansionsToLocal(
-                  calculationPointOctreeRoot,
-                  newNodesToVisit);
-            }
+            child->getBiggestNearNodes(res, point, radius);
          }
       }
    }
 }
 
-std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionList(
-   CalculationPointOctreeNode* calculationPointOctreeNode) const
+std::vector<QuadratureOctreeNode*> QuadratureOctreeNode::getNearNeighbours()
 {
-   std::vector<CalculationPointOctreeNode*> res;
+   std::vector<QuadratureOctreeNode*> res;
 
-   /*if(calculationPointOctreeNode && 
-      calculationPointOctreeNode->parent())
+   if(parent())
    {
-      auto grandparent = calculationPointOctreeNode->parent()->parent();
+      auto grandparent = parent()->parent();
 
       if(grandparent)
       {
@@ -372,47 +510,32 @@ std::vector<CalculationPointOctreeNode*> QuadratureOctreeNode::getInteractionLis
          {
             for(auto parentNearNeighbourChild : parentNearNeighbour->children())
             {
-               if(4 * _box.radius() * _box.radius() < 
-                  Vector3::distanceSquared(
-                     parentNearNeighbourChild->box().center(),
-                     _box.center()))
-               {
-                  res.push_back(parentNearNeighbourChild);
-               }
+               res.push_back(parentNearNeighbourChild);
             }
          }
-      }
-   }*/
-
-   std::queue< CalculationPointOctreeNode*> queue;
-   queue.push(calculationPointOctreeNode);
-
-   while(!queue.empty())
-   {
-      auto currentNode = queue.front();
-      queue.pop();
-
-      real twoRadiuses = 2 * currentNode->box().radius();
-      //real twoRadiuses = 2 * box().radius();
-      real distance = sqrt(Vector3::distanceSquared(
-         currentNode->box().center(),
-         _box.center()));
-
-      if(twoRadiuses < distance &&
-         !_box.intersects(currentNode->box()) &&
-         !_box.contains(currentNode->box().center()) &&
-         !currentNode->box().contains(_box.center()))
-      {
-         res.push_back(currentNode);
-      }
-      else
-      {
-         for(auto child : currentNode->children())
-            queue.push(child);
       }
    }
 
    return res;
+}
+
+void QuadratureOctreeNode::getBiggestNodesInBox(
+   const Box& box, 
+   std::vector<QuadratureOctreeNode*>& res)
+{
+   if((isSubdivided() || !_quadratures.empty()) &&
+      (box.contains(_box) || box.intersects(_box)))
+   {
+      res.push_back(this);
+   }
+   else
+   {
+      for (auto child : _children)
+      {
+         child->getBiggestNodesInBox(box, res);
+
+      }
+   }
 }
 
 const Box& QuadratureOctreeNode::box() const

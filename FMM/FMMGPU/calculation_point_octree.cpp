@@ -1,4 +1,5 @@
 #include "calculation_point_octree.hpp"
+#include "quadrature_octree.hpp"
 
 #include <iostream>
 
@@ -115,8 +116,11 @@ std::set<CalculationPointOctreeNode*> CalculationPointOctreeNode::getAllNodesAsS
 
    for(auto child : _children)
    {
-      auto childChildren = child->getAllNodes();
-      result.insert(childChildren.begin(), childChildren.end());
+      if(child->isSubdivided() || !child->points().empty())
+      {
+         auto childChildren = child->getAllNodesAsSet();
+         result.insert(childChildren.begin(), childChildren.end());
+      }
    }
 
    return result;
@@ -153,10 +157,9 @@ size_t CalculationPointOctreeNode::getAllNodeCount() const
    return count;
 }
 
-std::vector<std::pair<Vector3, Vector3>> CalculationPointOctreeNode::calcA(
-   size_t pointCount) const
+std::vector<FFMResult> CalculationPointOctreeNode::calcA(size_t pointCount)
 {
-   std::vector<std::pair<Vector3, Vector3>> res;
+   std::vector<FFMResult> res;
    res.reserve(pointCount);
    calcA(res);
 
@@ -176,8 +179,7 @@ void CalculationPointOctreeNode::initAllLocalExpansions(size_t order)
    }
 }
 
-void CalculationPointOctreeNode::calcA(
-   std::vector<std::pair<Vector3, Vector3>>& result) const
+void CalculationPointOctreeNode::calcA(std::vector<FFMResult>& result)
 {
    if(!_points.empty())
    {
@@ -187,8 +189,7 @@ void CalculationPointOctreeNode::calcA(
          auto regularHarmonic = Harmonics::calcRegularSolidHarmonics(
             _localExpansion.order(), translation);
          Vector3 aInPoint = mult(_localExpansion, regularHarmonic);
-         auto res = std::make_pair(*point, aInPoint);
-         result.emplace_back(res);
+         result.emplace_back(*point, aInPoint , this);
       }
    }
    else
@@ -232,6 +233,21 @@ void CalculationPointOctreeNode::removeAllDescendantsFromSet(
       set.erase(child);
       child->removeAllDescendantsFromSet(set);
    }
+}
+
+std::set<CalculationPointOctreeNode*> CalculationPointOctreeNode::addMeAndAllParentsToSet(
+   std::set<CalculationPointOctreeNode*>& res)
+{
+   res.insert(this);
+   CalculationPointOctreeNode* temp = this->parent();
+
+   while(temp)
+   {
+      res.insert(temp);
+      temp = temp->parent();
+   }
+
+   return res;
 }
 
 const Box& CalculationPointOctreeNode::box() const

@@ -29,6 +29,32 @@ namespace math
    }
 }
 
+real math::max(const std::vector<Vector3>& vec, size_t axis)
+{
+   real res = -1e+16;
+
+   for(size_t i = 0; i < vec.size(); i++)
+   {
+      if(vec[i][axis] > res)
+         res = vec[i][axis];
+   }
+
+   return res;
+}
+
+real math::min(const std::vector<Vector3>& vec, size_t axis)
+{
+   real res = 1e+16;
+
+   for(size_t i = 0; i < vec.size(); i++)
+   {
+      if(vec[i][axis] < res)
+         res = vec[i][axis];
+   }
+
+   return res;
+}
+
 Complex operator*(const Complex& lhs, const Complex& rhs)
 {
    return cuCmulf(lhs, rhs);

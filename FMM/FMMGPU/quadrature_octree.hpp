@@ -19,6 +19,7 @@ private:
    QuadratureOctreeNode* _parent;
 
 public:
+
    QuadratureOctreeNode();
    QuadratureOctreeNode(
       const Box& box,
@@ -50,15 +51,36 @@ public:
    Vector3 calcA(const Vector3& point) const;
    Vector3 caclRot(const Vector3& point) const;
    size_t getAllNodeCount() const;
+   std::set<QuadratureOctreeNode*> getAllUsefulNodes();
 
    void translateMultipoleExpansionsToLocal(
       CalculationPointOctreeNode* calculationPointOctreeRoot,
-      std::set<CalculationPointOctreeNode*>& nodesToVisit) const;
+      std::set<CalculationPointOctreeNode*>& nodesToVisit,
+      std::set<CalculationPointOctreeNode*>& nodesToAvoid);
 
    std::vector<CalculationPointOctreeNode*> getInteractionList(
-      CalculationPointOctreeNode* calculationPointOctreeNode) const;
+      CalculationPointOctreeNode* calculationPointOctreeNode,
+      const std::set<CalculationPointOctreeNode*>& nodesToAvoid) const;
+
+   std::vector<QuadratureOctreeNode*> getBiggestNodesInBox(const Box& box);
+   std::vector<QuadratureOctreeNode*> getNearNeighbours();
+   std::vector<QuadratureOctreeNode*> getBiggestNearNodes(
+      const Vector3& point,
+      real radius);
+   void removeAllDescendantsFromSet(
+      std::set<QuadratureOctreeNode*>& set) const;
 
    ~QuadratureOctreeNode();
 private:
+   void getAllUsefulNodes(std::set<QuadratureOctreeNode*>& res);
+
+   void getBiggestNodesInBox(
+      const Box& box,
+      std::vector<QuadratureOctreeNode*>& res);
+
    bool isLeafAndUseful() const;
+   void getBiggestNearNodes(
+      std::vector<QuadratureOctreeNode*>& res,
+      const Vector3& point,
+      real radius);
 };
