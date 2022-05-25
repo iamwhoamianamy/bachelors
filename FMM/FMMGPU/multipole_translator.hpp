@@ -4,7 +4,6 @@
 class MultipoleTranslator
 {
 public:
-
 #pragma region Multipole to multipole translation algorithms
 
    static ComplexHarmonicSeries translateMultipole(
