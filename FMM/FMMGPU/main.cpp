@@ -815,19 +815,18 @@ void FMMPrecisionTest()
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-   //Vector3 begin(4.5, 4.5, 4.5);
-   //Vector3 end(7.5, 7.5, 7.5);
+   //Vector3 begin(10, 10, 10);
+   //Vector3 end(9, 9, 9);
    Vector3 begin(4, 4, 4);
-   Vector3 end(2, 2, 2);
-   //auto points = createPoints(begin, end, 2);
+   Vector3 end(1, 1, 1);
+   //auto points = createPoints(begin, end, 10);
    //std::vector<Vector3> points = {{2, 2, 0}};
    //std::vector<Vector3> points = {{3, 3, 3}};
-   //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), 4);
-   auto points = createRandomPoints(Box({ 2, 2, 2 }, { 2, 2, 2 }), 100);
-   //auto points = createRandomPoints(Box({ 10, 5, 8 }, { 1, 1, 1 }), 10);
+   auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), 128);
+   //auto points = createRandomPoints(Box({ 10, 10, 10 }, { 2, 2, 2 }), 100);
    //auto points = std::vector<Vector3>({ Vector3(10.5, 5, 8) });
 
-   FastMultipoleSolver multipoleSolver(quadratures, points, 2, 1);
+   FastMultipoleSolver multipoleSolver(quadratures, points, 64, 32);
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
@@ -862,6 +861,67 @@ void FMMPrecisionTest()
    std::cout << "averageRelativeError: " << averageRelativeError / points.size() << "\n";
 }
 
+void FFMTimeTest()
+{
+   Torus torus = createTorus();
+   BasisQuadratures bq = readBasisQuadratures();
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+   std::cout << std::setw(5);
+   std::cout << std::setw(16) << "difference";
+   std::cout << std::setw(16) << "noFMMTime" << std::setw(16) << "FMMTime" << "\n";
+   test::printSeparateLine(std::cout, 70);
+
+   for(size_t i = 0; i < 33; i++)
+   {
+      size_t pointCount = pow(2, i);
+      //size_t pointCount = (i + 1) * quadratures.size();
+      auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), pointCount);
+      FastMultipoleSolver multipoleSolver(quadratures, points, 128, 32);
+      multipoleSolver.log = false;
+
+      auto commonPartStart = std::chrono::steady_clock::now();
+      multipoleSolver.calcMultipoleExpansionsAtLeaves();
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+      auto commonPartStop = std::chrono::steady_clock::now();
+      double commonPartTime = test::getTime(commonPartStart, commonPartStop);
+
+      auto fmmPartStart = std::chrono::steady_clock::now();
+      multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, M2MDevice::CPU);
+      auto fmmPartStop = std::chrono::steady_clock::now();
+      double fmmPartTime = test::getTime(fmmPartStart, fmmPartStop);
+
+
+      Vector3 noFMMRes;
+      Vector3 FMMRes;
+
+      auto start = std::chrono::steady_clock::now();
+      /*for(auto& point : points)
+      {
+         noFMMRes += multipoleSolver.calcA(current, point);
+      }*/
+      auto stop = std::chrono::steady_clock::now();
+      double noFMMTime = test::getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      auto fmmResults = multipoleSolver.calcA(current);
+      stop = std::chrono::steady_clock::now();
+      double FMMTime = test::getTime(start, stop);
+
+      for (auto &[point, fmmResult] : fmmResults)
+      {
+         FMMRes += fmmResult;
+      }
+
+      std::cout << std::fixed << std::setw(9) << pointCount;
+      std::cout << std::scientific;
+      //std::cout << std::setw(16) << 100 * (noFMMRes - FMMRes).length() / noFMMRes.length();
+      //std::cout << std::setw(16) << noFMMTime;
+      //std::cout << std::setw(16) << FMMTime + fmmPartTime << "\n";
+      std::cout << "\t" << FMMTime + fmmPartTime << "\n";
+   }
+}
+
 int main()
 {
    //NMResearch();
@@ -883,4 +943,5 @@ int main()
    //compareWithMatrixMultiplication();
 
    FMMPrecisionTest();
+   //FFMTimeTest();
 }

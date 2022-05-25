@@ -225,31 +225,6 @@ void CalculationPointOctreeNode::propagateLocalExpansions() const
    }
 }
 
-void CalculationPointOctreeNode::removeAllDescendantsFromSet(
-   std::set<CalculationPointOctreeNode*>& set) const
-{
-   for (auto child : _children)
-   {
-      set.erase(child);
-      child->removeAllDescendantsFromSet(set);
-   }
-}
-
-std::set<CalculationPointOctreeNode*> CalculationPointOctreeNode::addMeAndAllParentsToSet(
-   std::set<CalculationPointOctreeNode*>& res)
-{
-   res.insert(this);
-   CalculationPointOctreeNode* temp = this->parent();
-
-   while(temp)
-   {
-      res.insert(temp);
-      temp = temp->parent();
-   }
-
-   return res;
-}
-
 const Box& CalculationPointOctreeNode::box() const
 {
    return this->_box;
@@ -258,6 +233,11 @@ const Box& CalculationPointOctreeNode::box() const
 bool CalculationPointOctreeNode::isSubdivided() const
 {
    return !_children.empty();
+}
+
+bool CalculationPointOctreeNode::isUsefullLeaf() const
+{
+   return !_points.empty();
 }
 
 CalculationPointOctreeNode* CalculationPointOctreeNode::parent()

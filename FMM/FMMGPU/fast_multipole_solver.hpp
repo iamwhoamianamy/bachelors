@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <vector>
 #include "multipole_solver.hpp"
 #include "vector3.cuh"
@@ -7,12 +8,16 @@
 #include "calculation_point_octree.hpp"
 #include "multipole_solver_enums.hpp"
 
+typedef std::map<CalculationPointOctreeNode*, std::set<QuadratureOctreeNode*>> InteractionMap;
+
 class FastMultipoleSolver : public MultipoleSolver
 {
 private:
    std::vector<Vector3>& _points;
    CalculationPointOctreeNode* _calculationPointOctreeRoot = nullptr;
-   bool _localMultipolesAreInitialized= false;
+   bool _localMultipolesAreInitialized = false;
+   InteractionMap _farInteractionMap;
+   InteractionMap _closeInteractionMap;
 
 public:
    const size_t calculationPointOctreeLeafCapacity;
@@ -36,5 +41,15 @@ public:
 
 private:
    void initTrees() override;
-   void calcLocalMultipoleExpansionsWithComplexTranslation() const;
+   void calcLocalMultipoleExpansionsWithComplexTranslation();
+
+   void formInteractionMaps(
+      QuadratureOctreeNode* quadratureTreeNode,
+      CalculationPointOctreeNode* calcPointTreeNode);
+
+   bool checkIfFarEnough(
+      const QuadratureOctreeNode* quadratureTreeNode,
+      const CalculationPointOctreeNode* calcPointTreeNode) const;
+
+   void accountFarInteractions();
 };

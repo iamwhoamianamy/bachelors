@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "multipole_translator.hpp"
+
 FastMultipoleSolver::FastMultipoleSolver(
    std::vector<Quadrature>& quadratures,
    std::vector<Vector3>& points,
@@ -40,22 +42,121 @@ void FastMultipoleSolver::initTrees()
 
    _calculationPointOctreeRoot = new CalculationPointOctreeNode(
       Box(center, halfDim * 1.1), calculationPointOctreeLeafCapacity);
-      //Box(Vector3(10, 5, 8), Vector3(1, 1, 1)), calculationPointOctreeLeafCapacity);
    _calculationPointOctreeRoot->insert(_points);
 }
 
-void FastMultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation() const
+void FastMultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation()
 {
-   auto nodesToVisit = _calculationPointOctreeRoot->getAllNodesAsSet();
-   auto nodesToAvoid = std::set<CalculationPointOctreeNode*>();
+   formInteractionMaps(
+      _quadratureOctreeRoot,
+      _calculationPointOctreeRoot);
 
-   _quadratureOctreeRoot->translateMultipoleExpansionsToLocal(
-      _calculationPointOctreeRoot,
-      nodesToVisit,
-      nodesToAvoid);
+   accountFarInteractions();
 
    _calculationPointOctreeRoot->propagateLocalExpansions();
 }
+
+void FastMultipoleSolver::accountFarInteractions()
+{
+   for(auto& [calcTreeNode, interactionSet] : _farInteractionMap)
+   {
+      for(auto interactionNode : interactionSet)
+      {
+         auto translation = interactionNode->box().center() -
+            calcTreeNode->box().center();
+
+         auto contributionToLocalExpansion =
+            MultipoleTranslator::multipoleToLocalWithComplex(
+               interactionNode->multipoleExpansion(),
+               translation);
+
+         calcTreeNode->localExpansion().add(
+            contributionToLocalExpansion);
+      }
+   }
+}
+
+void FastMultipoleSolver::formInteractionMaps(
+   QuadratureOctreeNode* quadratureTreeNode,
+   CalculationPointOctreeNode* calcPointTreeNode)
+{
+   if(!((quadratureTreeNode->isSubdivided() || quadratureTreeNode->isUsefullLeaf()) &&
+      (calcPointTreeNode->isSubdivided() || calcPointTreeNode->isUsefullLeaf())))
+   {
+      return;
+   }
+
+   if(checkIfFarEnough(quadratureTreeNode, calcPointTreeNode))
+   {
+      _farInteractionMap[calcPointTreeNode].insert(quadratureTreeNode);
+   }
+   else
+   {
+      if(calcPointTreeNode->isUsefullLeaf())
+      {
+         bool сhildrenAreCloseEnough = true;
+
+         for (auto child : quadratureTreeNode->children())
+         {
+            if(checkIfFarEnough(child, calcPointTreeNode))
+            {
+               сhildrenAreCloseEnough = false;
+               break;
+            }
+         }
+
+         if(сhildrenAreCloseEnough)
+         {
+            _closeInteractionMap[calcPointTreeNode].insert(quadratureTreeNode);
+         }
+         else
+         {
+            for(auto child : quadratureTreeNode->children())
+            {
+               formInteractionMaps(child, calcPointTreeNode);
+            }
+         }
+      }
+      else
+      {
+         if((calcPointTreeNode->box().radius() < quadratureTreeNode->box().radius() ||
+             calcPointTreeNode->isUsefullLeaf()) && !quadratureTreeNode->isUsefullLeaf())
+         {
+            for(auto child : quadratureTreeNode->children())
+            {
+               formInteractionMaps(child, calcPointTreeNode);
+            }
+         }
+         else
+         {
+            for(auto child : calcPointTreeNode->children())
+            {
+               formInteractionMaps(quadratureTreeNode, child);
+            }
+         }
+      }
+   }
+}
+
+bool FastMultipoleSolver::checkIfFarEnough(
+   const QuadratureOctreeNode* quadratureTreeNode,
+   const CalculationPointOctreeNode* calcPointTreeNode) const
+{
+   real radius1 = quadratureTreeNode->box().radius();
+   real radius2 = calcPointTreeNode->box().radius();
+
+   real minRadius = std::min(radius1, radius2);
+   real maxRadius = std::max(radius1, radius2);
+
+   real minimalDistance = 2 * maxRadius + minRadius;
+
+   real distanceSquared = (
+      quadratureTreeNode->box().center() - 
+      calcPointTreeNode->box().center()).lengthSquared();
+
+   return minimalDistance * minimalDistance < distanceSquared;
+}
+
 void FastMultipoleSolver::calclLocalMultipoleExpansions(
    M2LAlg algorithm, 
    M2MDevice device)
@@ -105,68 +206,14 @@ std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcA(real current
 
    for (auto &[point, answer, node] : M2MAndM2LResults)
    {
-      /*HarmonicSeries<Vector3> nearestContribution(harmonicOrder);
-      auto nodesInsidePointsBox = _quadratureOctreeRoot->getBiggestNodesInBox(
-         node->box());
-      
-      for (auto node : nodesInsidePointsBox)
+      for (auto interactionNode : _closeInteractionMap[node])
       {
-         if(2 * node->box().radius() < (point - node->box().center()).length())
-         {
-            auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(
-               harmonicOrder, point - node->box().center());
-
-            answer += mult(node->multipoleExpansion(), irregularHarmonic);
-         }
-      }*/
-
-      /*HarmonicSeries<Vector3> nearestContribution(harmonicOrder);
-      auto biggestNearNodes = _quadratureOctreeRoot->getBiggestNearNodes(
-         point, node->box().radius());
-
-      for(auto nearNode : biggestNearNodes)
-      {
-         auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(
-            harmonicOrder, point - nearNode->box().center());
-
-         answer += mult(nearNode->multipoleExpansion(), irregularHarmonic);
-      }*/
-      
-      /*HarmonicSeries<Vector3> nearestContribution(harmonicOrder);
-      auto newLeftToInteractWith = node->leftToInteractWith;
-
-      for(auto nearNode : node->leftToInteractWith)
-      {
-         real radius1 = nearNode->box().radius();
-         real radius2 = node->box().radius();
-
-         real minRadius = std::min(radius1, radius2);
-         real maxRadius = std::max(radius1, radius2);
-
-         real minimalDistance = 2 * minRadius + maxRadius;
-         real distance1 = (point - nearNode->box().center()).length();
-         real distance2 = (node->box().center() - nearNode->box().center()).length();
-
-         if(2 * radius1 < distance1)
-         {
-            nearNode->removeAllDescendantsFromSet(newLeftToInteractWith);
-         }
-         else
-         {
-            newLeftToInteractWith.erase(nearNode);
-         }
+         answer += interactionNode->calcA(point);
       }
-
-      for(auto nearNode : newLeftToInteractWith)
-      {
-         auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(
-            harmonicOrder, point - nearNode->box().center());
-
-         answer += mult(nearNode->multipoleExpansion(), irregularHarmonic);
-      }*/
 
       result.emplace_back(point, answer / (4.0 * math::PI) * current);
    }
+
    return result;
 }
 

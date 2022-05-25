@@ -27,7 +27,7 @@ private:
    CalculationPointOctreeNode* _parent;
  
 public:
-   std::set<QuadratureOctreeNode*> leftToInteractWith;
+   //std::set<QuadratureOctreeNode*> leftToInteractWith;
 
    CalculationPointOctreeNode();
    CalculationPointOctreeNode(
@@ -41,6 +41,7 @@ public:
 
    const Box& box() const;
    bool isSubdivided() const;
+   bool isUsefullLeaf() const;
    CalculationPointOctreeNode* parent();
    CalculationPointOctreeNode* parent() const;
    std::vector<CalculationPointOctreeNode*>& children();
@@ -57,10 +58,6 @@ public:
 
    void initAllLocalExpansions(size_t order);
    void propagateLocalExpansions() const;
-   std::set<CalculationPointOctreeNode*> addMeAndAllParentsToSet(
-      std::set<CalculationPointOctreeNode*>& res);
-   void removeAllDescendantsFromSet(
-      std::set<CalculationPointOctreeNode*>& set) const;
 
    ~CalculationPointOctreeNode();
 private:
