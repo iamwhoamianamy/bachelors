@@ -56,10 +56,10 @@ void comparisonToTelmaIntegrals()
    multipoleSolver.calclMultipoleExpansions(M2MAlg::NoTranslation);
    multipoleSolver.calclMultipoleExpansions(M2MAlg::ComplexTranslation);
    multipoleSolver.calclMultipoleExpansions(M2MAlg::RealTranslation);
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::CPU);
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::GPU);
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::CPU);
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
 
    real sumErrorIntegration = 0;
    real sumErrorNoTranslation = 0;
@@ -150,13 +150,13 @@ void comparisonBetweenMethodsOnPrecision()
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers);
    Vector3 byMultipolesWithLayersCPU = multipoleSolver.calcB(current, point);
 
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::GPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
    Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
 
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::CPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
    Vector3 byMultipolesWithMatricesCPU = multipoleSolver.calcB(current, point);
 
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
    Vector3 byMultipolesWithMatricesGPU = multipoleSolver.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
@@ -264,27 +264,27 @@ void calculationTimeForLocalMultipolesByLeafCapacity()
       double timeWithRealTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::CPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::GPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::CPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverWithMatricesAda.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::Adaptive);
+      //multipoleSolverWithMatricesAda.calclMultipoleExpansions(M2MAlg::Matrices, Device::Adaptive);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesAda = getTime(start, stop);
 
@@ -347,27 +347,27 @@ void calculationTimeForLocalMultipolesByNodeCount()
       double timeWithRealTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::CPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::GPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::CPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverWithMatricesAda.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::Adaptive);
+      //multipoleSolverWithMatricesAda.calclMultipoleExpansions(M2MAlg::Matrices, Device::Adaptive);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesAda = getTime(start, stop);
 
@@ -406,7 +406,7 @@ std::pair<double, Vector3>  timeForMultipoles(
    const std::vector<Vector3>& points,
    std::vector<Quadrature>& quadratures,
    M2MAlg alg, 
-   M2MDevice device)
+   Device device)
 {
    Vector3 res;
    MultipoleSolver multipoleSolver(quadratures);
@@ -454,13 +454,13 @@ void NMResearch()
       std::cout << std::setw(5) << pointsCount * quadratures.size() << " ";
       std::cout << std::scientific;
       std::cout << std::setw(8) << wholeTimeForIntegrals(points, quadratures).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::NoTranslation, M2MDevice::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::ComplexTranslation, M2MDevice::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::RealTranslation, M2MDevice::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Layers, M2MDevice::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Layers, M2MDevice::GPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Matrices, M2MDevice::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Matrices, M2MDevice::GPU).first << std::endl;
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::NoTranslation, Device::CPU).first << " ";
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::ComplexTranslation, Device::CPU).first << " ";
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::RealTranslation, Device::CPU).first << " ";
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Layers, Device::CPU).first << " ";
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Layers, Device::GPU).first << " ";
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Matrices, Device::CPU).first << " ";
+      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Matrices, Device::GPU).first << std::endl;
    }
 }
 
@@ -476,10 +476,10 @@ void layerCalculationsPrecision()
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
 
-   multipoleSolverCPU.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::CPU);
+   multipoleSolverCPU.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
    Vector3 byMultipolesWithLayersCPU = multipoleSolverCPU.calcB(current, point);
 
-   multipoleSolverGPU.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::GPU);
+   multipoleSolverGPU.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
    Vector3 byMultipolesWithLayersGPU = multipoleSolverGPU.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
@@ -510,12 +510,12 @@ void layerCalculationTime()
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolverCPU.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::CPU);
+      multipoleSolverCPU.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
       auto stop = std::chrono::steady_clock::now();
       double timeWithCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverGPU.calclMultipoleExpansions(M2MAlg::Layers, M2MDevice::GPU);
+      multipoleSolverGPU.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithGPU = getTime(start, stop);
 
@@ -547,17 +547,17 @@ void matrixCalculationTime()
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolverCPU.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::CPU);
+      multipoleSolverCPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
       auto stop = std::chrono::steady_clock::now();
       double timeWithCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverGPU.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+      //multipoleSolverGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      //multipoleSolverAda.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::Adaptive);
+      //multipoleSolverAda.calclMultipoleExpansions(M2MAlg::Matrices, Device::Adaptive);
       stop = std::chrono::steady_clock::now();
       double timeWithAda = getTime(start, stop);
 
@@ -570,7 +570,7 @@ void matrixCalculationTime()
    }
 }
 
-void layerMatrixCalculationTime(M2MDevice device)
+void layerMatrixCalculationTime(Device device)
 {
    Torus torus = createTorus();
    BasisQuadratures bq = readBasisQuadratures();
@@ -600,7 +600,7 @@ void layerMatrixCalculationTime(M2MDevice device)
       double timeWithMatrices = getTime(start, stop);
 
       
-      std::cout << "device" << std::setw(w) << (device == M2MDevice::GPU ? "GPU" : "CPU") << std::endl;
+      std::cout << "device" << std::setw(w) << (device == Device::GPU ? "GPU" : "CPU") << std::endl;
       std::cout << "layers:  " << std::setw(w) << timeWithLayers << std::endl;
       std::cout << "matrices:" << std::setw(w) << timeWithMatrices << std::endl;
    }
@@ -741,13 +741,13 @@ void matrixCalculationsPrecision()
 
    Vector3 byIntegration = math::calcBioSavartLaplace(current, point, quadratures);
 
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::CPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
    Vector3 byMultipolesWithLayersCPU = multipoleSolver.calcB(current, point);
 
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
    Vector3 byMultipolesWithLayersGPU = multipoleSolver.calcB(current, point);
 
-   //multipoleSolverAda.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::Adaptive);
+   //multipoleSolverAda.calclMultipoleExpansions(M2MAlg::Matrices, Device::Adaptive);
    //Vector3 byMultipolesWithLayersAda = multipoleSolverAda.calcB(current, point);
 
    std::cout << std::setw(20) << "point ";
@@ -829,8 +829,8 @@ void FMMPrecisionTest()
    FastMultipoleSolver multipoleSolver(quadratures, points, 64, 32);
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
-   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
-   multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, M2MDevice::CPU);
+   multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+   multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
 
    auto fmmResults = multipoleSolver.calcB(current);
    
@@ -882,12 +882,12 @@ void FFMTimeTest()
 
       auto commonPartStart = std::chrono::steady_clock::now();
       multipoleSolver.calcMultipoleExpansionsAtLeaves();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
+      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       auto commonPartStop = std::chrono::steady_clock::now();
       double commonPartTime = test::getTime(commonPartStart, commonPartStop);
 
       auto fmmPartStart = std::chrono::steady_clock::now();
-      multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, M2MDevice::CPU);
+      multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
       auto fmmPartStop = std::chrono::steady_clock::now();
       double fmmPartTime = test::getTime(fmmPartStart, fmmPartStop);
 
@@ -896,15 +896,15 @@ void FFMTimeTest()
       Vector3 FMMRes;
 
       auto start = std::chrono::steady_clock::now();
-      /*for(auto& point : points)
+      for(auto& point : points)
       {
-         noFMMRes += multipoleSolver.calcA(current, point);
-      }*/
+         noFMMRes += multipoleSolver.calcB(current, point);
+      }
       auto stop = std::chrono::steady_clock::now();
       double noFMMTime = test::getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      auto fmmResults = multipoleSolver.calcA(current);
+      auto fmmResults = multipoleSolver.calcB(current);
       stop = std::chrono::steady_clock::now();
       double FMMTime = test::getTime(start, stop);
 
@@ -915,9 +915,8 @@ void FFMTimeTest()
 
       std::cout << std::fixed << std::setw(9) << pointCount;
       std::cout << std::scientific;
-      //std::cout << std::setw(16) << 100 * (noFMMRes - FMMRes).length() / noFMMRes.length();
-      //std::cout << std::setw(16) << noFMMTime;
-      //std::cout << std::setw(16) << FMMTime + fmmPartTime << "\n";
+      std::cout << std::setw(16) << 100 * (noFMMRes - FMMRes).length() / noFMMRes.length();
+      std::cout << std::setw(16) << noFMMTime;
       std::cout << "\t" << FMMTime + fmmPartTime << "\n";
    }
 }
@@ -938,10 +937,10 @@ int main()
 
    //layerCalculationTime();
    //matrixCalculationTime();
-   //layerMatrixCalculationTime(M2MDevice::CPU);
-   //layerMatrixCalculationTime(M2MDevice::GPU);
+   //layerMatrixCalculationTime(Device::CPU);
+   //layerMatrixCalculationTime(Device::GPU);
    //compareWithMatrixMultiplication();
 
-   FMMPrecisionTest();
-   //FFMTimeTest();
+   //FMMPrecisionTest();
+   FFMTimeTest();
 }

@@ -2,14 +2,12 @@
 #include <chrono>
 #include <iomanip>
 #include <fstream>
-#include <omp.h>
 
 #include "cblas.h"
 #include "multipole_solver.hpp"
 #include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
-#include "math.hpp"
 #include "translation_algorithms.hpp"
 #include "kernels.cuh"
 #include "testing_helpers.hpp"
@@ -36,7 +34,7 @@ size_t MultipoleSolver::getOctreeNodeCount() const
    return _quadratureOctreeRoot->getAllNodeCount();
 }
 
-void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice device)
+void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, Device device)
 {
    if(_multipolesAtLeavesAreReady)
    {
@@ -68,6 +66,8 @@ void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice devic
             break;
          }
       }
+
+      _multipolesAreReady = true;
    }
    else
    {
@@ -78,23 +78,20 @@ void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, M2MDevice devic
 void MultipoleSolver::calcMultipoleExpansionsWithoutTranslation()
 {
    _quadratureOctreeRoot->calcMultipoleExpansionsWithoutTranslation(harmonicOrder);
-   _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcMultipoleExpansionsWithComplexTranslation()
 {
    _quadratureOctreeRoot->calcMultipoleExpansionsWithComplexTranslation(harmonicOrder);
-   _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcMultipoleExpansionsWithRealTranslation()
 {
    _quadratureOctreeRoot->calcMultipoleExpansionsWithRealTranslation(harmonicOrder);
-   _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcMultipoleExpanstionsWithLayersOrMatrices(
-   M2MDevice device,
+   Device device,
    bool useMatrices)
 {
    std::vector<std::vector<QuadratureOctreeNode*>> layers;
@@ -115,7 +112,6 @@ void MultipoleSolver::calcMultipoleExpanstionsWithLayersOrMatrices(
    }
 
    calcContributionsToHigherLayers(layers, device, useMatrices);
-   _multipolesAreReady = true;
 }
 
 void MultipoleSolver::enumerateNodes(
@@ -139,7 +135,7 @@ void MultipoleSolver::enumerateNodes(
 
 void MultipoleSolver::calcContributionsToHigherLayers(
    const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
-   M2MDevice device,
+   Device device,
    bool useMatrices)
 {
    useMatrices ? calcContributionsToHigherLevelsWithMatrices(layers, device) :
@@ -162,7 +158,7 @@ void MultipoleSolver::calcMultipoleExpansionsAtLeaves(
 
 void MultipoleSolver::calcContributionsToHigherLayers(
    const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
-   M2MDevice device)
+   Device device)
 {
    for(int l = layers.size() - 1; l >= 1; l--)
    {
@@ -197,7 +193,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
 
 std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
    const std::vector<QuadratureOctreeNode*>& layer,
-   M2MDevice device)
+   Device device)
 {
    std::vector<Vector3> harmonics(layer.size() * harmonicLength);
    std::vector<real> regulars(layer.size() * harmonicLength);
@@ -222,7 +218,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
    switch(device)
    {
-      case M2MDevice::CPU:
+      case Device::CPU:
       {
          kernels::translateAllCPU(
             result.data(),
@@ -233,7 +229,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
          break;
       }
-      case M2MDevice::GPU:
+      case Device::GPU:
       {
          kernels::translateAllGPU(
             result.data(),
@@ -244,7 +240,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
          break;
       }
-      case M2MDevice::Adaptive:
+      case Device::Adaptive:
       {
          break;
       }
@@ -263,7 +259,7 @@ std::vector<Vector3> MultipoleSolver::calcContributionsToHigherLayer(
 
 void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
    const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
-   M2MDevice device)
+   Device device)
 {
    for(size_t l = layers.size() - 1; l >= 1; l--)
    {
@@ -299,7 +295,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
                switch(device)
                {
-                  case M2MDevice::CPU:
+                  case Device::CPU:
                   {
                      kernels::translateAllCPUMatrixBLAS(
                         translated[c].data(),
@@ -310,7 +306,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
                      break;
                   }
-                  case M2MDevice::GPU:
+                  case Device::GPU:
                   {
                     kernels::translateAllGPUMatrixCuBLAS(
                        translated[c].data(),
@@ -321,7 +317,7 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
                      break;
                   }
-                  case M2MDevice::Adaptive:
+                  case Device::Adaptive:
                   {
                      /*if(expansionVectors[c].size() < adaptiveBorder)
                      {

@@ -36,7 +36,7 @@ public:
 
    virtual void calclMultipoleExpansions(
       M2MAlg algorithm,
-      M2MDevice device = M2MDevice::CPU);
+      Device device = Device::CPU);
    
    virtual Vector3 calcA(real current, const Vector3& point);
    virtual Vector3 calcB(real current, const Vector3& point);
@@ -48,7 +48,7 @@ protected:
    virtual void calcMultipoleExpansionsWithRealTranslation();
 
    virtual void calcMultipoleExpanstionsWithLayersOrMatrices(
-      M2MDevice device,
+      Device device,
       bool useMatrices);
 
    virtual void enumerateNodes(
@@ -58,20 +58,20 @@ protected:
 
    virtual void calcContributionsToHigherLayers(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
-      M2MDevice device,
+      Device device,
       bool useMatrices);
 
    virtual void calcContributionsToHigherLayers(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
-      M2MDevice device);
+      Device device);
 
    virtual std::vector<Vector3> calcContributionsToHigherLayer(
       const std::vector<QuadratureOctreeNode*>& layer,
-      M2MDevice device);
+      Device device);
 
    virtual void calcContributionsToHigherLevelsWithMatrices(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
-      M2MDevice device);
+      Device device);
 
    virtual void calcMultipoleExpansionsAtLeaves(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers);

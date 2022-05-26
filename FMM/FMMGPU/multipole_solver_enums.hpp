@@ -9,7 +9,7 @@ enum class M2MAlg
    Matrices,
 };
 
-enum class M2MDevice
+enum class Device
 {
    CPU = 0,
    GPU,

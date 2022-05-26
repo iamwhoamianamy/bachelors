@@ -1,5 +1,6 @@
 ﻿#include "fast_multipole_solver.hpp"
 
+#include <iomanip>
 #include <iostream>
 
 #include "multipole_translator.hpp"
@@ -29,15 +30,69 @@ void FastMultipoleSolver::initTrees()
    _calculationPointOctreeRoot->insert(_points);
 }
 
-void FastMultipoleSolver::calcLocalMultipoleExpansionsWithComplexTranslation()
+void FastMultipoleSolver::calclLocalMultipoleExpansions(
+   M2LAlg algorithm,
+   Device device)
 {
-   formInteractionMaps(
-      _quadratureOctreeRoot,
-      _calculationPointOctreeRoot);
+   if(_multipolesAreReady)
+   {
+      if(!_localMultipolesAreInitialized)
+      {
+         _calculationPointOctreeRoot->initAllLocalExpansions(harmonicOrder);
+         _localMultipolesAreInitialized = true;
+      }
 
-   accountFarInteractions();
+      formInteractionMaps(
+         _quadratureOctreeRoot,
+         _calculationPointOctreeRoot);
 
+      accountFarInteractions();
+
+      switch(algorithm)
+      {
+         case M2LAlg::ComplexTranslation:
+         {
+            propagateLocalExpansionsWithComplexTranslation();
+            break;
+         }
+         case M2LAlg::Matrices:
+         {
+            propagateLocalExpansionsWithMatrices(device);
+            break;
+         }
+         default:
+         {
+            throw std::exception("Not implemented!");
+         }
+      }
+   }
+   else
+   {
+      throw std::exception("Multipoles are not ready!");
+   }
+}
+
+void FastMultipoleSolver::propagateLocalExpansionsWithComplexTranslation()
+{
    _calculationPointOctreeRoot->propagateLocalExpansions();
+}
+
+void FastMultipoleSolver::propagateLocalExpansionsWithMatrices(Device device)
+{
+   std::vector<std::vector<QuadratureOctreeNode*>> layers;
+   //enumerateNodes(_quadratureOctreeRoot, layers, 0);
+   //_quadratureOctreeRoot->initAllMultipoleExpansions(harmonicOrder);
+
+   if(log)
+   {
+      std::cout << std::setw(10) << "layer" << std::setw(15) << "mlpl count";
+      std::cout << std::setw(15) << "kernel time" << std::setw(15) << "total time" << std::endl;
+      std::cout << "-------------------------------------------------------" << std::endl;
+      std::cout << std::fixed;
+   }
+
+   //calcContributionsToHigherLayers(layers, device, useMatrices);
+   //_multipolesAreReady = true;
 }
 
 void FastMultipoleSolver::accountFarInteractions()
@@ -139,37 +194,6 @@ bool FastMultipoleSolver::checkIfFarEnough(
       calcPointTreeNode->box().center()).lengthSquared();
 
    return minimalDistance * minimalDistance < distanceSquared;
-}
-
-void FastMultipoleSolver::calclLocalMultipoleExpansions(
-   M2LAlg algorithm, 
-   M2MDevice device)
-{
-   if(_multipolesAreReady)
-   {
-      if(!_localMultipolesAreInitialized)
-      {
-         _calculationPointOctreeRoot->initAllLocalExpansions(harmonicOrder);
-         _localMultipolesAreInitialized = true;
-      }
-
-      switch(algorithm)
-      {
-         case M2LAlg::ComplexTranslation:
-         {
-            calcLocalMultipoleExpansionsWithComplexTranslation();
-            break;
-         }
-         default:
-         {
-            throw std::exception("Not implemented!");
-         }
-      }
-   }
-   else
-   {
-      throw std::exception("Multipoles are not ready!");
-   }
 }
 
 Vector3 FastMultipoleSolver::calcA(real current, const Vector3& point)

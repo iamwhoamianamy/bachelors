@@ -30,8 +30,8 @@ public:
    
    void calclLocalMultipoleExpansions(
       M2LAlg algorithm,
-      M2MDevice device = M2MDevice::CPU);
-
+      Device device = Device::CPU);
+   
    virtual Vector3 calcA(real current, const Vector3& point) override;
    virtual Vector3 calcB(real current, const Vector3& point) override;
    virtual std::vector<std::pair<Vector3, Vector3>> calcA(real current);
@@ -41,7 +41,8 @@ public:
 
 private:
    void initTrees() override;
-   void calcLocalMultipoleExpansionsWithComplexTranslation();
+   void propagateLocalExpansionsWithComplexTranslation();
+   void propagateLocalExpansionsWithMatrices(Device device);
 
    void formInteractionMaps(
       QuadratureOctreeNode* quadratureTreeNode,
