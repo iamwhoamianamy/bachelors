@@ -34,7 +34,7 @@ void QuadratureOctreeNode::insert(std::vector<Quadrature>& points)
 
 void QuadratureOctreeNode::insert(Quadrature& point)
 {
-   if(!_box.contains(point.coordinates))
+   if(!_box.contains(point))
    {
       return;
    }

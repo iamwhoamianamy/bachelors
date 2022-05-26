@@ -25,7 +25,7 @@ namespace math
 
       for(auto& quadrature : quadratures)
       {
-         res += f(point, quadrature.coordinates) * quadrature.weight;
+         res += f(point, quadrature) * quadrature.weight;
       }
 
       return res;
@@ -135,7 +135,7 @@ namespace math
       {
          auto regularHarmonics = Harmonics::calcSolidHarmonics(
             harmonicOrder,
-            quadrature->coordinates - center,
+            *quadrature - center,
             true);
 
          for(int l = 0; l <= harmonicOrder; l++)
@@ -143,7 +143,7 @@ namespace math
             for(int m = -l; m <= l; m++)
             {
                res.getHarmonic(l, m) +=
-                  quadrature->coordinates.perp().normalized() *
+                  quadrature->perp().normalized() *
                   regularHarmonics.getHarmonic(l, m) * quadrature->weight;
             }
          }

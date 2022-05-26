@@ -5,7 +5,7 @@ Quadrature::Quadrature()
 }
 
 Quadrature::Quadrature(const Vector3& coordinates, real volume, real weight):
-   coordinates(coordinates), weight(volume * weight)
+   Vector3(coordinates), weight(volume * weight)
 {
 
 }

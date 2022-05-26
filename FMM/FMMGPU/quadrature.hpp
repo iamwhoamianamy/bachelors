@@ -1,9 +1,8 @@
 #pragma once
 #include "vector3.cuh"
 
-struct Quadrature
+struct Quadrature : public Vector3
 {
-   Vector3 coordinates;
    real weight;
 
    Quadrature();
