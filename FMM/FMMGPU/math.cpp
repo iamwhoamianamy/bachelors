@@ -27,6 +27,26 @@ namespace math
       else
          return (number + devidor - 1) / devidor * devidor;
    }
+
+   Box getBoundingBox(const std::vector<Vector3>& points)
+   {
+      real maxX = math::max(points, 0);
+      real maxY = math::max(points, 1);
+      real maxZ = math::max(points, 2);
+
+      real minX = math::min(points, 0);
+      real minY = math::min(points, 1);
+      real minZ = math::min(points, 2);
+
+      Vector3 halfDim(
+         (maxX - minX) / 2 + 1e-5,
+         (maxY - minY) / 2 + 1e-5,
+         (maxZ - minZ) / 2 + 1e-5);
+
+      Vector3 center(minX + halfDim.x, minY + halfDim.y, minZ + halfDim.z);
+
+      return { center, halfDim * 1.1 };
+   }
 }
 
 real math::max(const std::vector<Vector3>& vec, size_t axis)

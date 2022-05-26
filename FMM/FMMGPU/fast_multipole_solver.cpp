@@ -24,24 +24,8 @@ FastMultipoleSolver::~FastMultipoleSolver()
 void FastMultipoleSolver::initTrees()
 {
    MultipoleSolver::initTrees();
-
-   real maxX = math::max(_points, 0);
-   real maxY = math::max(_points, 1);
-   real maxZ = math::max(_points, 2);
-
-   real minX = math::min(_points, 0);
-   real minY = math::min(_points, 1);
-   real minZ = math::min(_points, 2);
-
-   Vector3 halfDim(
-      (maxX - minX) / 2 + 1e-5,
-      (maxY - minY) / 2 + 1e-5,
-      (maxZ - minZ) / 2 + 1e-5);
-
-   Vector3 center(minX + halfDim.x, minY + halfDim.y, minZ + halfDim.z);
-
    _calculationPointOctreeRoot = new CalculationPointOctreeNode(
-      Box(center, halfDim * 1.1), calculationPointOctreeLeafCapacity);
+      math::getBoundingBox(_points), calculationPointOctreeLeafCapacity);
    _calculationPointOctreeRoot->insert(_points);
 }
 

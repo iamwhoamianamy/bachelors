@@ -5,6 +5,7 @@
 #include "cuda_runtime.h"
 #include "typedefs.hpp"
 #include "vector3.cuh"
+#include "box.hpp"
 
 namespace math
 {
@@ -15,10 +16,9 @@ namespace math
 
    real calcFactorial(int n);
    real calcBinomial(int k, int n);
-
    real randBetween(real min, real max);
-
    size_t nextDevisible(const size_t number, const size_t devidor);
+   Box getBoundingBox(const std::vector<Vector3>& points);
 
    template <class T>
    constexpr __all__ int sign(T val)
