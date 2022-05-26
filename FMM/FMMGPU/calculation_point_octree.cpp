@@ -157,18 +157,18 @@ size_t CalculationPointOctreeNode::getAllNodeCount() const
    return count;
 }
 
-std::vector<FFMResult> CalculationPointOctreeNode::calcA(size_t pointCount)
+std::vector<FMMResult> CalculationPointOctreeNode::calcA(size_t pointCount)
 {
-   std::vector<FFMResult> res;
+   std::vector<FMMResult> res;
    res.reserve(pointCount);
    calcA(res);
 
    return res;
 }
 
-std::vector<FFMResult> CalculationPointOctreeNode::calcRot(size_t pointCount)
+std::vector<FMMResult> CalculationPointOctreeNode::calcRot(size_t pointCount)
 {
-   std::vector<FFMResult> res;
+   std::vector<FMMResult> res;
    res.reserve(pointCount);
    calcRot(res);
 
@@ -188,7 +188,7 @@ void CalculationPointOctreeNode::initAllLocalExpansions(size_t order)
    }
 }
 
-void CalculationPointOctreeNode::calcA(std::vector<FFMResult>& result)
+void CalculationPointOctreeNode::calcA(std::vector<FMMResult>& result)
 {
    if(!_points.empty())
    {
@@ -210,7 +210,7 @@ void CalculationPointOctreeNode::calcA(std::vector<FFMResult>& result)
    }
 }
 
-void CalculationPointOctreeNode::calcRot(std::vector<FFMResult>& result)
+void CalculationPointOctreeNode::calcRot(std::vector<FMMResult>& result)
 {
    size_t n = _localExpansion.order();
    real eps = 1e-3;

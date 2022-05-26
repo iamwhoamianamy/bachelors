@@ -9,7 +9,7 @@
 class QuadratureOctreeNode;
 class CalculationPointOctreeNode;
 
-struct FFMResult
+struct FMMResult
 {
    Vector3 point;
    Vector3 answer;
@@ -54,15 +54,15 @@ public:
    std::set<CalculationPointOctreeNode*> getAllNodesAsSet();
    std::vector<Vector3*> getAllPoints() const;
    size_t getAllNodeCount() const;
-   std::vector<FFMResult> calcA(size_t pointCount);
-   std::vector<FFMResult> calcRot(size_t pointCount);
+   std::vector<FMMResult> calcA(size_t pointCount);
+   std::vector<FMMResult> calcRot(size_t pointCount);
 
    void initAllLocalExpansions(size_t order);
    void propagateLocalExpansions() const;
 
    ~CalculationPointOctreeNode();
 private:
-   void calcA(std::vector<FFMResult>& result);
-   void calcRot(std::vector<FFMResult>& result);
+   void calcA(std::vector<FMMResult>& result);
+   void calcRot(std::vector<FMMResult>& result);
 
 };

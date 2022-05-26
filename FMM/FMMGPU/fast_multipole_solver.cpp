@@ -200,11 +200,11 @@ Vector3 FastMultipoleSolver::calcB(real current, const Vector3& point)
 
 std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcA(real current)
 {
-   auto M2MAndM2LResults = _calculationPointOctreeRoot->calcA(_points.size());
+   auto ffmResults = _calculationPointOctreeRoot->calcA(_points.size());
    std::vector<std::pair<Vector3, Vector3>> result;
-   result.reserve(M2MAndM2LResults.size());
+   result.reserve(ffmResults.size());
 
-   for (auto &[point, answer, node] : M2MAndM2LResults)
+   for (auto &[point, answer, node] : ffmResults)
    {
       for (auto interactionNode : _closeInteractionMap[node])
       {
@@ -219,11 +219,11 @@ std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcA(real current
 
 std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcB(real current)
 {
-   auto M2MAndM2LResults = _calculationPointOctreeRoot->calcRot(_points.size());
+   auto ffmResults = _calculationPointOctreeRoot->calcRot(_points.size());
    std::vector<std::pair<Vector3, Vector3>> result;
-   result.reserve(M2MAndM2LResults.size());
+   result.reserve(ffmResults.size());
 
-   for(auto& [point, answer, node] : M2MAndM2LResults)
+   for(auto& [point, answer, node] : ffmResults)
    {
       for(auto interactionNode : _closeInteractionMap[node])
       {
