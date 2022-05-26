@@ -50,7 +50,7 @@ public:
    void initAllMultipoleExpansions(size_t n);
 
    Vector3 calcA(const Vector3& point) const;
-   Vector3 caclRot(const Vector3& point) const;
+   Vector3 calcRot(const Vector3& point) const;
    size_t getAllNodeCount() const;
 
    ~QuadratureOctreeNode();

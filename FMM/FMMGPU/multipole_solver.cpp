@@ -630,7 +630,7 @@ Vector3 MultipoleSolver::calcB(real current, const Vector3& point)
    if(!_multipolesAreReady)
       throw new std::exception("Multipoles are not ready!");
 
-   return _quadratureOctreeRoot->caclRot(point) / (4.0 * math::PI) * current * math::MU0;
+   return _quadratureOctreeRoot->calcRot(point) / (4.0 * math::PI) * current * math::MU0;
 }
 
 MultipoleSolver::~MultipoleSolver()

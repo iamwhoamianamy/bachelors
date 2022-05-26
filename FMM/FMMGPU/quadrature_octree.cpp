@@ -226,7 +226,7 @@ Vector3 QuadratureOctreeNode::calcA(const Vector3& point) const
    return res;
 }
 
-Vector3 QuadratureOctreeNode::caclRot(const Vector3& point) const
+Vector3 QuadratureOctreeNode::calcRot(const Vector3& point) const
 {
    int n = _multipoleExpansion.order();
    real eps = 1e-3;
@@ -277,7 +277,7 @@ Vector3 QuadratureOctreeNode::caclRot(const Vector3& point) const
    {
       for(auto child : _children)
       {
-         res += child->caclRot(point);
+         res += child->calcRot(point);
       }
    }
 

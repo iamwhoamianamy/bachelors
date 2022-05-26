@@ -227,7 +227,7 @@ std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcB(real current
    {
       for(auto interactionNode : _closeInteractionMap[node])
       {
-         answer += interactionNode->caclRot(point);
+         answer += interactionNode->calcRot(point);
       }
 
       result.emplace_back(point, answer / (4.0 * math::PI) * current * math::MU0);
