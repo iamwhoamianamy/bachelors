@@ -166,6 +166,15 @@ std::vector<FFMResult> CalculationPointOctreeNode::calcA(size_t pointCount)
    return res;
 }
 
+std::vector<FFMResult> CalculationPointOctreeNode::calcRot(size_t pointCount)
+{
+   std::vector<FFMResult> res;
+   res.reserve(pointCount);
+   calcRot(res);
+
+   return res;
+}
+
 void CalculationPointOctreeNode::initAllLocalExpansions(size_t order)
 {
    if(isSubdivided() || !_points.empty())
@@ -197,6 +206,69 @@ void CalculationPointOctreeNode::calcA(std::vector<FFMResult>& result)
       for (auto child : _children)
       {
          child->calcA(result);
+      }
+   }
+}
+
+void CalculationPointOctreeNode::calcRot(std::vector<FFMResult>& result)
+{
+   size_t n = _localExpansion.order();
+   real eps = 1e-3;
+
+   if(isUsefullLeaf())
+   {
+      for(auto point : _points)
+      {
+         Vector3 res;
+         
+         auto hx1 = Harmonics::calcRegularSolidHarmonics(
+            n, *point - _box.center() + Vector3::xAxis() * eps);
+         auto hx2 = Harmonics::calcRegularSolidHarmonics(
+            n, *point - _box.center() - Vector3::xAxis() * eps);
+
+         auto hy1 = Harmonics::calcRegularSolidHarmonics(
+            n, *point - _box.center() + Vector3::yAxis() * eps);
+         auto hy2 = Harmonics::calcRegularSolidHarmonics(
+            n, *point - _box.center() - Vector3::yAxis() * eps);
+
+         auto hz1 = Harmonics::calcRegularSolidHarmonics(
+            n, *point - _box.center() + Vector3::zAxis() * eps);
+         auto hz2 = Harmonics::calcRegularSolidHarmonics(
+            n, *point - _box.center() - Vector3::zAxis() * eps);
+
+         hx1.subtract(hx2);
+         hy1.subtract(hy2);
+         hz1.subtract(hz2);
+
+         Vector3 tempRes;
+
+         for(int l = 0; l < n; l++)
+         {
+            for(int m = -l; m <= l; m++)
+            {
+               tempRes.x += 
+                  _localExpansion.getHarmonic(l, m).z * hy1.getHarmonic(l, m) -
+                  _localExpansion.getHarmonic(l, m).y * hz1.getHarmonic(l, m);
+
+               tempRes.y += 
+                  _localExpansion.getHarmonic(l, m).x * hz1.getHarmonic(l, m) -
+                  _localExpansion.getHarmonic(l, m).z * hx1.getHarmonic(l, m);
+
+               tempRes.z += 
+                  _localExpansion.getHarmonic(l, m).y * hx1.getHarmonic(l, m) -
+                  _localExpansion.getHarmonic(l, m).x * hy1.getHarmonic(l, m);
+            }
+         }
+
+         res += tempRes / (2 * eps);
+         result.emplace_back(*point, res, this);
+      }
+   }
+   else
+   {
+      for(auto child : _children)
+      {
+         child->calcRot(result);
       }
    }
 }

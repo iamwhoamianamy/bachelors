@@ -217,11 +217,21 @@ std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcA(real current
    return result;
 }
 
-std::vector<Vector3> FastMultipoleSolver::calcB(real current)
+std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcB(real current)
 {
-   std::vector<Vector3> res(_points.size());
+   auto M2MAndM2LResults = _calculationPointOctreeRoot->calcRot(_points.size());
+   std::vector<std::pair<Vector3, Vector3>> result;
+   result.reserve(M2MAndM2LResults.size());
 
+   for(auto& [point, answer, node] : M2MAndM2LResults)
+   {
+      for(auto interactionNode : _closeInteractionMap[node])
+      {
+         answer += interactionNode->caclRot(point);
+      }
 
+      result.emplace_back(point, answer / (4.0 * math::PI) * current * math::MU0);
+   }
 
-   return res;
+   return result;
 }

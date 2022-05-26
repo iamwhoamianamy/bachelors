@@ -832,7 +832,7 @@ void FMMPrecisionTest()
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, M2MDevice::GPU);
    multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, M2MDevice::CPU);
 
-   auto fmmResults = multipoleSolver.calcA(current);
+   auto fmmResults = multipoleSolver.calcB(current);
    
    real averageAbsoluteError = 0;
    real averageRelativeError = 0;
@@ -841,7 +841,7 @@ void FMMPrecisionTest()
    {
       auto point = fmmResults[i].first;
       auto aInPointByFmm = fmmResults[i].second;
-      auto byMultipolesWithMatricesGPU = multipoleSolver.calcA(current, point);
+      auto byMultipolesWithMatricesGPU = multipoleSolver.calcB(current, point);
 
       real absoluteError = (aInPointByFmm - byMultipolesWithMatricesGPU).length();
       real relativeError = 100 * absoluteError / byMultipolesWithMatricesGPU.length();

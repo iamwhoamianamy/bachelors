@@ -54,7 +54,8 @@ public:
    std::set<CalculationPointOctreeNode*> getAllNodesAsSet();
    std::vector<Vector3*> getAllPoints() const;
    size_t getAllNodeCount() const;
-   std::vector<FFMResult> calcA(size_t pointCount) ;
+   std::vector<FFMResult> calcA(size_t pointCount);
+   std::vector<FFMResult> calcRot(size_t pointCount);
 
    void initAllLocalExpansions(size_t order);
    void propagateLocalExpansions() const;
@@ -62,5 +63,6 @@ public:
    ~CalculationPointOctreeNode();
 private:
    void calcA(std::vector<FFMResult>& result);
+   void calcRot(std::vector<FFMResult>& result);
 
 };

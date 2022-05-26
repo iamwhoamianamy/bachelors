@@ -35,7 +35,7 @@ public:
    virtual Vector3 calcA(real current, const Vector3& point) override;
    virtual Vector3 calcB(real current, const Vector3& point) override;
    virtual std::vector<std::pair<Vector3, Vector3>> calcA(real current);
-   virtual std::vector<Vector3> calcB(real current);
+   virtual std::vector<std::pair<Vector3, Vector3>> calcB(real current);
    
    virtual ~FastMultipoleSolver() override;
 
