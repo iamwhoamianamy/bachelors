@@ -761,13 +761,49 @@ void matrixCalculationsPrecision()
 
 void translationTest()
 {
-   Vector3 a(3, 2, 1);
+   /*Vector3 a(3, 2, 1);
    Vector3 b(1, 7, 4);
    
    auto seriesA = Harmonics(10, a).sphericalHarmonics();
    auto complexSeriesA1 = Harmonics::realToComplex(seriesA);
    auto realSeriesA1 = Harmonics::complexToReal(complexSeriesA1);
    
+   std::vector<Complex> temp1(121);
+   cblas_scopy(121, seriesA.data().data(), 1, (float*)temp1.data(), 2);
+   auto realToComplexMatrix2D = Harmonics::calcRealToComplexMatrix2D(10);
+   auto complexSeriesA2 = math::mult(temp1, realToComplexMatrix2D);
+   auto complexToRealMatrix2D = Harmonics::calcComplexToRealMatrix2D(10);
+   auto temp2 = math::mult(complexSeriesA2, complexToRealMatrix2D);
+   std::vector<real> realSeriesA2(121);
+   cblas_scopy(121, (float*)temp2.data(), 2, realSeriesA2.data(), 1);
+
+   auto realToComplexMatrixTransposed1D =
+      Harmonics::calcRealToComplexTransitionMatrix1D(10);
+   auto complexToRealMatrixTransposed1D =
+      Harmonics::calcComplexToRealTransitionMatrix1D(10);
+
+   auto matricesMultiplied = math::multMatricesAsVectors(
+      complexToRealMatrixTransposed1D,
+      realToComplexMatrixTransposed1D,
+      121, 121, 121
+   );
+
+   auto deb = math::multMatricesAsVectors(
+      temp1,
+      matricesMultiplied,
+      121, 1, 121);*/
+
+   Vector3 a(3, 2, 1);
+   Vector3 b(1, 7, 4);
+
+   Vector3 translation = a - b;
+
+   auto seriesA = Harmonics(10, a).sphericalHarmonics();
+   auto reg = Harmonics::calcRegularSolidHarmonics(10, translation);
+   
+   auto seriesA1Translated = MultipoleTranslator::translateMultipole(
+      seriesA, reg);
+
    std::vector<Complex> temp1(121);
    cblas_scopy(121, seriesA.data().data(), 1, (float*)temp1.data(), 2);
    auto realToComplexMatrix2D = Harmonics::calcRealToComplexMatrix2D(10);
@@ -822,15 +858,16 @@ void FMMPrecisionTest()
    //auto points = createPoints(begin, end, 10);
    //std::vector<Vector3> points = {{2, 2, 0}};
    //std::vector<Vector3> points = {{3, 3, 3}};
-   auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), 128);
-   //auto points = createRandomPoints(Box({ 10, 10, 10 }, { 2, 2, 2 }), 100);
+   //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), 256);
+   auto points = createRandomPoints(Box({ 10, 10, 10 }, { 2, 2, 2 }), 256);
    //auto points = std::vector<Vector3>({ Vector3(10.5, 5, 8) });
 
    FastMultipoleSolver multipoleSolver(quadratures, points, 64, 32);
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
-   multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   //multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::Matrices, Device::CPU);
 
    auto fmmResults = multipoleSolver.calcB(current);
    
@@ -854,7 +891,7 @@ void FMMPrecisionTest()
       std::cout << std::setw(40) << "point: " << point << "\n";
       std::cout << std::setw(40) << "multipoles with matrices GPU: " << byMultipolesWithMatricesGPU << "\n";
       std::cout << std::setw(40) << "fmm: " << aInPointByFmm << " ";
-      std::cout << std::setw(10) << absoluteError << "\n";
+      std::cout << std::setw(10) << relativeError << "\n";
    }
 
    std::cout << "averageAbsoluteError: " << averageAbsoluteError / points.size() << "\n";
@@ -867,58 +904,214 @@ void FFMTimeTest()
    BasisQuadratures bq = readBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-   std::cout << std::setw(5);
-   std::cout << std::setw(16) << "difference";
-   std::cout << std::setw(16) << "noFMMTime" << std::setw(16) << "FMMTime" << "\n";
-   test::printSeparateLine(std::cout, 70);
+   std::cout << std::setw(9) << "points";
+   std::cout << std::setw(16) << "errorComplex";
+   //std::cout << std::setw(16) << "errorMatrices";
+   std::cout << std::setw(16) << "noFMMTime";
+   std::cout << std::setw(16) << "timeComplex" << "\n";
+   //std::cout << std::setw(16) << "timeMatrices" << "\n";
+   test::printSeparateLine(std::cout, 100);
 
    for(size_t i = 0; i < 33; i++)
    {
       size_t pointCount = pow(2, i);
       //size_t pointCount = (i + 1) * quadratures.size();
+      //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), pointCount);
       auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), pointCount);
-      FastMultipoleSolver multipoleSolver(quadratures, points, 128, 32);
-      multipoleSolver.log = false;
-
-      auto commonPartStart = std::chrono::steady_clock::now();
-      multipoleSolver.calcMultipoleExpansionsAtLeaves();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
-      auto commonPartStop = std::chrono::steady_clock::now();
-      double commonPartTime = test::getTime(commonPartStart, commonPartStop);
-
-      auto fmmPartStart = std::chrono::steady_clock::now();
-      multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
-      auto fmmPartStop = std::chrono::steady_clock::now();
-      double fmmPartTime = test::getTime(fmmPartStart, fmmPartStop);
-
-
-      Vector3 noFMMRes;
-      Vector3 FMMRes;
+      FastMultipoleSolver multipoleSolverComplex(quadratures, points, 128, 32);
+      //FastMultipoleSolver multipoleSolverMatricesGPU(quadratures, points, 128, 32);
+      multipoleSolverComplex.log = false;
+      //multipoleSolverMatricesGPU.log = false;
+      
+      multipoleSolverComplex.calcMultipoleExpansionsAtLeaves();
+      multipoleSolverComplex.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
 
       auto start = std::chrono::steady_clock::now();
+      multipoleSolverComplex.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::GPU);
+      auto stop = std::chrono::steady_clock::now();
+      double fmmPartTimeComplex = test::getTime(start, stop);
+      
+      //multipoleSolverMatricesGPU.calcMultipoleExpansionsAtLeaves();
+      //multipoleSolverMatricesGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+
+      //start = std::chrono::steady_clock::now();
+      //multipoleSolverMatricesGPU.calclLocalMultipoleExpansions(M2LAlg::Matrices, Device::GPU);
+      //stop = std::chrono::steady_clock::now();
+      //double fmmPartTimeMatrices = test::getTime(start, stop);
+
+      Vector3 noFMMResComplex;
+      Vector3 FMMResComplex;
+      //Vector3 FMMResMatrices;
+
+      start = std::chrono::steady_clock::now();
       for(auto& point : points)
       {
-         noFMMRes += multipoleSolver.calcB(current, point);
+         noFMMResComplex += multipoleSolverComplex.calcB(current, point);
       }
-      auto stop = std::chrono::steady_clock::now();
+      stop = std::chrono::steady_clock::now();
       double noFMMTime = test::getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      auto fmmResults = multipoleSolver.calcB(current);
+      auto fmmComplexResults = multipoleSolverComplex.calcB(current);
       stop = std::chrono::steady_clock::now();
       double FMMTime = test::getTime(start, stop);
 
-      for (auto &[point, fmmResult] : fmmResults)
+      //start = std::chrono::steady_clock::now();
+      //auto fmmMatricesResults = multipoleSolverMatricesGPU.calcB(current);
+      //stop = std::chrono::steady_clock::now();
+      //double FMMTimeMatrices = test::getTime(start, stop);
+
+      for (auto &[point, fmmResult] : fmmComplexResults)
       {
-         FMMRes += fmmResult;
+         FMMResComplex += fmmResult;
       }
+
+      //for(auto& [point, fmmResult] : fmmMatricesResults)
+      //{
+      //   FMMResMatrices += fmmResult;
+      //}
 
       std::cout << std::fixed << std::setw(9) << pointCount;
       std::cout << std::scientific;
-      std::cout << std::setw(16) << 100 * (noFMMRes - FMMRes).length() / noFMMRes.length();
+      std::cout << std::setw(16) << 100 * (noFMMResComplex - FMMResComplex).length() / noFMMResComplex.length();
+      //std::cout << std::setw(16) << 100 * (noFMMResComplex - FMMResMatrices).length() / noFMMResComplex.length();
       std::cout << std::setw(16) << noFMMTime;
-      std::cout << "\t" << FMMTime + fmmPartTime << "\n";
+      std::cout << std::setw(16) << FMMTime + fmmPartTimeComplex << "\n";
+      //std::cout << std::setw(16) << FMMTimeMatrices + fmmPartTimeMatrices << "\n";
    }
+}
+
+void translationTest2()
+{
+   Vector3 a(4.2, 6.9, 2.1);
+   Vector3 b(4, 7, 2);
+   size_t order = 10;
+   size_t harmonicLength = 121;
+   size_t matrixElemCount = harmonicLength * harmonicLength;
+
+   //auto trans = a - b;
+   auto trans = a - b;
+   auto harm = Harmonics::calcRegularSolidHarmonics(order, b);
+   auto harmAComplex = Harmonics::realToComplex(harm);
+   auto regular = Harmonics::realToComplex(Harmonics::calcRegularSolidHarmonics(order, trans));
+   //auto realRegular = Harmonics::calcRegularSolidHarmonics(order, trans);
+   //auto trueResult = MultipoleTranslator::translateMultipole(realRegular, harm).data();
+
+   auto trueResult1 = Harmonics::complexToReal(
+      MultipoleTranslator::translateLocal(harmAComplex, regular)).data();
+
+   std::vector<Complex> regularMatrix(harmonicLength * harmonicLength);
+
+   /*for(int l = 0; l <= order; l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         for(int lambda = 0; lambda <= l; lambda++)
+         {
+            int dl = l - lambda;
+
+            for(int mu = -lambda; mu <= lambda; mu++)
+            {
+               int dm = m - mu;
+
+               if(-dl <= dm && dm <= dl)
+               {
+                  regularMatrix[(l * l + l + m) + (dl * dl + dl + dm) * harmonicLength] =
+                     regular.getHarmonic(lambda * lambda + lambda + mu) *
+                     MultipoleTranslator::multipoleTranslationFactor(m, mu);
+               }
+            }
+         }
+      }
+   }*/
+
+   for(int l = 0; l <= regular.order(); l++)
+   {
+      for(int m = -l; m <= l; m++)
+      {
+         for(int lambda = 0; lambda <= l; lambda++)
+         {
+            int dl = lambda - l;
+            if(dl >= 0)
+            {
+               for(int mu = -lambda; mu <= lambda; mu++)
+               {
+                  int dm = m - mu;
+
+                  if(-dl <= dm && dm <= dl)
+                  {
+                     regularMatrix[(l * l + l + m) + (lambda * lambda + lambda + mu) * harmonicLength] =
+                        regular.getHarmonic(dl * dl + dl + dm) *
+                        MultipoleTranslator::localTranslationFactor(m, mu, lambda, l);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   auto realToComplexMatrix = Harmonics::calcRealToComplexTransitionMatrix1D(order);
+   auto complexToRealMatrix = Harmonics::calcComplexToRealTransitionMatrix1D(order);
+   
+   Complex alpha = make_cuComplex(1, 0);
+   Complex beta = make_cuComplex(0, 0);
+
+   std::vector<Complex> temp1(matrixElemCount);
+
+   cblas_cgemm(
+      CBLAS_ORDER::CblasRowMajor,
+      CBLAS_TRANSPOSE::CblasNoTrans,
+      CBLAS_TRANSPOSE::CblasNoTrans,
+      harmonicLength, harmonicLength, harmonicLength,
+      (float*)&alpha,
+      (float*)realToComplexMatrix.data(),
+      harmonicLength,
+      (float*)regularMatrix.data(),
+      harmonicLength,
+      (float*)&beta,
+      (float*)temp1.data(),
+      harmonicLength);
+
+   std::vector<Complex> temp2(matrixElemCount);
+   std::vector<real> result(matrixElemCount);
+
+   cblas_cgemm(
+      CBLAS_ORDER::CblasRowMajor,
+      CBLAS_TRANSPOSE::CblasNoTrans,
+      CBLAS_TRANSPOSE::CblasNoTrans,
+      harmonicLength, harmonicLength, harmonicLength,
+      (float*)&alpha,
+      (float*)temp1.data(),
+      harmonicLength,
+      (float*)complexToRealMatrix.data(),
+      harmonicLength,
+      (float*)&beta,
+      (float*)temp2.data(),
+      harmonicLength);
+
+   cblas_scopy(
+      matrixElemCount,
+      (float*)(temp2.data()), 2,
+      result.data(), 1);
+
+   int m = harmonicLength;
+   int k = harmonicLength;
+   int n = 1;
+   int lda = m, ldb = k, ldc = m;
+   const real alpha1 = 1;
+   const real beta1 = 0;
+   
+   std::vector<real> notTrueResult(harmonicLength);
+
+   cblas_sgemm(CBLAS_ORDER::CblasColMajor,
+               CBLAS_TRANSPOSE::CblasNoTrans,
+               CBLAS_TRANSPOSE::CblasNoTrans,
+               m, n, k,
+               alpha1,
+               result.data(), ldb, harm.data().data(), lda,
+               beta1,
+               notTrueResult.data(), ldc);
+
 }
 
 int main()
@@ -940,6 +1133,8 @@ int main()
    //layerMatrixCalculationTime(Device::CPU);
    //layerMatrixCalculationTime(Device::GPU);
    //compareWithMatrixMultiplication();
+
+   //translationTest2();
 
    //FMMPrecisionTest();
    FFMTimeTest();

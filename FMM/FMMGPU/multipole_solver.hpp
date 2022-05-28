@@ -82,13 +82,13 @@ protected:
    virtual std::vector<ComplexMatrix> calcRegularMatricesForLayer(
       const Matrix<QuadratureOctreeNode*>& nodesByOrientation);
 
-   virtual RealMatrix calcRegularMatricesForLayerAsVectors(
+   virtual RealMatrix calcRegularMatricesForM2MAsVectors(
       const Matrix<QuadratureOctreeNode*>& nodesByOrientation);
 
    virtual ComplexMatrix formMatrixFromRegularHarmonics(
       const ComplexHarmonicSeries& regular);
 
-   virtual std::vector<Complex> formMatrixFromRegularHarmonicsAsVectors(
+   virtual std::vector<Complex> formMatrixFromRegularHarmonicsForM2MAsVectors(
       const ComplexHarmonicSeries& regular);
 
    virtual RealMatrix getExpansionsInOneOrientationAsVectors(

@@ -208,17 +208,20 @@ ComplexHarmonicSeries MultipoleTranslator::translateLocal(
    {
       for(int lambda = 0; lambda <= a.order(); lambda++)
       {
-         for(int m = -l; m <= l; m++)
+         if(lambda >= l)
          {
-            for(int mu = -lambda; mu <= lambda; mu++)
+            for(int m = -l; m <= l; m++)
             {
-               int dl = lambda - l;
-               int dm = m - mu;
-
-               if(dm >= -dl && dm <= +dl && dl <= a.order())
+               for(int mu = -lambda; mu <= lambda; mu++)
                {
-                  res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) *
-                     b.getHarmonic(dl, dm) * localTranslationFactor(m, mu, lambda, l);
+                  int dl = lambda - l;
+                  int dm = m - mu;
+
+                  if(dm >= -dl && dm <= +dl && dl <= a.order())
+                  {
+                     res.getHarmonic(l, m) += a.getHarmonic(lambda, mu) *
+                        b.getHarmonic(dl, dm) * localTranslationFactor(m, mu, lambda, l);
+                  }
                }
             }
          }
