@@ -212,7 +212,7 @@ void CalculationPointOctreeNode::calcA(std::vector<FMMResult>& result)
 
 void CalculationPointOctreeNode::calcRot(std::vector<FMMResult>& result)
 {
-   size_t n = _localExpansion.order();
+   size_t order = _localExpansion.order();
    real eps = 1e-3;
 
    if(isUsefullLeaf())
@@ -222,19 +222,19 @@ void CalculationPointOctreeNode::calcRot(std::vector<FMMResult>& result)
          Vector3 res;
          
          auto hx1 = Harmonics::calcRegularSolidHarmonics(
-            n, *point - _box.center() + Vector3::xAxis() * eps);
+            order, *point - _box.center() + Vector3::xAxis() * eps);
          auto hx2 = Harmonics::calcRegularSolidHarmonics(
-            n, *point - _box.center() - Vector3::xAxis() * eps);
+            order, *point - _box.center() - Vector3::xAxis() * eps);
 
          auto hy1 = Harmonics::calcRegularSolidHarmonics(
-            n, *point - _box.center() + Vector3::yAxis() * eps);
+            order, *point - _box.center() + Vector3::yAxis() * eps);
          auto hy2 = Harmonics::calcRegularSolidHarmonics(
-            n, *point - _box.center() - Vector3::yAxis() * eps);
+            order, *point - _box.center() - Vector3::yAxis() * eps);
 
          auto hz1 = Harmonics::calcRegularSolidHarmonics(
-            n, *point - _box.center() + Vector3::zAxis() * eps);
+            order, *point - _box.center() + Vector3::zAxis() * eps);
          auto hz2 = Harmonics::calcRegularSolidHarmonics(
-            n, *point - _box.center() - Vector3::zAxis() * eps);
+            order, *point - _box.center() - Vector3::zAxis() * eps);
 
          hx1.subtract(hx2);
          hy1.subtract(hy2);
@@ -242,7 +242,7 @@ void CalculationPointOctreeNode::calcRot(std::vector<FMMResult>& result)
 
          Vector3 tempRes;
 
-         for(int l = 0; l < n; l++)
+         for(int l = 0; l < order; l++)
          {
             for(int m = -l; m <= l; m++)
             {
