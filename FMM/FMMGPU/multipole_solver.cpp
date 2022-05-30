@@ -117,10 +117,10 @@ void MultipoleSolver::enumerateNodes(
    std::vector<std::vector<QuadratureOctreeNode*>>& layers,
    size_t currentLayerId)
 {
-   if(!node->quadratures().empty() || node->isSubdivided())
+   if(node->isUsefullLeaf() || node->isSubdivided())
    {
       if(layers.size() <= currentLayerId)
-         layers.push_back(std::vector<QuadratureOctreeNode*>());
+         layers.emplace_back(std::vector<QuadratureOctreeNode*>());
 
       layers[currentLayerId].push_back(node);
 
@@ -147,7 +147,7 @@ void MultipoleSolver::calcMultipoleExpansionsAtLeaves(
    {
       for(auto node : layer)
       {
-         if(!node->quadratures().empty())
+         if(node->isUsefullLeaf())
             node->multipoleExpansion() = math::calcIntegralContribution(
                node->quadratures(), harmonicOrder, node->box().center());
       }
@@ -158,7 +158,7 @@ void MultipoleSolver::calcContributionsToHigherLayers(
    const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
    Device device)
 {
-   for(int l = layers.size() - 1; l >= 1; l--)
+   for(size_t l = layers.size() - 1; l >= 1; l--)
    {
       auto start = std::chrono::steady_clock::now();
 

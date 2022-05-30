@@ -254,12 +254,9 @@ RealHarmonicSeries Harmonics::separateCoord(
 {
    RealHarmonicSeries res(harmonics.order());
 
-   for(int l = 0; l <= harmonics.order(); l++)
+   for(size_t h = 0; h < harmonics.elemCount(); h++)
    {
-      for(int m = -l; m <= l; m++)
-      {
-         res.getHarmonic(l, m) = harmonics.getHarmonic(l, m)[i];
-      }
+      res.getHarmonic(h) = harmonics.getHarmonic(h)[i];
    }
 
    return res;
