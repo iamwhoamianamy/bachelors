@@ -19,7 +19,7 @@ protected:
    std::vector<Complex> _complexToRealMatrix;
 
 public:
-   bool log = true;
+   bool log = false;
    float adaptiveBorder = 16e3;
    const int harmonicOrder = 10;
    const int harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);

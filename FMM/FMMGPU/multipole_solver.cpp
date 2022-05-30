@@ -36,43 +36,41 @@ size_t MultipoleSolver::getOctreeNodeCount() const
 
 void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, Device device)
 {
-   if(_multipolesAtLeavesAreReady)
+   if(!_multipolesAtLeavesAreReady)
    {
-      switch(algorithm)
-      {
-         case M2MAlg::NoTranslation:
-         {
-            calcMultipoleExpansionsWithoutTranslation();
-            break;
-         }
-         case M2MAlg::ComplexTranslation:
-         {
-            calcMultipoleExpansionsWithComplexTranslation();
-            break;
-         }
-         case M2MAlg::RealTranslation:
-         {
-            calcMultipoleExpansionsWithRealTranslation();
-            break;
-         }
-         case M2MAlg::Layers:
-         {
-            calcMultipoleExpanstionsWithLayersOrMatrices(device, false);
-            break;
-         }
-         case M2MAlg::Matrices:
-         {
-            calcMultipoleExpanstionsWithLayersOrMatrices(device, true);
-            break;
-         }
-      }
+      calcMultipoleExpansionsAtLeaves();
+   }
 
-      _multipolesAreReady = true;
-   }
-   else
+   switch(algorithm)
    {
-      throw std::exception("Multipoles at leaves are not ready!");
+      case M2MAlg::NoTranslation:
+      {
+         calcMultipoleExpansionsWithoutTranslation();
+         break;
+      }
+      case M2MAlg::ComplexTranslation:
+      {
+         calcMultipoleExpansionsWithComplexTranslation();
+         break;
+      }
+      case M2MAlg::RealTranslation:
+      {
+         calcMultipoleExpansionsWithRealTranslation();
+         break;
+      }
+      case M2MAlg::Layers:
+      {
+         calcMultipoleExpanstionsWithLayersOrMatrices(device, false);
+         break;
+      }
+      case M2MAlg::Matrices:
+      {
+         calcMultipoleExpanstionsWithLayersOrMatrices(device, true);
+         break;
+      }
    }
+
+   _multipolesAreReady = true;
 }
 
 void MultipoleSolver::calcMultipoleExpansionsWithoutTranslation()
