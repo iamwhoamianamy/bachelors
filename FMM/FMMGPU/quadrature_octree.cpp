@@ -119,7 +119,7 @@ void QuadratureOctreeNode::calcMultipoleExpansionsWithoutTranslation(int n)
    {
       _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center());
 
-      for(auto& child : _children)
+      for(auto child : _children)
       {
          child->calcMultipoleExpansionsWithoutTranslation(n);
       }
@@ -203,17 +203,13 @@ Vector3 QuadratureOctreeNode::calcA(const Vector3& point) const
 
    Vector3 res;
 
-   if(2 * _box.radius() < (point - _box.center()).length())
+   auto distanceSquared = Vector3::distanceSquared(point, box().center());
+   auto radius = box().radius();
+
+   if(4 * radius * radius < distanceSquared)
    {
       auto irregularHarmonic = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center());
-
-      for(int l = 0; l < n; l++)
-      {
-         for(int m = -l; m <= l; m++)
-         {
-            res += _multipoleExpansion.getHarmonic(l, m) * irregularHarmonic.getHarmonic(l, m);
-         }
-      }
+      res += mult(_multipoleExpansion, irregularHarmonic);
    }
    else
    {
@@ -228,27 +224,30 @@ Vector3 QuadratureOctreeNode::calcA(const Vector3& point) const
 
 Vector3 QuadratureOctreeNode::calcRot(const Vector3& point) const
 {
-   int n = _multipoleExpansion.order();
+   Vector3 result;
+
+   int order = _multipoleExpansion.order();
    real eps = 1e-3;
+   
+   auto distanceSquared = Vector3::distanceSquared(point, box().center());
+   auto radius = box().radius();
 
-   Vector3 res;
-
-   if(2 * _box.radius() < (point - _box.center()).length())
+   if(4 * radius * radius < distanceSquared)
    {
-      auto hx1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() +
-                                                        Vector3::xAxis() * eps);
-      auto hx2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() -
-                                                        Vector3::xAxis() * eps);
+      auto hx1 = Harmonics::calcIrregularSolidHarmonics(
+         order, point - _box.center() + Vector3::xAxis() * eps);
+      auto hx2 = Harmonics::calcIrregularSolidHarmonics(
+         order, point - _box.center() - Vector3::xAxis() * eps);
 
-      auto hy1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() +
-                                                        Vector3::yAxis() * eps);
-      auto hy2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() -
-                                                        Vector3::yAxis() * eps);
+      auto hy1 = Harmonics::calcIrregularSolidHarmonics(
+         order, point - _box.center() + Vector3::yAxis() * eps);
+      auto hy2 = Harmonics::calcIrregularSolidHarmonics(
+         order, point - _box.center() - Vector3::yAxis() * eps);
 
-      auto hz1 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() +
-                                                        Vector3::zAxis() * eps);
-      auto hz2 = Harmonics::calcIrregularSolidHarmonics(n, point - _box.center() -
-                                                        Vector3::zAxis() * eps);
+      auto hz1 = Harmonics::calcIrregularSolidHarmonics(
+         order, point - _box.center() + Vector3::zAxis() * eps);
+      auto hz2 = Harmonics::calcIrregularSolidHarmonics(
+         order, point - _box.center() - Vector3::zAxis() * eps);
 
       hx1.subtract(hx2);
       hy1.subtract(hy2);
@@ -256,46 +255,44 @@ Vector3 QuadratureOctreeNode::calcRot(const Vector3& point) const
 
       Vector3 tempRes;
 
-      for(int l = 0; l < n; l++)
+      for(int l = 0; l < order; l++)
       {
          for(int m = -l; m <= l; m++)
          {
-            tempRes.x += _multipoleExpansion.getHarmonic(l, m).z * hy1.getHarmonic(l, m) -
-                         _multipoleExpansion.getHarmonic(l, m).y * hz1.getHarmonic(l, m);
+            tempRes.x += 
+               _multipoleExpansion.getHarmonic(l, m).z * hy1.getHarmonic(l, m) -
+               _multipoleExpansion.getHarmonic(l, m).y * hz1.getHarmonic(l, m);
 
-            tempRes.y += _multipoleExpansion.getHarmonic(l, m).x * hz1.getHarmonic(l, m) -
-                         _multipoleExpansion.getHarmonic(l, m).z * hx1.getHarmonic(l, m);
+            tempRes.y += 
+               _multipoleExpansion.getHarmonic(l, m).x * hz1.getHarmonic(l, m) -
+               _multipoleExpansion.getHarmonic(l, m).z * hx1.getHarmonic(l, m);
 
-            tempRes.z += _multipoleExpansion.getHarmonic(l, m).y * hx1.getHarmonic(l, m) -
-                         _multipoleExpansion.getHarmonic(l, m).x * hy1.getHarmonic(l, m);
+            tempRes.z += 
+               _multipoleExpansion.getHarmonic(l, m).y * hx1.getHarmonic(l, m) -
+               _multipoleExpansion.getHarmonic(l, m).x * hy1.getHarmonic(l, m);
          }
       }
 
-      res += tempRes / (2 * eps);
+      result += tempRes / (2 * eps);
    }
    else
    {
       for(auto child : _children)
       {
-         res += child->calcRot(point);
+         result += child->calcRot(point);
       }
    }
 
-   return res;
+   return result;
 }
 
 size_t QuadratureOctreeNode::getAllNodeCount() const
 {
    size_t count = 1;
 
-   if(isSubdivided())
+   for(auto child : _children)
    {
-      count += 8;
-
-      for(auto child : _children)
-      {
-         count += child->getAllNodeCount();
-      }
+      count += child->getAllNodeCount();
    }
    
    return count;
@@ -353,12 +350,9 @@ const HarmonicSeries<Vector3>& QuadratureOctreeNode::multipoleExpansion() const
 
 QuadratureOctreeNode::~QuadratureOctreeNode()
 {
-   if(isSubdivided())
+   for(auto child : _children)
    {
-      for(auto child : _children)
-      {
-         delete child;
-      }
+      delete child;
    }
 }
 
