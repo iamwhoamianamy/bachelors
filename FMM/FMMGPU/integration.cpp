@@ -110,6 +110,36 @@ namespace math
          MU0 / (4 * PI) * current;
    }
 
+   Vector3 BEMFunction(
+      const Vector3& point,
+      const BEMQuadrature& quadrature)
+   {
+      Vector3 diff = point - quadrature;
+      real length3 = std::pow<real>(diff.length(), 3);
+      Vector3 normal = quadrature.normalized();
+      normal.z = 0;
+      Vector3 first = diff * Vector3::dot(quadrature.B, normal) / length3;
+      Vector3 second = Vector3::cross(
+         diff, 
+         Vector3::cross(quadrature.B, normal)) / length3;
+
+      return first + second;
+   }
+
+   Vector3 calcBEMIntegral(
+      const Vector3& point,
+      const std::vector<BEMQuadrature>& quadratures)
+   {
+      Vector3 res = 0;
+
+      for(auto& quadrature : quadratures)
+      {
+         res += BEMFunction(point, quadrature) * quadrature.weight;
+      }
+
+      return res / (4 * PI);
+   }
+
    Vector3 bioSavartLaplaceFunction(
       const Vector3& point,
       const Vector3& integr)

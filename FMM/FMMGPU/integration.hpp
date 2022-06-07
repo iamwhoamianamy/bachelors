@@ -51,6 +51,14 @@ namespace math
       const Vector3& point,
       const Vector3& integr);
 
+   Vector3 BEMFunction(
+      const Vector3& point,
+      const BEMQuadrature& quadrature);
+
+   Vector3 calcBEMIntegral(
+      const Vector3& point,
+      const std::vector<BEMQuadrature>& quadratures);
+   
    HarmonicSeries<Vector3> calcIntegralContribution(
       std::vector<Quadrature>& quadratures,
       int harmonicOrder,
