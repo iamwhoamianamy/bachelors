@@ -9,10 +9,10 @@ BasisQuadratures::BasisQuadratures()
    _order = 0;
 }
 
-void BasisQuadratures::InitFromTXT(string coordsFileName, string weightsFileName)
+void BasisQuadratures::initFromTXT(string coordsFileName, string weightsFileName)
 {
-   InitCoordinatesFromTXT(coordsFileName);
-   InitWeightsFromTXT(weightsFileName);
+   initCoordinatesFromTXT(coordsFileName);
+   initWeightsFromTXT(weightsFileName);
 }
 
 int BasisQuadratures::order() const
@@ -30,7 +30,7 @@ real BasisQuadratures::w(size_t i) const
    return _w[i];
 }
 
-void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
+void BasisQuadratures::initCoordinatesFromTXT(std::string coordsFileName)
 {
    ifstream fin(coordsFileName, ios_base::in);
 
@@ -64,7 +64,7 @@ void BasisQuadratures::InitCoordinatesFromTXT(std::string coordsFileName)
    }
 }
 
-void BasisQuadratures::InitWeightsFromTXT(std::string weightsFileName)
+void BasisQuadratures::initWeightsFromTXT(std::string weightsFileName)
 {
    ifstream fin(weightsFileName, ios_base::in);
 

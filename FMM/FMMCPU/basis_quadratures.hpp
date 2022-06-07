@@ -14,13 +14,13 @@ private:
 public:
 
    BasisQuadratures();
-   void InitFromTXT(std::string coordsFileName, std::string weightsFileame);
+   void initFromTXT(std::string coordsFileName, std::string weightsFileName);
 
    int order() const;
    const Vector3& values(size_t i) const;
    const real w(size_t i) const;
 
 private:
-   void InitCoordinatesFromTXT(std::string coordsFileName);
-   void InitWeightsFromTXT( std::string weightsFileName);
+   void initCoordinatesFromTXT(std::string coordsFileName);
+   void initWeightsFromTXT( std::string weightsFileName);
 };
