@@ -8,8 +8,8 @@ namespace test
 {
    Torus createTorus()
    {
-      constexpr double torusRadius = 2;
-      constexpr double torusSectionWidth = 0.2;
+      constexpr real torusRadius = 2;
+      constexpr real torusSectionWidth = 0.2;
       
       return { torusRadius, torusSectionWidth, 80, 8, 8 };
       //return { torusRadius, torusSectionWidth, 40, 8, 8 };
