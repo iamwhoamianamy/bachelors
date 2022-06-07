@@ -26,15 +26,15 @@ QuadratureOctreeNode::QuadratureOctreeNode(
 
 void QuadratureOctreeNode::insert(std::vector<Quadrature>& points)
 {
-   for(auto& point : points)
+   for(auto &point : points)
    {
-      insert(point);
+      insert(&point);
    }
 }
 
-void QuadratureOctreeNode::insert(Quadrature& point)
+void QuadratureOctreeNode::insert(Quadrature* point)
 {
-   if(!_box.contains(point))
+   if(!_box.contains(*point))
    {
       return;
    }
@@ -43,7 +43,7 @@ void QuadratureOctreeNode::insert(Quadrature& point)
    {
       if(!isSubdivided())
       {
-         _quadratures.push_back(&point);
+         _quadratures.push_back(point);
       }
       else
       {
@@ -57,13 +57,13 @@ void QuadratureOctreeNode::insert(Quadrature& point)
    {
       subdivide();
 
-      _quadratures.push_back(&point);
+      _quadratures.push_back(point);
 
       for(auto p : _quadratures)
       {
          for(auto& child : _children)
          {
-            child->insert(*p);
+            child->insert(p);
          }
       }
 

@@ -26,7 +26,7 @@ public:
       const size_t capacity,
       QuadratureOctreeNode* parent = nullptr);
 
-   void insert(Quadrature& point);
+   void insert(Quadrature* point);
    void insert(std::vector<Quadrature>& points);
    void subdivide();
 
