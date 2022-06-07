@@ -119,6 +119,7 @@
     <ClInclude Include="tetrahedron.hpp" />
     <ClInclude Include="tetrahedron_transformer.hpp" />
     <ClInclude Include="torus.hpp" />
+    <ClInclude Include="triangle.hpp" />
     <ClInclude Include="typedefs.hpp" />
     <ClInclude Include="vector3.cuh" />
   </ItemGroup>
@@ -144,6 +145,7 @@
     <ClCompile Include="tetrahedron_transformer.cpp" />
     <ClCompile Include="torus.cpp" />
     <ClCompile Include="translation_algorithms_cpu.cpp" />
+    <ClCompile Include="triangle.cpp" />
     <CudaCompile Include="vector3.cu">
       <FileType>Document</FileType>
     </CudaCompile>
