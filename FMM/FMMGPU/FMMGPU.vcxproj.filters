@@ -44,9 +44,6 @@
     <ClInclude Include="tetrahedron.hpp">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="tetrahedron_transformer.hpp">
-      <Filter>Code</Filter>
-    </ClInclude>
     <ClInclude Include="torus.hpp">
       <Filter>Code</Filter>
     </ClInclude>
@@ -110,9 +107,6 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="tetrahedron.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="tetrahedron_transformer.cpp">
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="torus.cpp">
