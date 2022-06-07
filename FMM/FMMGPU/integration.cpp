@@ -32,14 +32,24 @@ namespace math
    }
 
    Vector3 pointFromBasisQuadrature(
-      const Tetrahedron& tetr,
+      const Tetrahedron& tetrahedron,
       const Vector3& quadr)
    {
-      return tetr.a() +
-         (tetr.b() - tetr.a()) * quadr.x +
-         (tetr.c() - tetr.a()) * quadr.y +
-         (tetr.d() - tetr.a()) * quadr.z;
+      return tetrahedron.a() +
+         (tetrahedron.b() - tetrahedron.a()) * quadr.x +
+         (tetrahedron.c() - tetrahedron.a()) * quadr.y +
+         (tetrahedron.d() - tetrahedron.a()) * quadr.z;
    }
+
+   Vector3 pointFromBasisQuadrature(
+      const Triangle& triangle,
+      const Vector3& quadr)
+   {
+      return triangle.a() +
+         (triangle.b() - triangle.a()) * quadr.x +
+         (triangle.c() - triangle.a()) * quadr.y;
+   }
+
 
    Vector3 calcAViaSimpleIntegration(
       real current,

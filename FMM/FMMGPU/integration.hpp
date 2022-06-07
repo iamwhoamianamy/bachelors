@@ -3,9 +3,10 @@
 #include "vector3.cuh"
 #include "tetrahedron.hpp"
 #include "basis_quadratures.hpp"
+#include "bem_quadrature.hpp"
 #include "quadrature.hpp"
 #include "harmonic_series.hpp"
-
+#include "triangle.hpp"
 
 namespace math
 {
@@ -17,7 +18,11 @@ namespace math
       const std::vector<Quadrature>& quadratures);
 
    Vector3 pointFromBasisQuadrature(
-      const Tetrahedron& tetr,
+      const Tetrahedron& tetrahedron,
+      const Vector3& quadr);
+
+   Vector3 pointFromBasisQuadrature(
+      const Triangle& triangle,
       const Vector3& quadr);
 
    Vector3 calcAViaSimpleIntegration(
