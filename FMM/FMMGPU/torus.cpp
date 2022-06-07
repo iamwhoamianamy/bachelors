@@ -6,15 +6,15 @@
 void saveHexahedraAsOBJ(std::vector<Hexahedron>& hexahedra, std::string filename);
 void saveTetrahedraAsOBJ(std::vector<Tetrahedron>& tetrahedra, std::string filename);
 
-Torus::Torus(const double radius,
-             const double sectionWidth,
+Torus::Torus(const real radius,
+             const real sectionWidth,
              const int onLengthStepCount,
              const int onWidthStepCount,
              const int onHeightStepCount)
-   : radius(radius), sectionWidth(sectionWidth),
-   onLengthStepCount(onLengthStepCount),
-   onWidthStepCount(onWidthStepCount),
-   onHeightStepCount(onHeightStepCount)
+   : _radius(radius), _sectionWidth(sectionWidth),
+   _onLengthStepCount(onLengthStepCount),
+   _onWidthStepCount(onWidthStepCount),
+   _onHeightStepCount(onHeightStepCount)
 {
    std::vector<Hexahedron> hexahedra(onLengthStepCount * onWidthStepCount * onHeightStepCount);
    buildHexahedra(hexahedra);
@@ -24,34 +24,34 @@ Torus::Torus(const double radius,
    saveTetrahedraAsOBJ(tetrahedra, "testmesh/debsTet.obj");
 }
 
-double Torus::innerRadius() const
+real Torus::innerRadius() const
 {
-   return radius - sectionWidth / 2.0;
+   return _radius - _sectionWidth / 2.0;
 }
 
-double Torus::outerRadius() const
+real Torus::outerRadius() const
 {
-   return radius + sectionWidth / 2.0;
+   return _radius + _sectionWidth / 2.0;
 }
 
-double Torus::bottom() const
+real Torus::bottom() const
 {
-   return -1.0 * sectionWidth / 2.0;
+   return -1.0 * _sectionWidth / 2.0;
 }
 
-double Torus::top() const
+real Torus::top() const
 {
-   return sectionWidth / 2.0;
+   return _sectionWidth / 2.0;
 }
 
-double Torus::stepAngle() const
+real Torus::stepAngle() const
 {
-   return 360.0 / onLengthStepCount * 3.14159265359 / 180.0;
+   return 360.0 / _onLengthStepCount * 3.14159265359 / 180.0;
 }
 
 void Torus::buildHexahedra(std::vector<Hexahedron>& hexahedra)
 {
-   const double hexahedronHeight = sectionWidth / onHeightStepCount;
+   const real hexahedronHeight = _sectionWidth / _onHeightStepCount;
 
    auto getInnerRadiusPoint = [&](int n)
    {
@@ -60,18 +60,18 @@ void Torus::buildHexahedra(std::vector<Hexahedron>& hexahedra)
 
    auto getPointOnWidthSection = [&](Vector3 innerRadiusPoint, int n)
    {
-      double onWidthStepLength = sectionWidth / onWidthStepCount;
+      real onWidthStepLength = _sectionWidth / _onWidthStepCount;
       return innerRadiusPoint + innerRadiusPoint.normalized() * onWidthStepLength * n;
    };
 
    size_t hexahedronsCount = 0;
 
-   for(size_t lengthCounter = 0; lengthCounter < onLengthStepCount; lengthCounter++)
+   for(size_t lengthCounter = 0; lengthCounter < _onLengthStepCount; lengthCounter++)
    {
       Vector3 innerRadiusPoint = getInnerRadiusPoint(lengthCounter);
       Vector3 nextInnerRadiusPoint = getInnerRadiusPoint(lengthCounter + 1);
 
-      for(size_t widthCounter = 0; widthCounter < onWidthStepCount; widthCounter++)
+      for(size_t widthCounter = 0; widthCounter < _onWidthStepCount; widthCounter++)
       {
          Vector3 rightOnWidthSectionPoint = getPointOnWidthSection(innerRadiusPoint, widthCounter);
          Vector3 nextRightOnWidthSectionPoint = getPointOnWidthSection(innerRadiusPoint, widthCounter + 1);
@@ -79,10 +79,10 @@ void Torus::buildHexahedra(std::vector<Hexahedron>& hexahedra)
          Vector3 leftOnWidthSectionPoint = getPointOnWidthSection(nextInnerRadiusPoint, widthCounter);
          Vector3 nextLeftOnWidthSectionPoint = getPointOnWidthSection(nextInnerRadiusPoint, widthCounter + 1);
 
-         for(size_t heightCounter = 0; heightCounter < onHeightStepCount; heightCounter++)
+         for(size_t heightCounter = 0; heightCounter < _onHeightStepCount; heightCounter++)
          {
-            double hexahedronBottom = bottom() + hexahedronHeight * heightCounter;
-            double hexahedronTop = bottom() + hexahedronHeight * (heightCounter + 1);
+            real hexahedronBottom = bottom() + hexahedronHeight * heightCounter;
+            real hexahedronTop = bottom() + hexahedronHeight * (heightCounter + 1);
 
             std::vector<Vector3> points(8);
 

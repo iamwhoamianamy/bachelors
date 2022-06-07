@@ -3,26 +3,27 @@
 #include "vector3.cuh"
 #include "tetrahedron.hpp"
 #include "hexahedron.hpp"
+#include "real.hpp"
 
 class Torus
 {
 private:
-   const double radius;
-   const double sectionWidth;
-   const int onLengthStepCount;
-   const int onWidthStepCount;
-   const int onHeightStepCount;
+   const real _radius;
+   const real _sectionWidth;
+   const int _onLengthStepCount;
+   const int _onWidthStepCount;
+   const int _onHeightStepCount;
 public:
-   Torus(const double radius,
-         const double sectionWidth,
+   Torus(const real radius,
+         const real sectionWidth,
          const int onLengthStepCount,
          const int onWidthStepCount,
          const int onHeightStepCount);
-   double innerRadius() const;
-   double outerRadius() const;
-   double bottom() const;
-   double top() const;
-   double stepAngle() const;
+   real innerRadius() const;
+   real outerRadius() const;
+   real bottom() const;
+   real top() const;
+   real stepAngle() const;
    std::vector<Tetrahedron> tetrahedra;
 
 private:
