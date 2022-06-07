@@ -354,7 +354,7 @@ void timeResearchForMorePoints()
    }
 }
 
-void NMResearch()
+void NMResearch2()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
@@ -402,7 +402,7 @@ void layerCalculationsPrecision()
 
 int main()
 {
-   //NMResearch();
+   //NMResearch2();
    //timeResearchForMorePoints();
    //comparisonToTelmaWithTranslation();
    //comparisonBetweenMethodsOnPrecision();

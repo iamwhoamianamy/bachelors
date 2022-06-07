@@ -29,7 +29,7 @@ void MultipoleSolver::calcMultipoleExpansionsAtLeaves()
    _multipolesAtLeavesAreReady = true;
 }
 
-size_t MultipoleSolver::getOctreeNodeCount() const
+size_t MultipoleSolver::getQuadratureOctreeNodeCount() const
 {
    return _quadratureOctreeRoot->getAllNodeCount();
 }

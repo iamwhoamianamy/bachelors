@@ -13,7 +13,7 @@ withMGPU = []
 with open("time_for_local_multipoles_nodes.txt") as f:
    for line in f:
       values = line.split(" ")
-      xs.append(float(values[0]))
+      xs.append(float(values[0]) / 2)
       withoutT.append(float(values[1]))
       withC.append(float(values[2]))
       withR.append(float(values[3]))

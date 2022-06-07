@@ -32,7 +32,7 @@ public:
 
    virtual void calcMultipoleExpansionsAtLeaves();
 
-   virtual size_t getOctreeNodeCount() const;
+   virtual size_t getQuadratureOctreeNodeCount() const;
 
    virtual void calclMultipoleExpansions(
       M2MAlg algorithm,

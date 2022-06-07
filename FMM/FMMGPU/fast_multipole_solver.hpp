@@ -26,9 +26,9 @@ public:
       std::vector<Quadrature>& quadratures,
       std::vector<Vector3>& points,
       size_t quadratureOctreeLeafCapacity = 1000,
-      size_t calculationPointOctreeLeafCapacity = 2);
+      size_t calculationPointOctreeLeafCapacity = 100);
    
-   void calclLocalMultipoleExpansions(
+   void calcLocalMultipoleExpansions(
       M2LAlg algorithm,
       Device device = Device::CPU);
    
@@ -37,7 +37,6 @@ public:
    virtual std::vector<std::pair<Vector3, Vector3>> calcA(real current);
    virtual std::vector<std::pair<Vector3, Vector3>> calcB(real current);
 
-   
    virtual ~FastMultipoleSolver() override;
 
 private:

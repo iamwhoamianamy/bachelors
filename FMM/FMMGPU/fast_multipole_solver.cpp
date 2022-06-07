@@ -28,13 +28,24 @@ FastMultipoleSolver::~FastMultipoleSolver()
 
 void FastMultipoleSolver::initTrees()
 {
+   auto start = std::chrono::steady_clock::now();
    MultipoleSolver::initTrees();
+   auto stop = std::chrono::steady_clock::now();
+   auto time = test::getTime(start, stop);
+
+   //std::cout << time << " ";
+
+   start = std::chrono::steady_clock::now();
    _calculationPointOctreeRoot = new CalculationPointOctreeNode(
       math::getBoundingBox(_points), calculationPointOctreeLeafCapacity);
    _calculationPointOctreeRoot->insert(_points);
+   stop = std::chrono::steady_clock::now();
+   time = test::getTime(start, stop);
+
+   //std::cout << time << " ";
 }
 
-void FastMultipoleSolver::calclLocalMultipoleExpansions(
+void FastMultipoleSolver::calcLocalMultipoleExpansions(
    M2LAlg algorithm,
    Device device)
 {

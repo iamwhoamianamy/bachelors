@@ -75,7 +75,7 @@ void comparisonToTelmaIntegrals()
    multipoleSolverMatricesGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
 
    fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
-   fmmSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
 
    auto points = fmmSolver.calcB(current);
 
@@ -254,7 +254,7 @@ void calculationTimeForMultipolesInLeaves()
       auto stop = std::chrono::steady_clock::now();
       double timeForMultipolesInLeaves = getTime(start, stop);
 
-      std::cout << multipoleSolver.getOctreeNodeCount() << " ";
+      std::cout << multipoleSolver.getQuadratureOctreeNodeCount() << " ";
       std::cout << timeForMultipolesInLeaves << std::endl;
    }
 }
@@ -410,7 +410,7 @@ void calculationTimeForLocalMultipolesByNodeCount()
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesAda = getTime(start, stop);
 
-      std::cout << " " << multipoleSolver.getOctreeNodeCount();
+      std::cout << " " << multipoleSolver.getQuadratureOctreeNodeCount();
       std::cout << " " << timeWithoutTranslation;
       std::cout << " " << timeWithComplexTranslation;
       std::cout << " " << timeWithRealTranslation;
@@ -435,8 +435,6 @@ std::pair<double, Vector3> wholeTimeForIntegrals(const std::vector<Vector3>& poi
 
    auto stop = std::chrono::steady_clock::now();
    
-   std::cout << res.x << " ";
-
    return std::pair<double, Vector3>
       (std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count() * 1e-9, res);
 }
@@ -448,10 +446,9 @@ std::pair<double, Vector3>  timeForMultipoles(
    Device device)
 {
    Vector3 res;
+   auto start = std::chrono::steady_clock::now();
    MultipoleSolver multipoleSolver(quadratures);
    multipoleSolver.calclMultipoleExpansions(alg, device);
-
-   auto start = std::chrono::steady_clock::now();
 
    for(size_t p = 0; p < points.size(); p++)
    {
@@ -463,7 +460,7 @@ std::pair<double, Vector3>  timeForMultipoles(
    return { getTime(start, stop), res };
 }
 
-void NMResearch()
+void NMResearch1()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
@@ -471,35 +468,92 @@ void NMResearch()
    Vector3 end(0, 0, 0);
    BasisQuadratures bq = readBasisQuadratures();
 
-   std::cout << " " << "NM";
-   std::cout << " " << "w/t";
-   std::cout << " " << "Complex";
-   std::cout << " " << "real";
-   std::cout << " " << "layersCPU";
-   std::cout << " " << "layersGPU";
-   std::cout << " " << "matricesCPU";
-   std::cout << " " << "matricesGPU";
+   std::cout << std::setw(16) << "NM";
+   std::cout << std::setw(16) << "w/t";
+   std::cout << std::setw(16) << "matrices";
    std::cout << std::endl;
 
-   for(size_t i = 5; i < 12; i++)
+   double prevTimeIntegrals = 0;
+   double prevTimeMatrices = 0;
+
+   for(size_t i = 1; i < 15; i++)
    {
-      Torus torus(torusRadius, torusSectionWidth, pow(2, i + 1), 4, 4);
+      Torus torus(torusRadius, torusSectionWidth, pow(2, i), 4, 4);
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-      int pointsCount = 4 * pow(2, i);
+      int pointsCount = 3840 * pow(2, i - 1);
       auto points = createPoints(begin, end, pointsCount);
 
       std::cout << std::fixed;
-      std::cout << std::setw(5) << pointsCount * quadratures.size() << " ";
+      std::cout << std::setw(16) << pointsCount * quadratures.size() << " ";
       std::cout << std::scientific;
-      std::cout << std::setw(8) << wholeTimeForIntegrals(points, quadratures).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::NoTranslation, Device::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::ComplexTranslation, Device::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::RealTranslation, Device::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Layers, Device::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Layers, Device::GPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Matrices, Device::CPU).first << " ";
-      std::cout << std::setw(8) << timeForMultipoles(points, quadratures, M2MAlg::Matrices, Device::GPU).first << std::endl;
+
+      if(i < 5)
+         prevTimeIntegrals = wholeTimeForIntegrals(points, quadratures).first;
+      else
+         prevTimeIntegrals *= 4;
+
+      if(i < 8)
+         prevTimeMatrices = timeForMultipoles(points, quadratures, M2MAlg::Matrices, Device::GPU).first;
+      else
+         prevTimeMatrices = 0;
+
+      std::cout << std::setw(16) << prevTimeIntegrals;
+      std::cout << std::setw(16) << prevTimeMatrices << std::endl;
+   }
+}
+
+void NMResearch2()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+   BasisQuadratures bq = readBasisQuadratures();
+
+   std::cout << std::setw(16) << "NM";
+   std::cout << std::setw(16) << "w/t";
+   std::cout << std::setw(16) << "matrices";
+   std::cout << std::setw(16) << "Fmm";
+   std::cout << std::endl;
+
+   double prevTimeIntegrals = 0;
+   double prevTimeMatrices = 0;
+
+   for(size_t i = 1; i < 15; i++)
+   {
+      Torus torus(torusRadius, torusSectionWidth, pow(2, i), 4, 4);
+      auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+      int pointCount = 3840 * pow(2, i - 1);
+      auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), pointCount);
+
+      std::cout << std::fixed;
+      std::cout << std::setw(16) << pointCount * quadratures.size() << " ";
+      std::cout << std::scientific;
+
+      /*if(i < 5)
+         prevTimeIntegrals = wholeTimeForIntegrals(points, quadratures).first;
+      else
+         prevTimeIntegrals *= 4;*/
+      
+
+      if(i < 15)
+         prevTimeMatrices = timeForMultipoles(points, quadratures, M2MAlg::ComplexTranslation, Device::GPU).first;
+      else
+         prevTimeMatrices *= 2;
+
+      std::cout << std::setw(16) << prevTimeIntegrals;
+      std::cout << std::setw(16) << prevTimeMatrices;
+
+      auto start = std::chrono::steady_clock::now();
+      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+      fmmSolver.calcMultipoleExpansionsAtLeaves();
+      fmmSolver.calclMultipoleExpansions(M2MAlg::ComplexTranslation, Device::GPU);
+      fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+      auto fmmResults = fmmSolver.calcB(current);
+      auto stop = std::chrono::steady_clock::now();
+      auto time = getTime(start, stop);
+
+      std::cout << std::setw(16) << time << std::endl;
    }
 }
 
@@ -905,8 +959,8 @@ void FMMPrecisionTest()
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
-   //multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
-   multipoleSolver.calclLocalMultipoleExpansions(M2LAlg::Matrices, Device::CPU);
+   //multipoleSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   multipoleSolver.calcLocalMultipoleExpansions(M2LAlg::Matrices, Device::CPU);
 
    auto fmmResults = multipoleSolver.calcB(current);
    
@@ -966,7 +1020,7 @@ void FFMTimeTest()
       multipoleSolverComplex.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
 
       auto start = std::chrono::steady_clock::now();
-      multipoleSolverComplex.calclLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::GPU);
+      multipoleSolverComplex.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::GPU);
       auto stop = std::chrono::steady_clock::now();
       double fmmPartTimeComplex = test::getTime(start, stop);
       
@@ -974,7 +1028,7 @@ void FFMTimeTest()
       //multipoleSolverMatricesGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
 
       //start = std::chrono::steady_clock::now();
-      //multipoleSolverMatricesGPU.calclLocalMultipoleExpansions(M2LAlg::Matrices, Device::GPU);
+      //multipoleSolverMatricesGPU.calcLocalMultipoleExpansions(M2LAlg::Matrices, Device::GPU);
       //stop = std::chrono::steady_clock::now();
       //double fmmPartTimeMatrices = test::getTime(start, stop);
 
@@ -1153,18 +1207,139 @@ void translationTest2()
 
 }
 
+void timeForFullFMMByQuadratures()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+   Vector3 begin(3, 1, 2);
+   Vector3 end(0, 0, 0);
+   BasisQuadratures bq = readBasisQuadratures();
+   int pointsCount = 1000;
+   auto points = createRandomPoints({{0, 0, 0}, {2, 2, 2}}, pointsCount);
+
+   for(size_t i = 5; i < 15; i++)
+   {
+      Torus torus(torusRadius, torusSectionWidth, pow(2, i + 1), 4, 4);
+      auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+
+      auto start = std::chrono::steady_clock::now();
+      fmmSolver.calcMultipoleExpansionsAtLeaves();
+      fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+      auto stop = std::chrono::steady_clock::now();
+      auto time1 = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+      stop = std::chrono::steady_clock::now();
+      auto time2 = getTime(start, stop);
+
+      std::cout << std::fixed;
+      std::cout << std::setw(5) << pointsCount * quadratures.size() << " ";
+      std::cout << std::scientific;
+      std::cout << std::setw(8) << time1 << " " << time2 << std::endl << std::endl;
+   }
+}
+
+void timeForFullFMMByPointCount()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+   Vector3 begin(3, 1, 2);
+   Vector3 end(0, 0, 0);
+   BasisQuadratures bq = readBasisQuadratures();
+   Torus torus(torusRadius, torusSectionWidth, 20, 4, 4);
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+
+   for(size_t i = 5; i < 30; i++)
+   {
+      int pointsCount = pow(2, i);
+      auto points = createRandomPoints({ {0, 0, 0}, {2, 2, 2} }, pointsCount);
+      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+
+      auto start = std::chrono::steady_clock::now();
+      fmmSolver.calcMultipoleExpansionsAtLeaves();
+      fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+      auto stop = std::chrono::steady_clock::now();
+      auto time1 = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+      stop = std::chrono::steady_clock::now();
+      auto time2 = getTime(start, stop);
+
+      std::cout << std::fixed;
+      std::cout << std::setw(5) << pointsCount * quadratures.size() << " ";
+      std::cout << std::scientific;
+      std::cout << std::setw(8) << time1 << " " << time2 << std::endl;
+   }
+}
+
+void timeForTallCube()
+{
+   const double torusRadius = 2;
+   const double torusSectionWidth = 0.2;
+   Vector3 begin(3, 1, 2);
+   Vector3 end(0, 0, 0);
+   BasisQuadratures bq = readBasisQuadratures();
+   Torus torus(torusRadius, torusSectionWidth, 20, 4, 4);
+   auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
+   int pointsCount = quadratures.size();
+
+   for(size_t i = 2; i < 40; i++)
+   {
+      auto points = createRandomPoints({ 
+         {0, 0, 0},
+         {2, 2, static_cast<real>(i)}
+      }, pointsCount);
+
+      std::cout << std::scientific;
+
+      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+
+      auto start = std::chrono::steady_clock::now();
+      fmmSolver.calcMultipoleExpansionsAtLeaves();
+      fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
+      auto stop = std::chrono::steady_clock::now();
+      auto time1 = getTime(start, stop);
+
+      start = std::chrono::steady_clock::now();
+      fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+      stop = std::chrono::steady_clock::now();
+      auto time2 = getTime(start, stop);
+         
+      std::cout << std::fixed;
+      std::cout << std::setw(5) << i << " ";
+      std::cout << std::scientific;
+      std::cout << std::setw(8) << time1 << " " << time2 << " ";
+
+      real sumAverageError = 0;
+
+      auto resultPoints = fmmSolver.calcB(current);
+
+      for (auto &[point, bFmm] : resultPoints)
+      {
+         auto b = fmmSolver.calcB(current, point);
+
+         sumAverageError += 100 * (bFmm - b).length() / b.length();
+      }
+
+      std::cout << std::setw(8) << sumAverageError / resultPoints.size() << std::endl;
+   }
+}
+
 int main()
 {
-   //NMResearch();
+   //NMResearch2();
    //timeResearchForMorePoints();
-   comparisonToTelmaIntegrals();
+   //comparisonToTelmaIntegrals();
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
    //comparisonBetweenMethodsOnPrecision();
    //calculationTimeForLocalMultipolesByNodeCount();
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
-
+   
    //multipoleToLocalTest();
 
    //layerCalculationTime();
@@ -1177,4 +1352,10 @@ int main()
 
    //FMMPrecisionTest();
    //FFMTimeTest();
+
+   NMResearch2();
+
+   //timeForFullFMMByQuadratures();
+   //timeForFullFMMByPointCount();
+   //timeForTallCube();
 }
