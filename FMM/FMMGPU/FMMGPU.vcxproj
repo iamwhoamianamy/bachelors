@@ -99,6 +99,7 @@
     <ClInclude Include="box.hpp" />
     <ClInclude Include="calculation_point_octree.hpp" />
     <ClInclude Include="cuda_helper.hpp" />
+    <ClInclude Include="cylinder.hpp" />
     <ClInclude Include="dev_ptr.hpp" />
     <ClInclude Include="exeptions.hpp" />
     <ClInclude Include="factorials.hpp" />
@@ -145,6 +146,7 @@
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="torus.cpp" />
     <ClCompile Include="translation_algorithms_cpu.cpp" />
+    <ClCompile Include="cylinder.cpp" />
     <ClCompile Include="triangle.cpp" />
     <CudaCompile Include="vector3.cu">
       <FileType>Document</FileType>
