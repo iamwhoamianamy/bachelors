@@ -2,10 +2,10 @@
 
 BEMQuadrature::BEMQuadrature(
    const Vector3& coordinates,
-   real volume,
+   real square,
    real weight,
    const Vector3& B):
-   Quadrature(coordinates, volume, weight), B(B)
+   Quadrature(coordinates, square, weight), B(B)
 {
 
 }
