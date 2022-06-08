@@ -1328,6 +1328,46 @@ void timeForTallCube()
    }
 }
 
+struct ReferenceCylinderData
+{
+   size_t id;
+   Vector3 point;
+   Vector3 B;
+   real lengthOfB;
+
+   ReferenceCylinderData(size_t id, const Vector3& point, const Vector3& B, real lengthOfB) :
+      id(id), point(point), B(B), lengthOfB(lengthOfB) {}
+};
+
+std::vector<ReferenceCylinderData> readCylinderData(const std::string& filename)
+{
+   std::vector<ReferenceCylinderData> result;
+
+   std::ifstream fin(filename);
+   std::string _;
+   std::getline(fin, _);
+   std::getline(fin, _);
+   size_t pointId;
+   
+   while (fin >> pointId)
+   {
+      real px, py, pz;
+      real bx, by, bz, bl;
+
+      fin >> px >> py >> pz >> bx >> by >> bz >> bl;
+
+      result.emplace_back(pointId, Vector3(px, py, pz), Vector3(bx, by, bz), bl);
+   }
+   
+   return result;
+}
+
+void BApproximationOnCylinder()
+{
+   auto externalCylinder = readCylinderData("cylinder/ВнешнийЦилиндр.0");
+   auto internalCylinder = readCylinderData("cylinder/Внутренний Цилиндр.0");
+}
+
 int main()
 {
    //NMResearch2();
@@ -1353,9 +1393,11 @@ int main()
    //FMMPrecisionTest();
    //FFMTimeTest();
 
-   NMResearch2();
+   //NMResearch2();
 
    //timeForFullFMMByQuadratures();
    //timeForFullFMMByPointCount();
    //timeForTallCube();
+
+   BApproximationOnCylinder();
 }
