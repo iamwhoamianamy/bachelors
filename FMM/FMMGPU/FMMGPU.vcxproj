@@ -111,6 +111,7 @@
     <ClInclude Include="kernels.cuh" />
     <ClInclude Include="multipole_solver_enums.hpp" />
     <ClInclude Include="multipole_translator.hpp" />
+    <ClInclude Include="reference_cylinder_data.hpp" />
     <ClInclude Include="translation_algorithms.hpp" />
     <ClInclude Include="math.hpp" />
     <ClInclude Include="multipole_solver.hpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="multipole_translator.cpp" />
     <ClCompile Include="quadrature_octree.cpp" />
     <ClCompile Include="quadrature.cpp" />
+    <ClCompile Include="reference_cylinder_data.cpp" />
     <ClCompile Include="testing_helpers.cpp" />
     <ClCompile Include="tetrahedron.cpp" />
     <ClCompile Include="torus.cpp" />

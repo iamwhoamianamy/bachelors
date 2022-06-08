@@ -104,6 +104,9 @@
     <ClInclude Include="triangle.hpp">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="reference_cylinder_data.hpp">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cuda_helper.cpp">
@@ -173,6 +176,9 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="triangle.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="reference_cylinder_data.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>
