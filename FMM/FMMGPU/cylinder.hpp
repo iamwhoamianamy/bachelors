@@ -13,7 +13,8 @@ private:
 
 public:
    Cylinder(
-      real height,
+      real bottom,
+      real top,
       real radius,
       size_t widthSegmentCount,
       size_t heightSegmentCount);

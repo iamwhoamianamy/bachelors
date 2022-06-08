@@ -3,27 +3,24 @@
 #include "math.hpp"
 
 Cylinder::Cylinder(
-   real height,
+   real bottom,
+   real top,
    real radius,
    size_t widthSegmentCount,
-   size_t heightSegmentCount) :
-   _height(height),
-   _radius(radius),
-   _widthSegmentCount(widthSegmentCount),
-   _heightSegmentCount(heightSegmentCount)
+   size_t heightSegmentCount)
 {
    _sideTriangles.reserve(widthSegmentCount * heightSegmentCount * 2);
 
    real width = 2 * math::PI;
    real segmentWidth = width / widthSegmentCount;
-   real segmentHeight = height / heightSegmentCount;
+   real segmentHeight = (top - bottom) / heightSegmentCount;
 
    Vector3 widthSegmentStep(segmentWidth, 0, 0);
    Vector3 heightSegmentStep(0, 0, segmentHeight);
 
    for(size_t h = 0; h < heightSegmentCount; h++)
    {
-      Vector3 currentHeight(0, 0, segmentHeight * h);
+      Vector3 currentHeight(0, 0, segmentHeight * h + bottom);
 
       for(size_t w = 0; w < widthSegmentCount; w++)
       {
