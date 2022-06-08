@@ -6,6 +6,8 @@
 #include <sstream>
 
 #include "cblas.h"
+#include "cylinder.hpp"
+#include "exeptions.hpp"
 #include "vector3.cuh"
 #include "math.hpp"
 #include "integration.hpp"
@@ -1328,16 +1330,6 @@ void timeForTallCube()
    }
 }
 
-struct ReferenceCylinderData
-{
-   size_t id;
-   Vector3 point;
-   Vector3 B;
-   real lengthOfB;
-
-   ReferenceCylinderData(size_t id, const Vector3& point, const Vector3& B, real lengthOfB) :
-      id(id), point(point), B(B), lengthOfB(lengthOfB) {}
-};
 
 std::vector<ReferenceCylinderData> readCylinderData(const std::string& filename)
 {
@@ -1364,15 +1356,74 @@ std::vector<ReferenceCylinderData> readCylinderData(const std::string& filename)
 
 void BApproximationOnCylinder()
 {
-   auto externalCylinder = readCylinderData("cylinder/ВнешнийЦилиндр.0");
+   auto externalCylinderSides = readCylinderData("cylinder/ВнешнийЦилиндр.0");
+   auto externalCylinderTop = readCylinderData("cylinder/ВнешнийЦилиндрВерх.0");
+   auto externalCylinderBottom = readCylinderData("cylinder/ВнешнийЦилиндрНиз.0");
    auto internalCylinder = readCylinderData("cylinder/Внутренний Цилиндр.0");
+
+   real cylinderRadius = 1.0;
+   real cylinderBottom = -1.5;
+   real cylinderTop = 1.5;
+
+   real subdivisionLevel = 1;
+
+   size_t widthSegmentCount = 128 * subdivisionLevel;
+   size_t heightSegmentCount = 99 * subdivisionLevel;
+   size_t depthSegmentCount = 50 * subdivisionLevel;
+
+   Cylinder cylinder(
+      cylinderBottom,
+      cylinderTop,
+      cylinderRadius,
+      widthSegmentCount,
+      heightSegmentCount,
+      depthSegmentCount);
+
+   BasisQuadratures bq;
+   std::string path = "basis_quadratures/";
+
+   try
+   {
+      bq.initFromTXT(path + "gauss7_xy.txt", path + "gauss7_w.txt");
+   }
+   catch (Exeption ex)
+   {
+      std::cout << ex.message;
+   }
+
+   auto BEMQuadraturesSide = math::calcBEMquadraturesFromTriangles(
+      cylinder.sideTriangles(), bq, externalCylinderSides, 0);
+
+   auto BEMQuadraturesTop = math::calcBEMquadraturesFromTriangles(
+      cylinder.topTriangles(), bq, externalCylinderTop, 1);
+
+   auto BEMQuadraturesBottom = math::calcBEMquadraturesFromTriangles(
+      cylinder.bottomTriangles(), bq, externalCylinderBottom, -1);
+
+   for(size_t i = 0; i < internalCylinder.size(); i++)
+   {
+      std::cout << std::setw(5) << i << " ";
+
+      Vector3 trueRes = internalCylinder[i].B;
+      Vector3 res;
+      res += math::calcBEMIntegral(internalCylinder[i].point, BEMQuadraturesSide);
+      res += math::calcBEMIntegral(internalCylinder[i].point, BEMQuadraturesTop);
+      res += math::calcBEMIntegral(internalCylinder[i].point, BEMQuadraturesBottom);
+      
+      std::cout << std::setw(8) << res;
+      std::cout << std::setw(8) << trueRes;
+
+      real relativeError = (res - trueRes).length() / trueRes.length();
+
+      std::cout << std::setw(10) << 100 * relativeError << std::endl;
+   }
 }
 
 int main()
 {
    //NMResearch2();
    //timeResearchForMorePoints();
-   //comparisonToTelmaIntegrals();
+   comparisonToTelmaIntegrals();
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
    //comparisonBetweenMethodsOnPrecision();
@@ -1399,5 +1450,5 @@ int main()
    //timeForFullFMMByPointCount();
    //timeForTallCube();
 
-   BApproximationOnCylinder();
+   //BApproximationOnCylinder();
 }

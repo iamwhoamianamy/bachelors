@@ -110,36 +110,6 @@ namespace math
          MU0 / (4 * PI) * current;
    }
 
-   Vector3 BEMFunction(
-      const Vector3& point,
-      const BEMQuadrature& quadrature)
-   {
-      Vector3 diff = point - quadrature;
-      real length3 = std::pow<real>(diff.length(), 3);
-      Vector3 normal = quadrature.normalized();
-      normal.z = 0;
-      Vector3 first = diff * Vector3::dot(quadrature.B, normal) / length3;
-      Vector3 second = Vector3::cross(
-         diff, 
-         Vector3::cross(quadrature.B, normal)) / length3;
-
-      return first + second;
-   }
-
-   Vector3 calcBEMIntegral(
-      const Vector3& point,
-      const std::vector<BEMQuadrature>& quadratures)
-   {
-      Vector3 res = 0;
-
-      for(auto& quadrature : quadratures)
-      {
-         res += BEMFunction(point, quadrature) * quadrature.weight;
-      }
-
-      return res / (4 * PI);
-   }
-
    Vector3 bioSavartLaplaceFunction(
       const Vector3& point,
       const Vector3& integr)
@@ -217,4 +187,98 @@ namespace math
 
       return res;
    }
+
+#pragma region BEM problem
+
+   Vector3 BEMFunction(
+      const Vector3& point,
+      const BEMQuadrature& quadrature)
+   {
+      Vector3 diff = quadrature - point;
+      real length3 = std::pow<real>(diff.length(), 3);
+      Vector3 first = diff * Vector3::dot(quadrature.B, quadrature.normal);
+      Vector3 second = Vector3::cross(diff,Vector3::cross(quadrature.B, quadrature.normal));
+
+      return (first + second) / length3;
+   }
+
+   Vector3 calcBEMIntegral(
+      const Vector3& point,
+      const std::vector<BEMQuadrature>& quadratures)
+   {
+      Vector3 res = 0;
+
+      for(auto& quadrature : quadratures)
+      {
+         res += BEMFunction(point, quadrature) * quadrature.weight;
+      }
+
+      return res / (4 * PI);
+   }
+
+   std::vector<BEMQuadrature> calcBEMquadraturesFromTriangles(
+      const std::vector<Triangle>& triangles,
+      const BasisQuadratures& basisQuadratures,
+      const std::vector<ReferenceCylinderData>& referenceCylinderData,
+      int normalDir)
+   {
+      std::vector<BEMQuadrature> result;
+      result.reserve(basisQuadratures.order() * triangles.size());
+
+      for (auto triangle : triangles)
+      {
+         Triangle triangleCartesian = Triangle(
+            math::cylindricToCartesian(triangle.a()),
+            math::cylindricToCartesian(triangle.b()),
+            math::cylindricToCartesian(triangle.c()));
+
+         //real square = triangle.square();
+         real square = triangleCartesian.square();
+         Vector3 B;
+
+         Box triangleBoundingBox = triangleCartesian.boundingBox();
+
+         for (const auto & cylinderData : referenceCylinderData)
+         {
+            if(triangleBoundingBox.contains(cylinderData.point))
+            {
+               B = cylinderData.B;
+               break;
+            }
+         }
+
+         for(size_t q = 0; q < basisQuadratures.order(); q++)
+         {
+            auto pointFromBasisQuadratureCylindric = math::pointFromBasisQuadrature(
+               triangle, basisQuadratures.values(q));
+
+            Vector3 pointFromBasisQuadrature = 
+               math::cylindricToCartesian(pointFromBasisQuadratureCylindric);
+
+            Vector3 normal;
+
+            if(normalDir == 0)
+            {
+               normal = pointFromBasisQuadrature;
+               normal.z = 0;
+               normal.normalize();
+            }
+            else
+            {
+               normal = Vector3::zAxis() * normalDir;
+            }
+
+            result.emplace_back(
+               pointFromBasisQuadrature,
+               square,
+               basisQuadratures.w(q),
+               B,
+               normal);
+         }
+      }
+
+      return result;
+   }
+
+#pragma endregion
 }

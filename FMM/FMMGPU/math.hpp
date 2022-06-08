@@ -14,6 +14,8 @@ namespace math
    const real SQRT_2 = sqrt(2.0);
    __device__ constexpr real R_SQRT_2 = 0.70710678118;
 
+   Vector3 cylindricToCartesian(const Vector3& point);
+
    real calcFactorial(int n);
    real calcBinomial(int k, int n);
    real randBetween(real min, real max);

@@ -6,6 +6,7 @@
 #include "bem_quadrature.hpp"
 #include "quadrature.hpp"
 #include "harmonic_series.hpp"
+#include "reference_cylinder_data.hpp"
 #include "triangle.hpp"
 
 namespace math
@@ -50,14 +51,6 @@ namespace math
    Vector3 bioSavartLaplaceFunction(
       const Vector3& point,
       const Vector3& integr);
-
-   Vector3 BEMFunction(
-      const Vector3& point,
-      const BEMQuadrature& quadrature);
-
-   Vector3 calcBEMIntegral(
-      const Vector3& point,
-      const std::vector<BEMQuadrature>& quadratures);
    
    HarmonicSeries<Vector3> calcIntegralContribution(
       std::vector<Quadrature>& quadratures,
@@ -72,4 +65,22 @@ namespace math
    std::vector<Quadrature> tetrahedraToQuadratures(
       const std::vector<Tetrahedron>& mesh,
       const BasisQuadratures& basisQuadratures);
+
+#pragma region BEM problem
+
+   Vector3 BEMFunction(
+      const Vector3& point,
+      const BEMQuadrature& quadrature);
+
+   Vector3 calcBEMIntegral(
+      const Vector3& point,
+      const std::vector<BEMQuadrature>& quadratures);
+   
+   std::vector<BEMQuadrature> calcBEMquadraturesFromTriangles(
+      const std::vector<Triangle>& triangles,
+      const BasisQuadratures& basisQuadratures,
+      const std::vector<ReferenceCylinderData>& referenceCylinderData,
+      int normalDir);
+   
+#pragma endregion
 }

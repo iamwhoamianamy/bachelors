@@ -4,6 +4,14 @@
 
 namespace math
 {
+   Vector3 cylindricToCartesian(const Vector3& point)
+   {
+      return  {
+         point.y * std::cos(point.x),
+         point.y* std::sin(point.x),
+         point.z };
+   }
+
    real calcFactorial(int n)
    {
       return n <= 0 ? 1 : n * calcFactorial(n - 1);

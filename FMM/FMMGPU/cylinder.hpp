@@ -5,11 +5,9 @@
 class Cylinder
 {
 private:
-   real _height;
-   real _radius;
-   size_t _widthSegmentCount;
-   size_t _heightSegmentCount;
    std::vector<Triangle> _sideTriangles;
+   std::vector<Triangle> _topTriangles;
+   std::vector<Triangle> _bottomTriangles;
 
 public:
    Cylinder(
@@ -17,10 +15,17 @@ public:
       real top,
       real radius,
       size_t widthSegmentCount,
-      size_t heightSegmentCount);
+      size_t heightSegmentCount,
+      size_t depthSegmentCount);
 
    std::vector<Triangle>& sideTriangles();
    const std::vector<Triangle>& sideTriangles() const;
+
+   std::vector<Triangle>& topTriangles();
+   const std::vector<Triangle>& topTriangles() const;
+
+   std::vector<Triangle>& bottomTriangles();
+   const std::vector<Triangle>& bottomTriangles() const;
 
 private:
 };

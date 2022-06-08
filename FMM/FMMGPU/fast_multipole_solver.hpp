@@ -7,6 +7,7 @@
 #include "quadrature.hpp"
 #include "calculation_point_octree.hpp"
 #include "multipole_solver_enums.hpp"
+#include "bem_quadrature.hpp"
 
 typedef std::map<CalculationPointOctreeNode*, std::set<QuadratureOctreeNode*>> InteractionMap;
 
@@ -27,6 +28,12 @@ public:
       std::vector<Vector3>& points,
       size_t quadratureOctreeLeafCapacity = 1000,
       size_t calculationPointOctreeLeafCapacity = 100);
+
+   //FastMultipoleSolver(
+   //   std::vector<BEMQuadrature>& quadratures,
+   //   std::vector<Vector3>& points,
+   //   size_t quadratureOctreeLeafCapacity = 1000,
+   //   size_t calculationPointOctreeLeafCapacity = 100);
    
    void calcLocalMultipoleExpansions(
       M2LAlg algorithm,
