@@ -27,7 +27,7 @@ public:
       QuadratureOctreeNode* parent = nullptr);
 
    void insert(Quadrature* point);
-   void insert(std::vector<Quadrature>& points);
+   void insert(std::vector<Quadrature*>& points);
    void subdivide();
 
    const Box& box() const;
@@ -42,11 +42,9 @@ public:
    const HarmonicSeries<Vector3>& multipoleExpansion() const;
 
    std::vector<Quadrature*> getAllQuadratures() const;
-
-   void calcMultipoleExpansionsWithoutTranslation(int n);
+   
    void calcMultipoleExpansionsWithComplexTranslation(int n);
    void calcMultipoleExpansionsWithRealTranslation(int n);
-   void calcMultipoleExpansionsAtLeaves(size_t n);
    void initAllMultipoleExpansions(size_t n);
 
    Vector3 calcA(const Vector3& point) const;
@@ -56,5 +54,4 @@ public:
    ~QuadratureOctreeNode();
 
 private:
-   bool isLeafAndUseful() const;
 };

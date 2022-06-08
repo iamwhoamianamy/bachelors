@@ -5,6 +5,9 @@
 
 #include "cblas.h"
 #include "multipole_solver.hpp"
+
+#include <queue>
+
 #include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
@@ -16,16 +19,60 @@
 MultipoleSolver::MultipoleSolver(
    std::vector<Quadrature>& quadratures,
    size_t quadratureOctreeLeafCapacity) :
-   _quadratures(quadratures), 
    quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity)
 {
+   _quadratures.reserve(quadratures.size());
+
+   for (auto & quadrature : quadratures)
+   {
+      _quadratures.emplace_back(&quadrature);
+   }
+
+   initTrees();
+   initTransitionMatrices();
+}
+
+MultipoleSolver::MultipoleSolver(
+   std::vector<BEMQuadrature>& quadratures,
+   size_t quadratureOctreeLeafCapacity) :
+   quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity)
+{
+   _quadratures.reserve(quadratures.size());
+
+   for(auto& quadrature : quadratures)
+   {
+      _quadratures.emplace_back(&quadrature);
+   }
+
    initTrees();
    initTransitionMatrices();
 }
 
 void MultipoleSolver::calcMultipoleExpansionsAtLeaves()
 {
-   _quadratureOctreeRoot->calcMultipoleExpansionsAtLeaves(harmonicOrder);
+   std::queue<QuadratureOctreeNode*> qq;
+
+   qq.push(_quadratureOctreeRoot);
+   
+   while(!qq.empty())
+   {
+      auto currentNode = qq.front();
+      qq.pop();
+      
+      if(currentNode->isUsefullLeaf())
+      {
+         currentNode->multipoleExpansion() = math::calcIntegralContribution(
+            currentNode->quadratures(), harmonicOrder, currentNode->box().center());
+      }
+      else
+      {
+         for (auto child : currentNode->children())
+         {
+            qq.push(child);
+         }
+      }
+   }
+   
    _multipolesAtLeavesAreReady = true;
 }
 
@@ -75,7 +122,28 @@ void MultipoleSolver::calclMultipoleExpansions(M2MAlg algorithm, Device device)
 
 void MultipoleSolver::calcMultipoleExpansionsWithoutTranslation()
 {
-   _quadratureOctreeRoot->calcMultipoleExpansionsWithoutTranslation(harmonicOrder);
+   std::queue<QuadratureOctreeNode*> qq;
+
+   qq.push(_quadratureOctreeRoot);
+
+   while(!qq.empty())
+   {
+      auto currentNode = qq.front();
+      qq.pop();
+
+      if(!currentNode->isUsefullLeaf())
+      {
+         currentNode->multipoleExpansion() = math::calcIntegralContribution(
+            currentNode->getAllQuadratures(),
+            harmonicOrder,
+            currentNode->box().center());
+
+         for(auto child : currentNode->children())
+         {
+            qq.push(child);
+         }
+      }
+   }
 }
 
 void MultipoleSolver::calcMultipoleExpansionsWithComplexTranslation()

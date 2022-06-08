@@ -2,6 +2,7 @@
 #include <vector>
 #include "vector3.cuh"
 #include "basis_quadratures.hpp"
+#include "bem_quadrature.hpp"
 #include "harmonics.hpp"
 #include "quadrature.hpp"
 #include "quadrature_octree.hpp"
@@ -11,7 +12,7 @@
 class MultipoleSolver
 {
 protected:
-   std::vector<Quadrature>& _quadratures;
+   std::vector<Quadrature*> _quadratures;
    QuadratureOctreeNode* _quadratureOctreeRoot = nullptr;
    bool _multipolesAreReady = false;
    bool _multipolesAtLeavesAreReady = false;
@@ -28,6 +29,10 @@ public:
 
    MultipoleSolver(
       std::vector<Quadrature>& quadratures,
+      size_t quadratureOctreeLeafCapacity = 1000);
+
+   MultipoleSolver(
+      std::vector<BEMQuadrature>& quadratures,
       size_t quadratureOctreeLeafCapacity = 1000);
 
    virtual void calcMultipoleExpansionsAtLeaves();

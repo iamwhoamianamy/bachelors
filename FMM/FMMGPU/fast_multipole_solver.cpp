@@ -1,11 +1,10 @@
 ﻿#include <iomanip>
 #include <iostream>
 #include <chrono>
+#include <cblas.h>
 
 #include "fast_multipole_solver.hpp"
 #include "multipole_translator.hpp"
-#include <cblas.h>
-
 #include "testing_helpers.hpp"
 #include "translation_algorithms.hpp"
 
@@ -21,17 +20,17 @@ FastMultipoleSolver::FastMultipoleSolver(
    initTrees();
 }
 
-//FastMultipoleSolver::FastMultipoleSolver(
-//   std::vector<BEMQuadrature>& quadratures,
-//   std::vector<Vector3>& points,
-//   size_t quadratureOctreeLeafCapacity,
-//   size_t calculationPointOctreeLeafCapacity) :
-//   MultipoleSolver(quadratures, quadratureOctreeLeafCapacity),
-//   _points(points),
-//   calculationPointOctreeLeafCapacity(calculationPointOctreeLeafCapacity)
-//{
-//   initTrees();
-//}
+FastMultipoleSolver::FastMultipoleSolver(
+   std::vector<BEMQuadrature>& quadratures,
+   std::vector<Vector3>& points,
+   size_t quadratureOctreeLeafCapacity,
+   size_t calculationPointOctreeLeafCapacity) :
+   MultipoleSolver(quadratures, quadratureOctreeLeafCapacity),
+   _points(points),
+   calculationPointOctreeLeafCapacity(calculationPointOctreeLeafCapacity)
+{
+   initTrees();
+}
 
 FastMultipoleSolver::~FastMultipoleSolver()
 {

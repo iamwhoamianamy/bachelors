@@ -1,14 +1,11 @@
+#include <thrust/complex.h>
+#include <queue>
+
 #include "quadrature_octree.hpp"
-
-#include <iostream>
-
-#include "math.hpp"
 #include "integration.hpp"
 #include "harmonics.hpp"
 #include "multipole_translator.hpp"
 
-#include <thrust/complex.h>
-#include <queue>
 
 QuadratureOctreeNode::QuadratureOctreeNode() : 
    _parent(nullptr)
@@ -24,11 +21,11 @@ QuadratureOctreeNode::QuadratureOctreeNode(
 
 }
 
-void QuadratureOctreeNode::insert(std::vector<Quadrature>& points)
+void QuadratureOctreeNode::insert(std::vector<Quadrature*>& points)
 {
-   for(auto &point : points)
+   for(auto point : points)
    {
-      insert(&point);
+      insert(point);
    }
 }
 
@@ -113,22 +110,9 @@ std::vector<Quadrature*> QuadratureOctreeNode::getAllQuadratures() const
    return result;
 }
 
-void QuadratureOctreeNode::calcMultipoleExpansionsWithoutTranslation(int n)
-{
-   if(!isLeafAndUseful())
-   {
-      _multipoleExpansion = math::calcIntegralContribution(getAllQuadratures(), n, _box.center());
-
-      for(auto child : _children)
-      {
-         child->calcMultipoleExpansionsWithoutTranslation(n);
-      }
-   }
-}
-
 void QuadratureOctreeNode::calcMultipoleExpansionsWithComplexTranslation(int n)
 {
-   if(!isLeafAndUseful())
+   if(!isUsefullLeaf())
    {
       _multipoleExpansion = HarmonicSeries<Vector3>(n);
 
@@ -149,7 +133,7 @@ void QuadratureOctreeNode::calcMultipoleExpansionsWithComplexTranslation(int n)
 
 void QuadratureOctreeNode::calcMultipoleExpansionsWithRealTranslation(int n)
 {
-   if(!isLeafAndUseful())
+   if(!isUsefullLeaf())
    {
       _multipoleExpansion = HarmonicSeries<Vector3>(n);
 
@@ -177,22 +161,6 @@ void QuadratureOctreeNode::initAllMultipoleExpansions(size_t n)
       for(auto child : _children)
       {
          child->initAllMultipoleExpansions(n);
-      }
-   }
-}
-
-void QuadratureOctreeNode::calcMultipoleExpansionsAtLeaves(size_t n)
-{
-   if(isLeafAndUseful())
-   {
-      _multipoleExpansion = math::calcIntegralContribution(
-         _quadratures, n, _box.center());
-   }
-   else
-   {
-      for(auto child : _children)
-      {
-         child->calcMultipoleExpansionsAtLeaves(n);
       }
    }
 }
@@ -354,9 +322,4 @@ QuadratureOctreeNode::~QuadratureOctreeNode()
    {
       delete child;
    }
-}
-
-bool QuadratureOctreeNode::isLeafAndUseful() const
-{
-   return !isSubdivided() && !_quadratures.empty();
 }
