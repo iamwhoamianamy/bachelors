@@ -22,3 +22,9 @@ enum class M2LAlg
    ComplexTranslation = 0,
    Matrices,
 };
+
+enum class Problem
+{
+   BioSavartLaplace = 0,
+   BEM,
+};

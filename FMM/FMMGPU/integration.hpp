@@ -81,6 +81,11 @@ namespace math
       const BasisQuadratures& basisQuadratures,
       const std::vector<ReferenceCylinderData>& referenceCylinderData,
       int normalDir);
+
+   HarmonicSeries<Vector3> calcBEMIntegralContribution(
+      const std::vector<Quadrature*>& quadratures,
+      int harmonicOrder,
+      const Vector3& center = Vector3());
    
 #pragma endregion
 }

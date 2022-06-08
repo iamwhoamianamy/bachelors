@@ -11,9 +11,10 @@
 FastMultipoleSolver::FastMultipoleSolver(
    std::vector<Quadrature>& quadratures,
    std::vector<Vector3>& points,
+   Problem problem,
    size_t quadratureOctreeLeafCapacity,
    size_t calculationPointOctreeLeafCapacity) :
-   MultipoleSolver(quadratures, quadratureOctreeLeafCapacity),
+   MultipoleSolver(quadratures, problem, quadratureOctreeLeafCapacity),
    _points(points),
    calculationPointOctreeLeafCapacity(calculationPointOctreeLeafCapacity)
 {
@@ -23,9 +24,10 @@ FastMultipoleSolver::FastMultipoleSolver(
 FastMultipoleSolver::FastMultipoleSolver(
    std::vector<BEMQuadrature>& quadratures,
    std::vector<Vector3>& points,
+   Problem problem,
    size_t quadratureOctreeLeafCapacity,
    size_t calculationPointOctreeLeafCapacity) :
-   MultipoleSolver(quadratures, quadratureOctreeLeafCapacity),
+   MultipoleSolver(quadratures, problem, quadratureOctreeLeafCapacity),
    _points(points),
    calculationPointOctreeLeafCapacity(calculationPointOctreeLeafCapacity)
 {
@@ -184,7 +186,6 @@ Vector3 FastMultipoleSolver::calcA(real current, const Vector3& point)
 {
    return MultipoleSolver::calcA(current, point);
 }
-
 Vector3 FastMultipoleSolver::calcB(real current, const Vector3& point)
 {
    return MultipoleSolver::calcB(current, point);
@@ -223,6 +224,25 @@ std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcB(real current
       }
 
       result.emplace_back(point, answer / (4.0 * math::PI) * current * math::MU0);
+   }
+
+   return result;
+}
+
+std::vector<std::pair<Vector3, Vector3>> FastMultipoleSolver::calcBEM(real current)
+{
+   auto ffmResults = _calculationPointOctreeRoot->calcA(_points.size());
+   std::vector<std::pair<Vector3, Vector3>> result;
+   result.reserve(ffmResults.size());
+
+   for(auto& [point, answer, node] : ffmResults)
+   {
+      for(auto interactionNode : _closeInteractionMap[node])
+      {
+         answer += interactionNode->calcA(point);
+      }
+
+      result.emplace_back(point, answer / (4.0 * math::PI));
    }
 
    return result;

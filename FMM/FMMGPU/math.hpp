@@ -11,6 +11,7 @@ namespace math
 {
    constexpr real PI = 3.14159265359;
    constexpr real MU0 = 1.2566370614e-6;
+   constexpr real eps = 1e-3;
    const real SQRT_2 = sqrt(2.0);
    __device__ constexpr real R_SQRT_2 = 0.70710678118;
 

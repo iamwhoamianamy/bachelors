@@ -18,12 +18,14 @@
 
 MultipoleSolver::MultipoleSolver(
    std::vector<Quadrature>& quadratures,
+   Problem problem,
    size_t quadratureOctreeLeafCapacity) :
-   quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity)
+   quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity),
+   _problem(problem)
 {
    _quadratures.reserve(quadratures.size());
 
-   for (auto & quadrature : quadratures)
+   for(auto& quadrature : quadratures)
    {
       _quadratures.emplace_back(&quadrature);
    }
@@ -34,8 +36,10 @@ MultipoleSolver::MultipoleSolver(
 
 MultipoleSolver::MultipoleSolver(
    std::vector<BEMQuadrature>& quadratures,
+   Problem problem,
    size_t quadratureOctreeLeafCapacity) :
-   quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity)
+   quadratureOctreeLeafCapacity(quadratureOctreeLeafCapacity),
+   _problem(problem)
 {
    _quadratures.reserve(quadratures.size());
 
@@ -61,8 +65,21 @@ void MultipoleSolver::calcMultipoleExpansionsAtLeaves()
       
       if(currentNode->isUsefullLeaf())
       {
-         currentNode->multipoleExpansion() = math::calcIntegralContribution(
-            currentNode->quadratures(), harmonicOrder, currentNode->box().center());
+         switch(_problem)
+         {
+            case Problem::BioSavartLaplace:
+            {
+               currentNode->multipoleExpansion() = math::calcIntegralContribution(
+                  currentNode->quadratures(), harmonicOrder, currentNode->box().center());
+               break;
+            }
+            case Problem::BEM:
+            {
+               currentNode->multipoleExpansion() = math::calcBEMIntegralContribution(
+                  currentNode->quadratures(), harmonicOrder, currentNode->box().center());
+               break;
+            }
+         }
       }
       else
       {
@@ -206,20 +223,6 @@ void MultipoleSolver::calcContributionsToHigherLayers(
 {
    useMatrices ? calcContributionsToHigherLevelsWithMatrices(layers, device) :
       calcContributionsToHigherLayers(layers, device);
-}
-
-void MultipoleSolver::calcMultipoleExpansionsAtLeaves(
-   const std::vector<std::vector<QuadratureOctreeNode*>>& layers)
-{
-   for(auto &layer : layers)
-   {
-      for(auto node : layer)
-      {
-         if(node->isUsefullLeaf())
-            node->multipoleExpansion() = math::calcIntegralContribution(
-               node->quadratures(), harmonicOrder, node->box().center());
-      }
-   }
 }
 
 void MultipoleSolver::calcContributionsToHigherLayers(
@@ -644,8 +647,22 @@ void MultipoleSolver::printMatrices(
 
 void MultipoleSolver::initTrees()
 {
-   _quadratureOctreeRoot = new QuadratureOctreeNode(
-      Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), quadratureOctreeLeafCapacity);
+   switch(_problem)
+   {
+      case Problem::BioSavartLaplace:
+      {
+         _quadratureOctreeRoot = new QuadratureOctreeNode(
+            Box(Vector3(0, 0, 0), Vector3(3, 3, 3)), quadratureOctreeLeafCapacity);
+         break;
+      }
+      case Problem::BEM:
+      {
+         _quadratureOctreeRoot = new QuadratureOctreeNode(
+            Box(Vector3(0, 0, 0), Vector3(1.1, 1.1, 1.6)), quadratureOctreeLeafCapacity);
+         break;
+      }
+   }
+
    _quadratureOctreeRoot->insert(_quadratures);
 }
 

@@ -47,7 +47,7 @@ std::vector<std::pair<Vector3, Vector3>> readTelmaResults(const std::string& fil
 void comparisonToTelmaIntegrals()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto telmaResults = readTelmaResults("results/telma_results.txt");
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
@@ -66,7 +66,7 @@ void comparisonToTelmaIntegrals()
    MultipoleSolver multipoleSolverMatricesCPU(quadratures);
    MultipoleSolver multipoleSolverMatricesGPU(quadratures);
 
-   FastMultipoleSolver fmmSolver(quadratures, initialPoints, 1000, 32);
+   FastMultipoleSolver fmmSolver(quadratures, initialPoints, Problem::BioSavartLaplace, 1000, 32);
 
    multipoleSolverNoExp.calclMultipoleExpansions(M2MAlg::NoTranslation);
    multipoleSolverComplex.calclMultipoleExpansions(M2MAlg::ComplexTranslation);
@@ -169,9 +169,9 @@ void comparisonToTelmaIntegrals()
 void comparisonBetweenMethodsOnPrecision()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-   MultipoleSolver multipoleSolver(quadratures, 10);
+   MultipoleSolver multipoleSolver(quadratures, Problem::BioSavartLaplace, 10);
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
 
@@ -223,11 +223,11 @@ void octreeFormingTime()
    for(size_t i = 1; i < 16; i++)
    {
       Torus torus(torusRadius, torusSectionWidth, 10 * i, 16, 16);
-      auto bq = readBasisQuadratures();
+      auto bq = readTetrahedronBasisQuadratures();
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
       auto start = std::chrono::steady_clock::now();
-      MultipoleSolver multipoleSolver(quadratures, 1000);
+      MultipoleSolver multipoleSolver(quadratures, Problem::BioSavartLaplace, 1000);
       auto stop = std::chrono::steady_clock::now();
       double timeForOctreeForming = getTime(start, stop);
 
@@ -246,10 +246,10 @@ void calculationTimeForMultipolesInLeaves()
    for(size_t i = 1; i < 15; i++)
    {
       Torus torus(torusRadius, torusSectionWidth, 10 * i, 16, 16);
-      auto bq = readBasisQuadratures();
+      auto bq = readTetrahedronBasisQuadratures();
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-      MultipoleSolver multipoleSolver(quadratures, 16);
+      MultipoleSolver multipoleSolver(quadratures, Problem::BioSavartLaplace, 16);
 
       auto start = std::chrono::steady_clock::now();
       multipoleSolver.calcMultipoleExpansionsAtLeaves();
@@ -264,7 +264,7 @@ void calculationTimeForMultipolesInLeaves()
 void calculationTimeForLocalMultipolesByLeafCapacity()
 {
    auto torus = createTorus();
-   auto bq = readBasisQuadratures();
+   auto bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    size_t w = 15;
@@ -285,7 +285,7 @@ void calculationTimeForLocalMultipolesByLeafCapacity()
    for(size_t i = 3; i < 15; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolver(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolver(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
       multipoleSolver.calcMultipoleExpansionsAtLeaves();
       multipoleSolver.log = false;
 
@@ -365,10 +365,10 @@ void calculationTimeForLocalMultipolesByNodeCount()
    for(size_t i = 1; i < 15; i++)
    {
       Torus torus(torusRadius, torusSectionWidth, 40 * i, 16, 16);
-      auto bq = readBasisQuadratures();
+      auto bq = readTetrahedronBasisQuadratures();
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-      MultipoleSolver multipoleSolver(quadratures, 8);
+      MultipoleSolver multipoleSolver(quadratures, Problem::BioSavartLaplace, 8);
       multipoleSolver.calcMultipoleExpansionsAtLeaves();
       multipoleSolver.log = false;
 
@@ -468,7 +468,7 @@ void NMResearch1()
    const double torusSectionWidth = 0.2;
    Vector3 begin(3, 1, 2);
    Vector3 end(0, 0, 0);
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
 
    std::cout << std::setw(16) << "NM";
    std::cout << std::setw(16) << "w/t";
@@ -509,7 +509,7 @@ void NMResearch2()
 {
    const double torusRadius = 2;
    const double torusSectionWidth = 0.2;
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
 
    std::cout << std::setw(16) << "NM";
    std::cout << std::setw(16) << "w/t";
@@ -547,7 +547,7 @@ void NMResearch2()
       std::cout << std::setw(16) << prevTimeMatrices;
 
       auto start = std::chrono::steady_clock::now();
-      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+      FastMultipoleSolver fmmSolver(quadratures, points, Problem::BioSavartLaplace, 1000, 100);
       fmmSolver.calcMultipoleExpansionsAtLeaves();
       fmmSolver.calclMultipoleExpansions(M2MAlg::ComplexTranslation, Device::GPU);
       fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
@@ -562,7 +562,7 @@ void NMResearch2()
 void layerCalculationsPrecision()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    MultipoleSolver multipoleSolverCPU(quadratures);
    MultipoleSolver multipoleSolverGPU(quadratures);
@@ -588,7 +588,7 @@ void layerCalculationsPrecision()
 void layerCalculationTime()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    Vector3 point(3, 1, 2);
@@ -598,8 +598,8 @@ void layerCalculationTime()
    for(size_t i = 1; i < 2; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverGPU(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverCPU(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverGPU(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
@@ -624,7 +624,7 @@ void layerCalculationTime()
 void matrixCalculationTime()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    Vector3 point(3, 1, 2);
@@ -634,7 +634,7 @@ void matrixCalculationTime()
    for(size_t i = 1; i < 2; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolverCPU(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverCPU(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
       //MultipoleSolver multipoleSolverGPU(quadratures, quadratureOctreeLeafCapacity);
       //MultipoleSolver multipoleSolverAda(quadratures, quadratureOctreeLeafCapacity);
 
@@ -668,7 +668,7 @@ void matrixCalculationTime()
 void layerMatrixCalculationTime(Device device)
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    Vector3 point(3, 1, 2);
@@ -678,8 +678,8 @@ void layerMatrixCalculationTime(Device device)
    for(size_t i = 2; i < 3; i++)
    {
       int octreeLeafCapacity = pow(2, i);
-      MultipoleSolver multipoleSolverLayers(quadratures, octreeLeafCapacity);
-      MultipoleSolver multipoleSolverMatrices(quadratures, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverLayers(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
+      MultipoleSolver multipoleSolverMatrices(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
 
       std::cout << std::setw(w) << "leaf capacity:";
       std::cout << std::setw(w) << octreeLeafCapacity << std::endl;
@@ -826,7 +826,7 @@ void printIndeces()
 void matrixCalculationsPrecision()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    MultipoleSolver multipoleSolver(quadratures);
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
@@ -944,7 +944,7 @@ void multipoleToLocalTest()
 void FMMPrecisionTest()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    //Vector3 begin(10, 10, 10);
    //Vector3 end(9, 9, 9);
@@ -957,7 +957,7 @@ void FMMPrecisionTest()
    auto points = createRandomPoints(Box({ 10, 10, 10 }, { 2, 2, 2 }), 256);
    //auto points = std::vector<Vector3>({ Vector3(10.5, 5, 8) });
 
-   FastMultipoleSolver multipoleSolver(quadratures, points, 64, 32);
+   FastMultipoleSolver multipoleSolver(quadratures, points, Problem::BioSavartLaplace, 64, 32);
    multipoleSolver.log = false;
    multipoleSolver.calcMultipoleExpansionsAtLeaves();
    multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
@@ -996,7 +996,7 @@ void FMMPrecisionTest()
 void FFMTimeTest()
 {
    Torus torus = createTorus();
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
    std::cout << std::setw(9) << "points";
@@ -1013,7 +1013,7 @@ void FFMTimeTest()
       //size_t pointCount = (i + 1) * quadratures.size();
       //auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), pointCount);
       auto points = createRandomPoints(Box({ 0, 0, 0 }, { 2, 2, 2 }), pointCount);
-      FastMultipoleSolver multipoleSolverComplex(quadratures, points, 128, 32);
+      FastMultipoleSolver multipoleSolverComplex(quadratures, points, Problem::BioSavartLaplace, 128, 32);
       //FastMultipoleSolver multipoleSolverMatricesGPU(quadratures, points, 128, 32);
       multipoleSolverComplex.log = false;
       //multipoleSolverMatricesGPU.log = false;
@@ -1215,7 +1215,7 @@ void timeForFullFMMByQuadratures()
    const double torusSectionWidth = 0.2;
    Vector3 begin(3, 1, 2);
    Vector3 end(0, 0, 0);
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    int pointsCount = 1000;
    auto points = createRandomPoints({{0, 0, 0}, {2, 2, 2}}, pointsCount);
 
@@ -1223,7 +1223,7 @@ void timeForFullFMMByQuadratures()
    {
       Torus torus(torusRadius, torusSectionWidth, pow(2, i + 1), 4, 4);
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
-      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+      FastMultipoleSolver fmmSolver(quadratures, points, Problem::BioSavartLaplace, 1000, 100);
 
       auto start = std::chrono::steady_clock::now();
       fmmSolver.calcMultipoleExpansionsAtLeaves();
@@ -1249,7 +1249,7 @@ void timeForFullFMMByPointCount()
    const double torusSectionWidth = 0.2;
    Vector3 begin(3, 1, 2);
    Vector3 end(0, 0, 0);
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    Torus torus(torusRadius, torusSectionWidth, 20, 4, 4);
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
@@ -1257,7 +1257,7 @@ void timeForFullFMMByPointCount()
    {
       int pointsCount = pow(2, i);
       auto points = createRandomPoints({ {0, 0, 0}, {2, 2, 2} }, pointsCount);
-      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+      FastMultipoleSolver fmmSolver(quadratures, points, Problem::BioSavartLaplace, 1000, 100);
 
       auto start = std::chrono::steady_clock::now();
       fmmSolver.calcMultipoleExpansionsAtLeaves();
@@ -1283,7 +1283,7 @@ void timeForTallCube()
    const double torusSectionWidth = 0.2;
    Vector3 begin(3, 1, 2);
    Vector3 end(0, 0, 0);
-   BasisQuadratures bq = readBasisQuadratures();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
    Torus torus(torusRadius, torusSectionWidth, 20, 4, 4);
    auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
    int pointsCount = quadratures.size();
@@ -1297,7 +1297,7 @@ void timeForTallCube()
 
       std::cout << std::scientific;
 
-      FastMultipoleSolver fmmSolver(quadratures, points, 1000, 100);
+      FastMultipoleSolver fmmSolver(quadratures, points, Problem::BioSavartLaplace, 1000, 100);
 
       auto start = std::chrono::steady_clock::now();
       fmmSolver.calcMultipoleExpansionsAtLeaves();
@@ -1361,35 +1361,8 @@ void BApproximationOnCylinder()
    auto externalCylinderBottom = readCylinderData("cylinder/ВнешнийЦилиндрНиз.0");
    auto internalCylinder = readCylinderData("cylinder/Внутренний Цилиндр.0");
 
-   real cylinderRadius = 1.0;
-   real cylinderBottom = -1.5;
-   real cylinderTop = 1.5;
-
-   real subdivisionLevel = 1;
-
-   size_t widthSegmentCount = 128 * subdivisionLevel;
-   size_t heightSegmentCount = 99 * subdivisionLevel;
-   size_t depthSegmentCount = 50 * subdivisionLevel;
-
-   Cylinder cylinder(
-      cylinderBottom,
-      cylinderTop,
-      cylinderRadius,
-      widthSegmentCount,
-      heightSegmentCount,
-      depthSegmentCount);
-
-   BasisQuadratures bq;
-   std::string path = "basis_quadratures/";
-
-   try
-   {
-      bq.initFromTXT(path + "gauss7_xy.txt", path + "gauss7_w.txt");
-   }
-   catch (Exeption ex)
-   {
-      std::cout << ex.message;
-   }
+   Cylinder cylinder = createCylinder();
+   BasisQuadratures bq = readTriangleBasisQuadratures();
 
    auto BEMQuadraturesSide = math::calcBEMquadraturesFromTriangles(
       cylinder.sideTriangles(), bq, externalCylinderSides, 0);
@@ -1400,30 +1373,129 @@ void BApproximationOnCylinder()
    auto BEMQuadraturesBottom = math::calcBEMquadraturesFromTriangles(
       cylinder.bottomTriangles(), bq, externalCylinderBottom, -1);
 
+   real sumErrorFmmSolver = 0;
+   real totalTime = 0;
+
    for(size_t i = 0; i < internalCylinder.size(); i++)
    {
       std::cout << std::setw(5) << i << " ";
 
       Vector3 trueRes = internalCylinder[i].B;
       Vector3 res;
+
+      auto start = std::chrono::steady_clock::now();
       res += math::calcBEMIntegral(internalCylinder[i].point, BEMQuadraturesSide);
       res += math::calcBEMIntegral(internalCylinder[i].point, BEMQuadraturesTop);
       res += math::calcBEMIntegral(internalCylinder[i].point, BEMQuadraturesBottom);
-      
-      std::cout << std::setw(8) << res;
-      std::cout << std::setw(8) << trueRes;
+      auto stop = std::chrono::steady_clock::now();
+      totalTime += test::getTime(start, stop);
+
+      res.printWithWidth(std::cout, 9);
+      trueRes.printWithWidth(std::cout, 9);
 
       real relativeError = (res - trueRes).length() / trueRes.length();
 
-      std::cout << std::setw(10) << 100 * relativeError << std::endl;
+      std::cout << std::setw(10) << relativeError << std::endl;
+
+      sumErrorFmmSolver += relativeError;
    }
+
+   std::cout << "Average error: ";
+   std::cout << std::scientific << sumErrorFmmSolver / internalCylinder.size() << std::fixed << std::endl;
+   std::cout << "Total time: " << totalTime;
+}
+
+void comparisonToBEM()
+{
+   Cylinder cylinder = createCylinder();
+   BasisQuadratures bq = readTetrahedronBasisQuadratures();
+
+   auto externalCylinderSides = readCylinderData("cylinder/ВнешнийЦилиндр.0");
+   auto externalCylinderTop = readCylinderData("cylinder/ВнешнийЦилиндрВерх.0");
+   auto externalCylinderBottom = readCylinderData("cylinder/ВнешнийЦилиндрНиз.0");
+   auto internalCylinder = readCylinderData("cylinder/Внутренний Цилиндр.0");
+
+   auto BEMQuadraturesSide = math::calcBEMquadraturesFromTriangles(
+      cylinder.sideTriangles(), bq, externalCylinderSides, 0);
+
+   auto BEMQuadraturesTop = math::calcBEMquadraturesFromTriangles(
+      cylinder.topTriangles(), bq, externalCylinderTop, 1);
+
+   auto BEMQuadraturesBottom = math::calcBEMquadraturesFromTriangles(
+      cylinder.bottomTriangles(), bq, externalCylinderBottom, -1);
+
+   std::vector<BEMQuadrature> quadratures;
+   quadratures.reserve(
+      BEMQuadraturesSide.size() +
+      BEMQuadraturesTop.size() +
+      BEMQuadraturesTop.size());
+      
+   quadratures.insert(quadratures.end(), BEMQuadraturesSide.begin(), BEMQuadraturesSide.end());
+   quadratures.insert(quadratures.end(), BEMQuadraturesTop.begin(), BEMQuadraturesTop.end());
+   quadratures.insert(quadratures.end(), BEMQuadraturesBottom.begin(), BEMQuadraturesBottom.end());
+
+   std::vector<Vector3> initialPoints(internalCylinder.size());
+
+   for(size_t i = 0; i < internalCylinder.size(); i++)
+   {
+      initialPoints[i] = internalCylinder[i].point;
+   }
+
+   std::cout << "FMM SOLVER BEGIN SOLVING" << std::endl;
+
+   auto start = std::chrono::steady_clock::now();
+   FastMultipoleSolver fmmSolver(quadratures, initialPoints, Problem::BEM, 256, 128);
+   fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
+   fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   auto results = fmmSolver.calcBEM(current);
+   auto stop = std::chrono::steady_clock::now();
+
+   real sumErrorFmmSolver = 0;
+
+   size_t n = internalCylinder.size();
+
+   for(size_t i = 0; i < n; i++)
+   {
+      auto point = results[i].first;
+      Vector3 trueRes;
+
+      for(size_t j = 0; j < n; j++)
+      {
+         if(point.x == internalCylinder[j].point.x &&
+            point.y == internalCylinder[j].point.y &&
+            point.z == internalCylinder[j].point.z)
+         {
+            trueRes = internalCylinder[j].B;
+            break;
+         }
+      }
+      real errorFmm = (results[i].second - trueRes).length() / trueRes.length();
+
+      std::cout << std::fixed << std::setw(4) << i << " ";
+      
+      point.printWithWidth(std::cout, 9);
+      results[i].second.printWithWidth(std::cout, 9);
+      
+      internalCylinder[i].B.printWithWidth(std::cout, 9);
+
+      std::cout << std::scientific << std::setw(16) << errorFmm << std::fixed;
+      std::cout << std::endl;
+
+      sumErrorFmmSolver += errorFmm;
+   }
+
+   std::cout << "Average error: ";
+   std::cout << std::scientific << sumErrorFmmSolver / n << std::fixed << std::endl;
+   std::cout << "Total time: " << test::getTime(start, stop);
 }
 
 int main()
 {
    //NMResearch2();
    //timeResearchForMorePoints();
-   comparisonToTelmaIntegrals();
+
+   //comparisonToTelmaIntegrals();
+
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
    //comparisonBetweenMethodsOnPrecision();
@@ -1451,4 +1523,5 @@ int main()
    //timeForTallCube();
 
    //BApproximationOnCylinder();
+   comparisonToBEM();
 }

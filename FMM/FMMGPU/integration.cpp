@@ -143,19 +143,17 @@ namespace math
 
       for(auto quadrature : quadratures)
       {
+         auto translation = *quadrature - center;
          auto regularHarmonics = Harmonics::calcSolidHarmonics(
             harmonicOrder,
-            *quadrature - center,
+            translation,
             true);
 
-         for(int l = 0; l <= harmonicOrder; l++)
+         for(size_t i = 0; i < regularHarmonics.elemCount(); i++)
          {
-            for(int m = -l; m <= l; m++)
-            {
-               res.getHarmonic(l, m) +=
-                  quadrature->perp().normalized() *
-                  regularHarmonics.getHarmonic(l, m) * quadrature->weight;
-            }
+            res.getHarmonic(i) +=
+               quadrature->perp().normalized() *
+               regularHarmonics.getHarmonic(i) * quadrature->weight;
          }
       }
 
@@ -235,6 +233,8 @@ namespace math
          //real square = triangle.square();
          real square = triangleCartesian.square();
          Vector3 B;
+         Vector3 closestB;
+         real minDist = 1000000;
 
          Box triangleBoundingBox = triangleCartesian.boundingBox();
 
@@ -245,7 +245,21 @@ namespace math
                B = cylinderData.B;
                break;
             }
+            else
+            {
+               real dist;
+
+               if((dist = Vector3::distanceSquared(cylinderData.point, triangleCartesian.center())) < 
+                  minDist * minDist)
+               {
+                  closestB = cylinderData.B;
+                  minDist = dist;
+               }
+            }
          }
+
+         if(B.x == 0 && B.y == 0 && B.z == 0)
+            B = closestB;
 
          for(size_t q = 0; q < basisQuadratures.order(); q++)
          {
@@ -278,6 +292,66 @@ namespace math
       }
 
       return result;
+   }
+
+   HarmonicSeries<Vector3> calcBEMIntegralContribution(
+      const std::vector<Quadrature*>& quadratures,
+      int harmonicOrder,
+      const Vector3& center)
+   {
+      HarmonicSeries<Vector3> res(harmonicOrder);
+
+      for(auto quadrature : quadratures)
+      {
+         auto translation = *quadrature - center;
+
+         auto hx1 = Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder,
+            translation + Vector3::xAxis() * math::eps);
+
+         auto hx2 = Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder,
+            translation - Vector3::xAxis() * math::eps);
+
+         auto hy1 = Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder,
+            translation + Vector3::yAxis() * math::eps);
+
+         auto hy2 = Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder,
+            translation - Vector3::yAxis() * math::eps);
+
+         auto hz1 = Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder,
+            translation + Vector3::zAxis() * math::eps);
+
+         auto hz2 = Harmonics::calcRegularSolidHarmonics(
+            harmonicOrder,
+            translation - Vector3::zAxis() * math::eps);
+
+         hx1.subtract(hx2);
+         hy1.subtract(hy2);
+         hz1.subtract(hz2);
+
+         auto bemQuadrature = reinterpret_cast<BEMQuadrature*>(quadrature);
+
+         for(size_t i = 0; i < hx1.elemCount(); i++)
+         {
+            Vector3 gradR = Vector3(
+               hx1.getHarmonic(i),
+               hy1.getHarmonic(i),
+               hz1.getHarmonic(i)) / (2 * math::eps);
+
+            Vector3 first = gradR * Vector3::dot(bemQuadrature->B, bemQuadrature->normal);
+            Vector3 second = Vector3::cross(
+               gradR,
+               Vector3::cross(bemQuadrature->B, bemQuadrature->normal));
+
+            res.getHarmonic(i) -= (first + second) * bemQuadrature->weight;
+         }
+      }
+
+      return res;
    }
 
 #pragma endregion

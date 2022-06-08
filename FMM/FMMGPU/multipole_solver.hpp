@@ -18,6 +18,7 @@ protected:
    bool _multipolesAtLeavesAreReady = false;
    std::vector<Complex> _realToComplexMatrix;
    std::vector<Complex> _complexToRealMatrix;
+   Problem _problem;
 
 public:
    bool log = false;
@@ -29,10 +30,12 @@ public:
 
    MultipoleSolver(
       std::vector<Quadrature>& quadratures,
+      Problem problem = Problem::BioSavartLaplace,
       size_t quadratureOctreeLeafCapacity = 1000);
 
    MultipoleSolver(
       std::vector<BEMQuadrature>& quadratures,
+      Problem problem = Problem::BioSavartLaplace,
       size_t quadratureOctreeLeafCapacity = 1000);
 
    virtual void calcMultipoleExpansionsAtLeaves();
@@ -77,10 +80,7 @@ protected:
    virtual void calcContributionsToHigherLevelsWithMatrices(
       const std::vector<std::vector<QuadratureOctreeNode*>>& layers,
       Device device);
-
-   virtual void calcMultipoleExpansionsAtLeaves(
-      const std::vector<std::vector<QuadratureOctreeNode*>>& layers);
-
+   
    virtual Matrix<QuadratureOctreeNode*> separateNodesByOrientation(
       const std::vector<QuadratureOctreeNode*>& layer);
 

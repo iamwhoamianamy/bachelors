@@ -25,12 +25,14 @@ public:
    FastMultipoleSolver(
       std::vector<Quadrature>& quadratures,
       std::vector<Vector3>& points,
+      Problem problem = Problem::BioSavartLaplace,
       size_t quadratureOctreeLeafCapacity = 1000,
       size_t calculationPointOctreeLeafCapacity = 100);
 
    FastMultipoleSolver(
       std::vector<BEMQuadrature>& quadratures,
       std::vector<Vector3>& points,
+      Problem problem = Problem::BioSavartLaplace,
       size_t quadratureOctreeLeafCapacity = 1000,
       size_t calculationPointOctreeLeafCapacity = 100);
    
@@ -42,6 +44,8 @@ public:
    virtual Vector3 calcB(real current, const Vector3& point) override;
    virtual std::vector<std::pair<Vector3, Vector3>> calcA(real current);
    virtual std::vector<std::pair<Vector3, Vector3>> calcB(real current);
+
+   virtual std::vector<std::pair<Vector3, Vector3>> calcBEM(real current);
 
    virtual ~FastMultipoleSolver() override;
 

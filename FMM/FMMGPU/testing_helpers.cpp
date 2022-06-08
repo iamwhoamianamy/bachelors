@@ -16,6 +16,27 @@ namespace test
       //return { torusRadius, torusSectionWidth, 20, 4, 4 };
    }
 
+   Cylinder createCylinder()
+   {
+      real cylinderRadius = 1.0;
+      real cylinderBottom = -1.5;
+      real cylinderTop = 1.5;
+
+      real subdivisionLevel = 1;
+
+      size_t widthSegmentCount = 128 * subdivisionLevel;
+      size_t heightSegmentCount = 99 * subdivisionLevel;
+      size_t depthSegmentCount = 50 * subdivisionLevel;
+
+      return {
+         cylinderBottom,
+         cylinderTop,
+         cylinderRadius,
+         widthSegmentCount,
+         heightSegmentCount,
+         depthSegmentCount };
+   }
+
    double getTime(void (*f)())
    {
       auto start = std::chrono::steady_clock::now();
@@ -31,7 +52,7 @@ namespace test
          (stop - start).count() * 1e-6;
    }
 
-   BasisQuadratures readBasisQuadratures()
+   BasisQuadratures readTetrahedronBasisQuadratures()
    {
       BasisQuadratures bq;
       std::string bqDir = "E:/ÃÌ∏/¡Ë·‡/bachelors/FMM/FMMGPU/basis_quadratures/";
@@ -45,6 +66,23 @@ namespace test
       catch(Exeption ex)
       {
          std::cout << ex;
+      }
+
+      return bq;
+   }
+
+   BasisQuadratures readTriangleBasisQuadratures()
+   {
+      BasisQuadratures bq;
+      std::string path = "basis_quadratures/";
+
+      try
+      {
+         bq.initFromTXT(path + "gauss7_xy.txt", path + "gauss7_w.txt");
+      }
+      catch(Exeption ex)
+      {
+         std::cout << ex.message;
       }
 
       return bq;
