@@ -1,4 +1,5 @@
 #include "triangle.hpp"
+#include "math.hpp"
 
 Triangle::Triangle()
 {
@@ -6,7 +7,7 @@ Triangle::Triangle()
 }
 
 Triangle::Triangle(const Vector3& a, const Vector3& b, const Vector3& c)
-   :points({a, b, c})
+   : points({a, b, c})
 {
 }
 
@@ -20,6 +21,16 @@ real Triangle::square() const
    real t2 = ab.x * ac.y - ab.y * ac.x;
 
    return 0.5 * sqrt(t0 * t0 + t1 * t1 + t2 * t2);
+}
+
+Vector3 Triangle::center() const
+{
+   return (a() + b() + c()) / 3;
+}
+
+Box Triangle::boundingBox() const
+{
+   return math::getBoundingBox(points);
 }
 
 Vector3& Triangle::a()
