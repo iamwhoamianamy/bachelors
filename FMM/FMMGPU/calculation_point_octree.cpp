@@ -242,7 +242,7 @@ void CalculationPointOctreeNode::calcRot(std::vector<FMMResult>& result)
 
          Vector3 tempRes;
 
-         for(int l = 0; l < order; l++)
+         for(int l = 0; l <= order; l++)
          {
             for(int m = -l; m <= l; m++)
             {

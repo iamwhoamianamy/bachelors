@@ -223,7 +223,7 @@ Vector3 QuadratureOctreeNode::calcRot(const Vector3& point) const
 
       Vector3 tempRes;
 
-      for(int l = 0; l < order; l++)
+      for(int l = 0; l <= order; l++)
       {
          for(int m = -l; m <= l; m++)
          {
