@@ -51,4 +51,11 @@ namespace kernels
       const real* b,
       size_t harmonicCount,
       size_t harmonicOrder);
+   
+   void translateAllGPUMatrixCuBLAS(
+      RealMatrix& result,
+      const RealMatrix& a,
+      const real* b,
+      size_t harmonicCount,
+      size_t harmonicOrder);
 }

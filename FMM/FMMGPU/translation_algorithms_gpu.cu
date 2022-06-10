@@ -131,6 +131,61 @@ namespace kernels
       cDev.copyToHost(result);
    }
 
+   void translateAllGPUMatrixCuBLAS(
+      RealMatrix& result,
+      const RealMatrix& a,
+      const real* b, 
+      size_t harmonicCount, 
+      size_t harmonicOrder)
+   {
+      size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
+
+      real* aDevs[3];
+      real* bDevs[3];
+      real* cDevs[3];
+
+      for(size_t c = 0; c < 3; c++)
+      {
+         cudaMalloc(&aDevs[c], harmonicCount * harmonicLength);
+         cudaMalloc(&bDevs[c], harmonicLength * harmonicLength);
+         cudaMalloc(&cDevs[c], harmonicCount * harmonicLength);
+
+         cudaMemcpy(
+            aDevs[c], a[c].data(), harmonicCount * harmonicLength * sizeof(real),
+            cudaMemcpyHostToDevice);
+
+         cudaMemcpy(
+            bDevs[c], b, harmonicLength * harmonicLength * sizeof(real),
+            cudaMemcpyHostToDevice);
+      }
+      
+      int m = harmonicLength;
+      int k = harmonicLength;
+      int n = harmonicCount;
+      int lda = m, ldb = k, ldc = m;
+      const real alpha = 1;
+      const real beta = 0;
+
+      cublasHandle_t handle;
+      cublasCreate(&handle);
+
+      cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+                     bDevs, ldb, aDevs, lda, &beta, cDevs, ldc, 3);
+
+      cublasDestroy(handle);
+
+      for(size_t c = 0; c < 3; c++)
+      {
+         cudaMemcpy(
+            result[c].data(), cDevs[c], harmonicCount * harmonicLength * sizeof(real),
+            cudaMemcpyDeviceToHost);
+
+         cudaFree(aDevs[c]);
+         cudaFree(bDevs[c]);
+         cudaFree(cDevs[c]);
+      }
+   }
+
    size_t lmToIndex(int harmonicBegin,
                     int l, int m)
    {

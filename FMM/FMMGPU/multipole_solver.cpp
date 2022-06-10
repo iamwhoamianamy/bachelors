@@ -358,6 +358,16 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
             RealMatrix translated(3, std::vector<real>(harmonicLength * nodesCount));
 
+            /*if(device == Device::GPU)
+            {
+               kernels::translateAllGPUMatrixCuBLAS(
+                  translated,
+                  expansionVectors,
+                  regularVectors[o].data(),
+                  nodesCount,
+                  harmonicOrder);
+            }*/
+
             for(size_t c = 0; c < 3; c++)
             {
                auto kernelStart = std::chrono::steady_clock::now();
