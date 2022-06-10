@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#include <cublas_v2.h>
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <iomanip>
@@ -7,6 +8,7 @@
 
 #include "cblas.h"
 #include "cylinder.hpp"
+#include "dev_ptr.hpp"
 #include "exeptions.hpp"
 #include "vector3.cuh"
 #include "math.hpp"
@@ -58,112 +60,112 @@ void comparisonToTelmaIntegrals()
       initialPoints[i] = telmaResults[i].first;
    }
 
-   MultipoleSolver multipoleSolverNoExp(quadratures);
-   MultipoleSolver multipoleSolverComplex(quadratures);
-   MultipoleSolver multipoleSolverReal(quadratures);
-   MultipoleSolver multipoleSolverLayersCPU(quadratures);
-   MultipoleSolver multipoleSolverLayersGPU(quadratures);
-   MultipoleSolver multipoleSolverMatricesCPU(quadratures);
+   //MultipoleSolver multipoleSolverNoExp(quadratures);
+   //MultipoleSolver multipoleSolverComplex(quadratures);
+   //MultipoleSolver multipoleSolverReal(quadratures);
+   //MultipoleSolver multipoleSolverLayersCPU(quadratures);
+   //MultipoleSolver multipoleSolverLayersGPU(quadratures);
+   //MultipoleSolver multipoleSolverMatricesCPU(quadratures);
    MultipoleSolver multipoleSolverMatricesGPU(quadratures);
 
-   FastMultipoleSolver fmmSolver(quadratures, initialPoints, Problem::BioSavartLaplace, 1000, 32);
+   //FastMultipoleSolver fmmSolver(quadratures, initialPoints, Problem::BioSavartLaplace, 1000, 32);
 
-   multipoleSolverNoExp.calclMultipoleExpansions(M2MAlg::NoTranslation);
-   multipoleSolverComplex.calclMultipoleExpansions(M2MAlg::ComplexTranslation);
-   multipoleSolverReal.calclMultipoleExpansions(M2MAlg::RealTranslation);
-   multipoleSolverLayersCPU.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
-   multipoleSolverLayersGPU.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
-   multipoleSolverMatricesCPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
+   //multipoleSolverNoExp.calclMultipoleExpansions(M2MAlg::NoTranslation);
+   //multipoleSolverComplex.calclMultipoleExpansions(M2MAlg::ComplexTranslation);
+   //multipoleSolverReal.calclMultipoleExpansions(M2MAlg::RealTranslation);
+   //multipoleSolverLayersCPU.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
+   //multipoleSolverLayersGPU.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
+   //multipoleSolverMatricesCPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
    multipoleSolverMatricesGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
 
-   fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
-   fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   //fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+   //fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
 
-   auto points = fmmSolver.calcB(current);
+   //auto points = fmmSolver.calcB(current);
 
-   real sumErrorIntegration = 0;
-   real sumErrorNoTranslation = 0;
-   real sumErrorComplexTranslation = 0;
-   real sumErrorRealTranslation = 0;
-   real sumErrorLayersTranslationCPU = 0;
-   real sumErrorLayersTranslationGPU = 0;
-   real sumErrorMatricesTranslationCPU = 0;
+   //real sumErrorIntegration = 0;
+   //real sumErrorNoTranslation = 0;
+   //real sumErrorComplexTranslation = 0;
+   //real sumErrorRealTranslation = 0;
+   //real sumErrorLayersTranslationCPU = 0;
+   //real sumErrorLayersTranslationGPU = 0;
+   //real sumErrorMatricesTranslationCPU = 0;
    real sumErrorMatricesTranslationGPU = 0;
-   real sumFmmSolver = 0;
+   //real sumFmmSolver = 0;
 
    size_t n = telmaResults.size();
 
    for(size_t i = 0; i < n; i++)
    {
-      auto point = points[i].first;
-      Vector3 telmaB;
+      //auto point = points[i].first;
+      //Vector3 telmaB;
 
-      for(size_t j = 0; j < n; j++)
-      {
-         if(point.x == telmaResults[j].first.x &&
-            point.y == telmaResults[j].first.y &&
-            point.z == telmaResults[j].first.z)
-         {
-            telmaB = telmaResults[j].second * math::MU0;
-            break;
-         }
-      }
+      //for(size_t j = 0; j < n; j++)
+      //{
+      //   if(point.x == telmaResults[j].first.x &&
+      //      point.y == telmaResults[j].first.y &&
+      //      point.z == telmaResults[j].first.z)
+      //   {
+      //      telmaB = telmaResults[j].second * math::MU0;
+      //      break;
+      //   }
+      //}
 
-      /*auto point = telmaResults[i].first;
-      auto telmaB = telmaResults[i].second * math::MU0;*/
+      auto point = telmaResults[i].first;
+      auto telmaB = telmaResults[i].second * math::MU0;
 
-      Vector3 integration = math::calcBioSavartLaplace(current, point, quadratures);
+     /* Vector3 integration = math::calcBioSavartLaplace(current, point, quadratures);
       Vector3 noTranslation = multipoleSolverNoExp.calcB(current, point);
       Vector3 complexTranslation = multipoleSolverComplex.calcB(current, point);
       Vector3 realTranslation = multipoleSolverReal.calcB(current, point);
       Vector3 layersTranslationCPU = multipoleSolverLayersCPU.calcB(current, point);
       Vector3 layersTranslationGPU = multipoleSolverLayersGPU.calcB(current, point);
-      Vector3 matricesTranslationCPU = multipoleSolverMatricesCPU.calcB(current, point);
+      Vector3 matricesTranslationCPU = multipoleSolverMatricesCPU.calcB(current, point);*/
       Vector3 matricesTranslationGPU = multipoleSolverMatricesGPU.calcB(current, point);
 
-      real errorIntegration = 100 * (integration - telmaB).length() / telmaB.length();
-      real errorNoTranslation = 100 * (noTranslation - telmaB).length() / telmaB.length();
-      real errorComplexTranslation = 100 * (complexTranslation - telmaB).length() / telmaB.length();
-      real errorRealTranslation = 100 * (realTranslation - telmaB).length() / telmaB.length();
-      real errorLayersTranslationCPU = 100 * (layersTranslationCPU - telmaB).length() / telmaB.length();
-      real errorLayersTranslationGPU = 100 * (layersTranslationGPU - telmaB).length() / telmaB.length();
-      real errorMatricesTranslationCPU = 100 * (matricesTranslationCPU - telmaB).length() / telmaB.length();
+      //real errorIntegration = 100 * (integration - telmaB).length() / telmaB.length();
+      //real errorNoTranslation = 100 * (noTranslation - telmaB).length() / telmaB.length();
+      //real errorComplexTranslation = 100 * (complexTranslation - telmaB).length() / telmaB.length();
+      //real errorRealTranslation = 100 * (realTranslation - telmaB).length() / telmaB.length();
+      //real errorLayersTranslationCPU = 100 * (layersTranslationCPU - telmaB).length() / telmaB.length();
+      //real errorLayersTranslationGPU = 100 * (layersTranslationGPU - telmaB).length() / telmaB.length();
+      //real errorMatricesTranslationCPU = 100 * (matricesTranslationCPU - telmaB).length() / telmaB.length();
       real errorMatricesTranslationGPU = 100 * (matricesTranslationGPU - telmaB).length() / telmaB.length();
-      real errorFmm = 100 * (points[i].second - telmaB).length() / telmaB.length();
+      //real errorFmm = 100 * (points[i].second - telmaB).length() / telmaB.length();
 
       std::cout << std::fixed << std::setw(3) << i << " ";
       point.printWithWidth(std::cout, 6);
-      std::cout << std::setw(16) << errorIntegration;
-      std::cout << std::setw(16) << errorNoTranslation;
-      std::cout << std::setw(16) << errorComplexTranslation;
-      std::cout << std::setw(16) << errorRealTranslation;
-      std::cout << std::setw(16) << errorLayersTranslationCPU;
-      std::cout << std::setw(16) << errorLayersTranslationGPU;
-      std::cout << std::setw(16) << errorMatricesTranslationCPU;
+      //std::cout << std::setw(16) << errorIntegration;
+      //std::cout << std::setw(16) << errorNoTranslation;
+      //std::cout << std::setw(16) << errorComplexTranslation;
+      //std::cout << std::setw(16) << errorRealTranslation;
+      //std::cout << std::setw(16) << errorLayersTranslationCPU;
+      //std::cout << std::setw(16) << errorLayersTranslationGPU;
+      //std::cout << std::setw(16) << errorMatricesTranslationCPU;
       std::cout << std::setw(16) << errorMatricesTranslationGPU;
-      std::cout << std::setw(16) << errorFmm;
+      //std::cout << std::setw(16) << errorFmm;
       std::cout << std::endl;
 
-      sumErrorIntegration += errorIntegration;
-      sumErrorNoTranslation += errorNoTranslation;
-      sumErrorComplexTranslation += errorComplexTranslation;
-      sumErrorRealTranslation += errorRealTranslation;
-      sumErrorLayersTranslationCPU += errorLayersTranslationCPU;
-      sumErrorLayersTranslationGPU += errorLayersTranslationGPU;
-      sumErrorMatricesTranslationCPU += errorMatricesTranslationCPU;
+      //sumErrorIntegration += errorIntegration;
+      //sumErrorNoTranslation += errorNoTranslation;
+      //sumErrorComplexTranslation += errorComplexTranslation;
+      //sumErrorRealTranslation += errorRealTranslation;
+      //sumErrorLayersTranslationCPU += errorLayersTranslationCPU;
+      //sumErrorLayersTranslationGPU += errorLayersTranslationGPU;
+      //sumErrorMatricesTranslationCPU += errorMatricesTranslationCPU;
       sumErrorMatricesTranslationGPU += errorMatricesTranslationGPU;
-      sumFmmSolver += errorFmm;
+      //sumFmmSolver += errorFmm;
    }
 
-   std::cout << sumErrorIntegration / n << std::endl;
-   std::cout << sumErrorNoTranslation / n << std::endl;
-   std::cout << sumErrorComplexTranslation / n << std::endl;
-   std::cout << sumErrorRealTranslation / n << std::endl;
-   std::cout << sumErrorLayersTranslationCPU / n << std::endl;
-   std::cout << sumErrorLayersTranslationGPU / n << std::endl;
-   std::cout << sumErrorMatricesTranslationCPU / n << std::endl;
+   //std::cout << sumErrorIntegration / n << std::endl;
+   //std::cout << sumErrorNoTranslation / n << std::endl;
+   //std::cout << sumErrorComplexTranslation / n << std::endl;
+   //std::cout << sumErrorRealTranslation / n << std::endl;
+   //std::cout << sumErrorLayersTranslationCPU / n << std::endl;
+   //std::cout << sumErrorLayersTranslationGPU / n << std::endl;
+   //std::cout << sumErrorMatricesTranslationCPU / n << std::endl;
    std::cout << sumErrorMatricesTranslationGPU / n << std::endl;
-   std::cout << sumFmmSolver / n << std::endl;
+   //std::cout << sumFmmSolver / n << std::endl;
 }
 
 void comparisonBetweenMethodsOnPrecision()
@@ -357,7 +359,6 @@ void calculationTimeForLocalMultipolesByNodeCount()
    std::cout << std::setw(w) << "layersGPU";
    std::cout << std::setw(w) << "matricesCPU";
    std::cout << std::setw(w) << "matricesGPU";
-   //std::cout << std::setw(w) << "matricesAda";
    std::cout << std::endl;
 
    std::cout << std::fixed;
@@ -368,9 +369,17 @@ void calculationTimeForLocalMultipolesByNodeCount()
       auto bq = readTetrahedronBasisQuadratures();
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
-      MultipoleSolver multipoleSolver(quadratures, Problem::BioSavartLaplace, 8);
-      multipoleSolver.calcMultipoleExpansionsAtLeaves();
-      multipoleSolver.log = false;
+      /*MultipoleSolver multipoleSolverLCPU(quadratures, Problem::BioSavartLaplace, 8);
+      multipoleSolverLCPU.calcMultipoleExpansionsAtLeaves();
+
+      MultipoleSolver multipoleSolverLGPU(quadratures, Problem::BioSavartLaplace, 8);
+      multipoleSolverLGPU.calcMultipoleExpansionsAtLeaves();*/
+
+      MultipoleSolver multipoleSolverMCPU(quadratures, Problem::BioSavartLaplace, 8);
+      multipoleSolverMCPU.calcMultipoleExpansionsAtLeaves();
+
+      MultipoleSolver multipoleSolverMGPU(quadratures, Problem::BioSavartLaplace, 8);
+      multipoleSolverMGPU.calcMultipoleExpansionsAtLeaves();
 
       auto start = std::chrono::steady_clock::now();
       //multipoleSolver.calclMultipoleExpansions(M2MAlg::NoTranslation);
@@ -388,31 +397,27 @@ void calculationTimeForLocalMultipolesByNodeCount()
       double timeWithRealTranslation = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
+      //multipoleSolverLCPU.calclMultipoleExpansions(M2MAlg::Layers, Device::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
+      //multipoleSolverLGPU.calclMultipoleExpansions(M2MAlg::Layers, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithLayersGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
+      multipoleSolverMCPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+      multipoleSolverMGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesGPU = getTime(start, stop);
 
-      start = std::chrono::steady_clock::now();
-      //multipoleSolverWithMatricesAda.calclMultipoleExpansions(M2MAlg::Matrices, Device::Adaptive);
-      stop = std::chrono::steady_clock::now();
-      double timeWithMatricesAda = getTime(start, stop);
-
-      std::cout << " " << multipoleSolver.getQuadratureOctreeNodeCount();
+      std::cout << std::scientific;
+      std::cout << " " << (real)multipoleSolverMGPU.getQuadratureOctreeNodeCount();
       std::cout << " " << timeWithoutTranslation;
       std::cout << " " << timeWithComplexTranslation;
       std::cout << " " << timeWithRealTranslation;
@@ -420,7 +425,6 @@ void calculationTimeForLocalMultipolesByNodeCount()
       std::cout << " " << timeWithLayersGPU;
       std::cout << " " << timeWithMatricesCPU;
       std::cout << " " << timeWithMatricesGPU << std::endl;
-      //std::cout << " " << timeWithMatricesAda << std::endl;
    }
 }
 
@@ -675,7 +679,7 @@ void layerMatrixCalculationTime(Device device)
 
    size_t w = 15;
 
-   for(size_t i = 2; i < 3; i++)
+   for(size_t i = 10; i < 10; i++)
    {
       int octreeLeafCapacity = pow(2, i);
       MultipoleSolver multipoleSolverLayers(quadratures, Problem::BioSavartLaplace, octreeLeafCapacity);
@@ -993,7 +997,7 @@ void FMMPrecisionTest()
    std::cout << "averageRelativeError: " << averageRelativeError / points.size() << "\n";
 }
 
-void FFMTimeTest()
+void FMMTimeTest()
 {
    Torus torus = createTorus();
    BasisQuadratures bq = readTetrahedronBasisQuadratures();
@@ -1393,7 +1397,7 @@ void BApproximationOnCylinder()
       res.printWithWidth(std::cout, 9);
       trueRes.printWithWidth(std::cout, 9);
 
-      real relativeError = (res - trueRes).length() / trueRes.length();
+      real relativeError = 100 * (res - trueRes).length() / trueRes.length();
 
       std::cout << std::setw(10) << relativeError << std::endl;
 
@@ -1446,7 +1450,7 @@ void comparisonToBEM()
    auto start = std::chrono::steady_clock::now();
    FastMultipoleSolver fmmSolver(quadratures, initialPoints, Problem::BEM, 256, 128);
    fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
-   fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
+   fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::GPU);
    auto results = fmmSolver.calcBEM(current);
    auto stop = std::chrono::steady_clock::now();
 
@@ -1469,7 +1473,7 @@ void comparisonToBEM()
             break;
          }
       }
-      real errorFmm = (results[i].second - trueRes).length() / trueRes.length();
+      real errorFmm = 100 * (results[i].second - trueRes).length() / trueRes.length();
 
       std::cout << std::fixed << std::setw(4) << i << " ";
       
@@ -1489,17 +1493,135 @@ void comparisonToBEM()
    std::cout << "Total time: " << test::getTime(start, stop);
 }
 
+void stridedMatricesTest()
+{
+   size_t width = 10000;
+   size_t height = 20000;
+
+   std::vector<real> a(width * height);
+   std::vector<real> b(width * height);
+
+   for(size_t i = 0; i < height; i++)
+   {
+      for(size_t j = 0; j < width; j++)
+      {
+         size_t ida = i * width + j;
+         size_t idb = i + j * height;
+         a[ida] = j;
+         b[idb] = i;
+      }
+   }
+   
+   std::vector<real> c2(width * height);
+
+   size_t harmonicLength = width;
+   size_t harmonicCount = height;
+
+   cuda::DevPtr<real> aDev(a.data(), harmonicCount * harmonicLength);
+   cuda::DevPtr<real> bDev(b.data(), harmonicLength * harmonicLength);
+   cuda::DevPtr<real> cDev(harmonicCount * harmonicLength);
+
+   int m = harmonicLength;
+   int k = harmonicLength;
+   int n = harmonicCount;
+   int lda = m, ldb = k, ldc = m;
+   const real alpha = 1;
+   const real beta = 0;
+
+   cublasHandle_t handle;
+   cublasCreate(&handle);
+
+   auto start = std::chrono::steady_clock::now();
+   cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+                  bDev.data(), ldb, aDev.data(), lda, &beta, cDev.data(), ldc);
+   cDev.copyToHost(c2.data());
+   cublasDestroy(handle);
+   auto stop = std::chrono::steady_clock::now();
+   std::cout << test::getTime(start, stop) << std::endl;
+
+   std::vector<real> c3(width * height);
+   start = std::chrono::steady_clock::now();
+   cblas_sgemm(CBLAS_ORDER::CblasColMajor,
+               CBLAS_TRANSPOSE::CblasNoTrans,
+               CBLAS_TRANSPOSE::CblasNoTrans,
+               m, n, k,
+               alpha,
+               b.data(), ldb, a.data(), lda,
+               beta,
+               c3.data(), ldc);
+   stop = std::chrono::steady_clock::now();
+   std::cout << test::getTime(start, stop);
+
+   /*size_t harmonicLength = width;
+   size_t hostPitch = harmonicLength * sizeof(real);
+   size_t harmonicCount = height;
+
+   real* aDev;
+   real* bDev;
+   real* cDev;
+
+   size_t aPitch;
+   size_t bPitch;
+   size_t cPitch;
+
+   cudaMallocPitch<real>(&aDev, &aPitch, hostPitch, harmonicCount);
+   cudaMallocPitch<real>(&bDev, &bPitch, hostPitch, harmonicLength);
+   cudaMallocPitch<real>(&cDev, &cPitch, hostPitch, harmonicCount);
+
+   cudaMemcpy2D(
+      aDev, aPitch,
+      a.data(), hostPitch, hostPitch, harmonicCount,
+      cudaMemcpyHostToDevice);
+
+   cudaMemcpy2D(
+      bDev, bPitch,
+      b.data(), hostPitch, hostPitch, harmonicLength,
+      cudaMemcpyHostToDevice);
+
+   int m = harmonicLength;
+   int k = harmonicLength;
+   int n = harmonicCount;
+   int lda = aPitch / sizeof(real);
+   int ldb = bPitch / sizeof(real);
+   int ldc = cPitch / sizeof(real);
+   const real alpha = 1;
+   const real beta = 0;
+
+   cublasHandle_t handle;
+   cublasCreate(&handle);
+
+   auto start = std::chrono::steady_clock::now();
+   cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+                  aDev, lda, bDev, ldb, &beta, cDev, ldc);
+   auto stop = std::chrono::steady_clock::now();
+
+   std::cout << test::getTime(start, stop);
+
+   cublasDestroy(handle);
+
+   cudaMemcpy2D(
+      c2.data(), hostPitch,
+      cDev, cPitch, hostPitch, harmonicCount,
+      cudaMemcpyDeviceToHost);
+
+   cudaFree(aDev);
+   cudaFree(bDev);
+   cudaFree(cDev);*/
+}
+
 int main()
 {
    //NMResearch2();
    //timeResearchForMorePoints();
 
-   //comparisonToTelmaIntegrals();
+   comparisonToTelmaIntegrals();
 
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
    //comparisonBetweenMethodsOnPrecision();
+
    //calculationTimeForLocalMultipolesByNodeCount();
+
    //layerCalculationsPrecision();
    //matrixCalculationsPrecision();
    
@@ -1509,12 +1631,11 @@ int main()
    //matrixCalculationTime();
    //layerMatrixCalculationTime(Device::CPU);
    //layerMatrixCalculationTime(Device::GPU);
-   //compareWithMatrixMultiplication();
 
    //translationTest2();
 
    //FMMPrecisionTest();
-   //FFMTimeTest();
+   //FMMTimeTest();
 
    //NMResearch2();
 
@@ -1523,5 +1644,7 @@ int main()
    //timeForTallCube();
 
    //BApproximationOnCylinder();
-   comparisonToBEM();
+   //comparisonToBEM();
+
+   //stridedMatricesTest();
 }
