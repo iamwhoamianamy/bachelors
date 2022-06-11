@@ -22,10 +22,8 @@ protected:
 
 public:
    bool log = false;
-   float adaptiveBorder = 16e3;
    const int harmonicOrder = 10;
    const int harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
-   const real eps = 1e-6;
    const size_t quadratureOctreeLeafCapacity;
 
    MultipoleSolver(
@@ -39,7 +37,6 @@ public:
       size_t quadratureOctreeLeafCapacity = 1000);
 
    virtual void calcMultipoleExpansionsAtLeaves();
-
    virtual size_t getQuadratureOctreeNodeCount() const;
 
    virtual void calclMultipoleExpansions(

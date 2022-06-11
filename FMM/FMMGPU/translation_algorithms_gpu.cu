@@ -140,22 +140,24 @@ namespace kernels
    {
       size_t harmonicLength = (harmonicOrder + 1) * (harmonicOrder + 1);
 
-      real* aDevs[3];
-      real* bDevs[3];
-      real* cDevs[3];
+      real* aDevs;
+      real* bDevs;
+      real* cDevs;
+
+      cudaMalloc(&aDevs, harmonicCount * harmonicLength * sizeof(real) * 3);
+      cudaMalloc(&bDevs, harmonicLength * harmonicLength * sizeof(real) * 3);
+      cudaMalloc(&cDevs, harmonicCount * harmonicLength * sizeof(real) * 3);
 
       for(size_t c = 0; c < 3; c++)
       {
-         cudaMalloc(&aDevs[c], harmonicCount * harmonicLength);
-         cudaMalloc(&bDevs[c], harmonicLength * harmonicLength);
-         cudaMalloc(&cDevs[c], harmonicCount * harmonicLength);
-
          cudaMemcpy(
-            aDevs[c], a[c].data(), harmonicCount * harmonicLength * sizeof(real),
+            aDevs + harmonicCount * harmonicLength * c, a[c].data(),
+            harmonicCount * harmonicLength * sizeof(real),
             cudaMemcpyHostToDevice);
 
          cudaMemcpy(
-            bDevs[c], b, harmonicLength * harmonicLength * sizeof(real),
+            bDevs + harmonicLength * harmonicLength * c, b,
+            harmonicLength * harmonicLength * sizeof(real),
             cudaMemcpyHostToDevice);
       }
       
@@ -169,21 +171,25 @@ namespace kernels
       cublasHandle_t handle;
       cublasCreate(&handle);
 
-      cublasSgemmBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
-                     bDevs, ldb, aDevs, lda, &beta, cDevs, ldc, 3);
+      cublasSgemmStridedBatched(
+         handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+         bDevs, ldb, harmonicLength * harmonicLength,
+         aDevs, lda, harmonicCount * harmonicLength,
+         &beta, cDevs, ldc, harmonicCount * harmonicLength, 3);
 
       cublasDestroy(handle);
 
       for(size_t c = 0; c < 3; c++)
       {
          cudaMemcpy(
-            result[c].data(), cDevs[c], harmonicCount * harmonicLength * sizeof(real),
+            result[c].data(), cDevs + harmonicCount * harmonicLength * c,
+            harmonicCount * harmonicLength * sizeof(real),
             cudaMemcpyDeviceToHost);
-
-         cudaFree(aDevs[c]);
-         cudaFree(bDevs[c]);
-         cudaFree(cDevs[c]);
       }
+
+      cudaFree(aDevs);
+      cudaFree(bDevs);
+      cudaFree(cDevs);
    }
 
    size_t lmToIndex(int harmonicBegin,

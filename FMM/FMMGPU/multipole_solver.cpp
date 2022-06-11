@@ -358,24 +358,14 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
 
             RealMatrix translated(3, std::vector<real>(harmonicLength * nodesCount));
 
-            /*if(device == Device::GPU)
+            switch(device)
             {
-               kernels::translateAllGPUMatrixCuBLAS(
-                  translated,
-                  expansionVectors,
-                  regularVectors[o].data(),
-                  nodesCount,
-                  harmonicOrder);
-            }*/
-
-            for(size_t c = 0; c < 3; c++)
-            {
-               auto kernelStart = std::chrono::steady_clock::now();
-
-               switch(device)
+               case Device::CPU:
                {
-                  case Device::CPU:
+                  for(size_t c = 0; c < 3; c++)
                   {
+                     auto kernelStart = std::chrono::steady_clock::now();
+
                      kernels::translateAllCPUMatrixBLAS(
                         translated[c].data(),
                         expansionVectors[c].data(),
@@ -383,30 +373,26 @@ void MultipoleSolver::calcContributionsToHigherLevelsWithMatrices(
                         nodesCount,
                         harmonicOrder);
 
-                     break;
+                     auto kernelStop = std::chrono::steady_clock::now();
+                     kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
+                        (kernelStop - kernelStart).count() * 1e-6;
                   }
-                  case Device::GPU:
-                  {
-                    kernels::translateAllGPUMatrixCuBLAS(
-                       translated[c].data(),
-                        expansionVectors[c].data(),
-                        regularVectors[o].data(),
-                        nodesCount,
-                        harmonicOrder);
 
-                     break;
-                  }
-                  default:
-                  {
-                     throw std::exception("Not implemented!");
-                  }
+                  break;
                }
+               case Device::GPU:
+               {
+                  kernels::translateAllGPUMatrixCuBLAS(
+                     translated,
+                     expansionVectors,
+                     regularVectors[o].data(),
+                     nodesCount,
+                     harmonicOrder);
 
-               auto kernelStop = std::chrono::steady_clock::now();
-               kernelTime += std::chrono::duration_cast<std::chrono::microseconds>
-                  (kernelStop - kernelStart).count() * 1e-6;
+                  break;
+               }
             }
-
+            
             accountChildrenContributions(
                nodesByOrientation[o],
                translated);
