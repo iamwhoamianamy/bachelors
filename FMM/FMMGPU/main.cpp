@@ -363,10 +363,10 @@ void calculationTimeForLocalMultipolesByNodeCount()
 
    std::cout << std::fixed;
 
-   for(size_t i = 1; i < 15; i++)
+   for(size_t i = 1; i < 8; i++)
    {
-      //Torus torus(torusRadius, torusSectionWidth, 40 * i, 16, 16);
-      Torus torus(torusRadius, torusSectionWidth, 40 * pow(2, i), 16, 16);
+      Torus torus(torusRadius, torusSectionWidth, 40 * i, 16, 16);
+      //Torus torus(torusRadius, torusSectionWidth, 40 * pow(2, i), 16, 16);
       auto bq = readTetrahedronBasisQuadratures();
       auto quadratures = math::tetrahedraToQuadratures(torus.tetrahedra, bq);
 
@@ -380,8 +380,8 @@ void calculationTimeForLocalMultipolesByNodeCount()
       multipoleSolverMCPU.calcMultipoleExpansionsAtLeaves();
       //multipoleSolverMCPU.log = true;
 
-      MultipoleSolver multipoleSolverMGPU(quadratures, Problem::BioSavartLaplace, 8);
-      multipoleSolverMGPU.calcMultipoleExpansionsAtLeaves();
+      //MultipoleSolver multipoleSolverMGPU(quadratures, Problem::BioSavartLaplace, 8);
+      //multipoleSolverMGPU.calcMultipoleExpansionsAtLeaves();
       //multipoleSolverMGPU.log = true;
 
       auto start = std::chrono::steady_clock::now();
@@ -410,24 +410,24 @@ void calculationTimeForLocalMultipolesByNodeCount()
       double timeWithLayersGPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverMCPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
+      multipoleSolverMCPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesCPU = getTime(start, stop);
 
       start = std::chrono::steady_clock::now();
-      multipoleSolverMGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
+      //multipoleSolverMGPU.calclMultipoleExpansions(M2MAlg::Matrices, Device::GPU);
       stop = std::chrono::steady_clock::now();
       double timeWithMatricesGPU = getTime(start, stop);
 
       std::cout << std::scientific;
-      std::cout << " " << (real)multipoleSolverMGPU.getQuadratureOctreeNodeCount();
-      std::cout << " " << timeWithoutTranslation;
-      std::cout << " " << timeWithComplexTranslation;
-      std::cout << " " << timeWithRealTranslation;
-      std::cout << " " << timeWithLayersCPU;
-      std::cout << " " << timeWithLayersGPU;
-      std::cout << " " << timeWithMatricesCPU;
-      std::cout << " " << timeWithMatricesGPU << std::endl;
+      //std::cout << " " << (real)multipoleSolverMCPU.getQuadratureOctreeNodeCount();
+      //std::cout << " " << timeWithoutTranslation;
+      //std::cout << " " << timeWithComplexTranslation;
+      //std::cout << " " << timeWithRealTranslation;
+      //std::cout << " " << timeWithLayersCPU;
+      //std::cout << " " << timeWithLayersGPU;
+      std::cout << " " << timeWithMatricesCPU << std::endl;
+      //std::cout << " " << timeWithMatricesGPU << std::endl;
    }
 }
 
@@ -545,10 +545,10 @@ void NMResearch2()
          prevTimeIntegrals *= 4;*/
       
 
-      if(i < 15)
+      /*if(i < 15)
          prevTimeMatrices = timeForMultipoles(points, quadratures, M2MAlg::ComplexTranslation, Device::GPU).first;
       else
-         prevTimeMatrices *= 2;
+         prevTimeMatrices *= 2;*/
 
       std::cout << std::setw(16) << prevTimeIntegrals;
       std::cout << std::setw(16) << prevTimeMatrices;
@@ -556,7 +556,7 @@ void NMResearch2()
       auto start = std::chrono::steady_clock::now();
       FastMultipoleSolver fmmSolver(quadratures, points, Problem::BioSavartLaplace, 1000, 100);
       fmmSolver.calcMultipoleExpansionsAtLeaves();
-      fmmSolver.calclMultipoleExpansions(M2MAlg::ComplexTranslation, Device::GPU);
+      fmmSolver.calclMultipoleExpansions(M2MAlg::Matrices, Device::CPU);
       fmmSolver.calcLocalMultipoleExpansions(M2LAlg::ComplexTranslation, Device::CPU);
       auto fmmResults = fmmSolver.calcB(current);
       auto stop = std::chrono::steady_clock::now();
@@ -1640,14 +1640,14 @@ int main()
    //FMMPrecisionTest();
    //FMMTimeTest();
 
-   //NMResearch2();
+   NMResearch2();
 
    //timeForFullFMMByQuadratures();
    //timeForFullFMMByPointCount();
    //timeForTallCube();
 
    //BApproximationOnCylinder();
-   FMMAndBEM();
+   //FMMAndBEM();
 
    //stridedMatricesTest();
 }
