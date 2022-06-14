@@ -1,7 +1,7 @@
 #pragma once
 
-//#define REAL_IS_FLOAT
-#define REAL_IS_DOUBLE
+#define REAL_IS_FLOAT
+//#define REAL_IS_DOUBLE
 
 #ifdef REAL_IS_FLOAT
 
