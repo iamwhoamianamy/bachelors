@@ -6,7 +6,6 @@
 #include "harmonics.hpp"
 #include "multipole_translator.hpp"
 
-
 QuadratureOctreeNode::QuadratureOctreeNode() : 
    _parent(nullptr)
 {
@@ -36,11 +35,14 @@ void QuadratureOctreeNode::insert(Quadrature* point)
       return;
    }
 
-   if(_quadratures.size() < _capacity)
+   if(_quadratures.size() + 1 < _capacity)
    {
       if(!isSubdivided())
       {
-         _quadratures.push_back(point);
+         if(_quadratures.empty())
+            _quadratures.reserve(_capacity);
+
+         _quadratures.emplace_back(point);
       }
       else
       {
@@ -64,7 +66,8 @@ void QuadratureOctreeNode::insert(Quadrature* point)
          }
       }
 
-      _quadratures.resize(0);
+      _quadratures.clear();
+      _quadratures.shrink_to_fit();
    }
 }
 

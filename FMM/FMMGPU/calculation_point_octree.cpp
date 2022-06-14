@@ -66,7 +66,8 @@ void CalculationPointOctreeNode::insert(Vector3& point)
          }
       }
 
-      _points.resize(0);
+      _points.clear();
+      _points.shrink_to_fit();
    }
 }
 
