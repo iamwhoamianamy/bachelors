@@ -54,25 +54,15 @@ Cylinder::Cylinder(
          Vector3 currentWidth(segmentWidth * w, 0, 0);
          Vector3 triangleBase = currentWidth + currentDepth + Vector3(0, 0, top);
 
-         if(d == 0)
-         {
-            _topTriangles.emplace_back(
-               triangleBase,
-               triangleBase + depthSegmentStep,
-               triangleBase + widthSegmentStep + depthSegmentStep);
-         }
-         else
-         {
-            _topTriangles.emplace_back(
-               triangleBase,
-               triangleBase + widthSegmentStep,
-               triangleBase + depthSegmentStep);
+         _topTriangles.emplace_back(
+            triangleBase,
+            triangleBase + widthSegmentStep,
+            triangleBase + depthSegmentStep);
 
-            _topTriangles.emplace_back(
-               triangleBase + widthSegmentStep + depthSegmentStep,
-               triangleBase + widthSegmentStep,
-               triangleBase + depthSegmentStep);
-         }
+         _topTriangles.emplace_back(
+            triangleBase + widthSegmentStep + depthSegmentStep,
+            triangleBase + widthSegmentStep,
+            triangleBase + depthSegmentStep);
       }
    }
 
