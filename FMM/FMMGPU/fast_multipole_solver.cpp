@@ -514,34 +514,34 @@ RealMatrix FastMultipoleSolver::calcRegularMatricesForL2LAsVectors(
 
       std::vector<Complex> temp1(matrixElemCount);
 
-      cblas_cgemm(
+      blas::multComplexMatrices(
          CBLAS_ORDER::CblasRowMajor,
          CBLAS_TRANSPOSE::CblasNoTrans,
          CBLAS_TRANSPOSE::CblasNoTrans,
          harmonicLength, harmonicLength, harmonicLength,
-         (float*)&alpha,
-         (float*)_realToComplexMatrix.data(),
+         (real*)&alpha,
+         (real*)_realToComplexMatrix.data(),
          harmonicLength,
-         (float*)regularHarmonicsMatrix.data(),
+         (real*)regularHarmonicsMatrix.data(),
          harmonicLength,
-         (float*)&beta,
-         (float*)temp1.data(),
+         (real*)&beta,
+         (real*)temp1.data(),
          harmonicLength);
 
       std::vector<Complex> temp2(matrixElemCount);
 
-      cblas_cgemm(
+      blas::multComplexMatrices(
          CBLAS_ORDER::CblasRowMajor,
          CBLAS_TRANSPOSE::CblasNoTrans,
          CBLAS_TRANSPOSE::CblasNoTrans,
          harmonicLength, harmonicLength, harmonicLength,
-         (float*)&alpha,
-         (float*)temp1.data(),
+         (real*)&alpha,
+         (real*)temp1.data(),
          harmonicLength,
-         (float*)_complexToRealMatrix.data(),
+         (real*)_complexToRealMatrix.data(),
          harmonicLength,
-         (float*)&beta,
-         (float*)temp2.data(),
+         (real*)&beta,
+         (real*)temp2.data(),
          harmonicLength);
 
       blas::copyVector(

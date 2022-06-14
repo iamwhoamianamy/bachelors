@@ -27,6 +27,34 @@ void blas::multMatrices(
 #endif
 }
 
+void blas::multComplexMatrices(
+   CBLAS_ORDER order,
+   CBLAS_TRANSPOSE transA,
+   CBLAS_TRANSPOSE transB,
+   blasint m, blasint n, blasint k,
+   real* alpha,
+   real* a, blasint lda,
+   real* b, blasint ldb,
+   real* beta,
+   real* c, blasint ldc)
+{
+#ifdef REAL_IS_FLOAT
+
+   cblas_cgemm(
+      order, transA, transB, m, n, k, alpha,
+      a, lda, b, ldb, beta, c, ldc);
+
+#endif
+
+#ifdef REAL_IS_DOUBLE
+
+   cblas_zgemm(
+      order, transA, transB, m, n, k, alpha,
+      a, lda, b, ldb, beta, c, ldc);
+
+#endif
+}
+
 void blas::multMatricesCUBLAS(
    cublasHandle_t handle,
    cublasOperation_t transa,

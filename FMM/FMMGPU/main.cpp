@@ -1577,7 +1577,7 @@ int main()
    //NMResearch2();
    //timeResearchForMorePoints();
 
-   //comparisonToTelmaIntegrals();
+   comparisonToTelmaIntegrals();
 
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
@@ -1607,7 +1607,7 @@ int main()
    //timeForTallCube();
 
    //BApproximationOnCylinder();
-   FMMAndBEM();
+   //FMMAndBEM();
 
    //stridedMatricesTest();
 

@@ -16,6 +16,18 @@ namespace blas
       real beta,
       real* c, blasint ldc);
 
+   void multComplexMatrices(
+      CBLAS_ORDER order, 
+      CBLAS_TRANSPOSE transA,
+      CBLAS_TRANSPOSE transB,
+      blasint m, blasint n, blasint k,
+      real* alpha,
+      real* a, blasint lda,
+      real* b, blasint ldb,
+      real* beta,
+      real* c, blasint ldc);
+
+
    void multMatricesCUBLAS(
       cublasHandle_t handle,
       cublasOperation_t transa,
