@@ -229,9 +229,7 @@ namespace math
             math::cylindricToCartesian(triangle.a()),
             math::cylindricToCartesian(triangle.b()),
             math::cylindricToCartesian(triangle.c()));
-
-         //real area = triangle.area();
-         real square = triangleCartesian.area();
+         
          Vector3 B;
          Vector3 closestB;
          real minDist = 1000000;
@@ -266,8 +264,8 @@ namespace math
             auto pointFromBasisQuadratureCylindric = math::pointFromBasisQuadrature(
                triangle, basisQuadratures.values(q));
 
-            Vector3 pointFromBasisQuadrature = 
-               math::cylindricToCartesian(pointFromBasisQuadratureCylindric);
+            Vector3 pointFromBasisQuadrature = math::cylindricToCartesian(
+               pointFromBasisQuadratureCylindric);
 
             Vector3 normal;
 
@@ -284,7 +282,7 @@ namespace math
 
             result.emplace_back(
                pointFromBasisQuadrature,
-               square,
+               triangle.area() * pointFromBasisQuadratureCylindric.y,
                basisQuadratures.w(q),
                B,
                normal);
