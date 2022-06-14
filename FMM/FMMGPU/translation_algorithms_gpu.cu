@@ -5,6 +5,7 @@
 #include "cuda_helper.hpp"
 #include "dev_ptr.hpp"
 #pragma comment (lib, "cublas.lib")
+#include "blass_callers.hpp"
 #include "cublasLt.h"
 
 namespace kernels
@@ -123,8 +124,9 @@ namespace kernels
       cublasHandle_t handle;
       cublasCreate(&handle);
       
-      cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
-                  bDev.data(), ldb, aDev.data(), lda, &beta, cDev.data(), ldc);
+      blas::multMatricesCUBLAS(
+         handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+         bDev.data(), ldb, aDev.data(), lda, &beta, cDev.data(), ldc);
       
       cublasDestroy(handle);
 
@@ -171,7 +173,7 @@ namespace kernels
       cublasHandle_t handle;
       cublasCreate(&handle);
 
-      cublasSgemmStridedBatched(
+      blas::multMatricesStridedBatchedCUBLAS(
          handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
          bDevs, ldb, harmonicLength * harmonicLength,
          aDevs, lda, harmonicCount * harmonicLength,

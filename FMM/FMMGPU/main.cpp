@@ -19,6 +19,7 @@
 #include "translation_algorithms.hpp"
 #include "testing_helpers.hpp"
 #include "multipole_translator.hpp"
+#include "blass_callers.hpp"
 
 using namespace math;
 using namespace test;
@@ -907,13 +908,13 @@ void translationTest()
       seriesA, reg);
 
    std::vector<Complex> temp1(121);
-   cblas_scopy(121, seriesA.data().data(), 1, (float*)temp1.data(), 2);
+   blas::copyVector(121, seriesA.data().data(), 1, (real*)temp1.data(), 2);
    auto realToComplexMatrix2D = Harmonics::calcRealToComplexMatrix2D(10);
    auto complexSeriesA2 = math::mult(temp1, realToComplexMatrix2D);
    auto complexToRealMatrix2D = Harmonics::calcComplexToRealMatrix2D(10);
    auto temp2 = math::mult(complexSeriesA2, complexToRealMatrix2D);
    std::vector<real> realSeriesA2(121);
-   cblas_scopy(121, (float*)temp2.data(), 2, realSeriesA2.data(), 1);
+   blas::copyVector(121, (real*)temp2.data(), 2, realSeriesA2.data(), 1);
 
    auto realToComplexMatrixTransposed1D =
       Harmonics::calcRealToComplexTransitionMatrix1D(10);
@@ -1155,8 +1156,8 @@ void translationTest2()
    auto realToComplexMatrix = Harmonics::calcRealToComplexTransitionMatrix1D(order);
    auto complexToRealMatrix = Harmonics::calcComplexToRealTransitionMatrix1D(order);
    
-   Complex alpha = make_cuComplex(1, 0);
-   Complex beta = make_cuComplex(0, 0);
+   Complex alpha = makeComplex(1, 0);
+   Complex beta = makeComplex(0, 0);
 
    std::vector<Complex> temp1(matrixElemCount);
 
@@ -1191,9 +1192,9 @@ void translationTest2()
       (float*)temp2.data(),
       harmonicLength);
 
-   cblas_scopy(
+   blas::copyVector(
       matrixElemCount,
-      (float*)(temp2.data()), 2,
+      (real*)(temp2.data()), 2,
       result.data(), 1);
 
    int m = harmonicLength;
@@ -1205,7 +1206,7 @@ void translationTest2()
    
    std::vector<real> notTrueResult(harmonicLength);
 
-   cblas_sgemm(CBLAS_ORDER::CblasColMajor,
+   blas::multMatrices(CBLAS_ORDER::CblasColMajor,
                CBLAS_TRANSPOSE::CblasNoTrans,
                CBLAS_TRANSPOSE::CblasNoTrans,
                m, n, k,
@@ -1338,29 +1339,6 @@ void timeForTallCube()
 }
 
 
-std::vector<ReferenceCylinderData> readCylinderData(const std::string& filename)
-{
-   std::vector<ReferenceCylinderData> result;
-
-   std::ifstream fin(filename);
-   std::string _;
-   std::getline(fin, _);
-   std::getline(fin, _);
-   size_t pointId;
-   
-   while (fin >> pointId)
-   {
-      real px, py, pz;
-      real bx, by, bz, bl;
-
-      fin >> px >> py >> pz >> bx >> by >> bz >> bl;
-
-      result.emplace_back(pointId, Vector3(px, py, pz), Vector3(bx, by, bz), bl);
-   }
-   
-   return result;
-}
-
 void BApproximationOnCylinder()
 {
    auto externalCylinderSides = readCylinderData("cylinder/ВнешнийЦилиндр.0");
@@ -1414,33 +1392,8 @@ void BApproximationOnCylinder()
 
 void FMMAndBEM()
 {
-   Cylinder cylinder = createCylinder();
-   BasisQuadratures bq = readTetrahedronBasisQuadratures();
-
-   auto externalCylinderSides = readCylinderData("cylinder/ВнешнийЦилиндр.0");
-   auto externalCylinderTop = readCylinderData("cylinder/ВнешнийЦилиндрВерх.0");
-   auto externalCylinderBottom = readCylinderData("cylinder/ВнешнийЦилиндрНиз.0");
    auto internalCylinder = readCylinderData("cylinder/Внутренний Цилиндр.0");
-
-   auto BEMQuadraturesSide = math::calcBEMquadraturesFromTriangles(
-      cylinder.sideTriangles(), bq, externalCylinderSides, 0);
-
-   auto BEMQuadraturesTop = math::calcBEMquadraturesFromTriangles(
-      cylinder.topTriangles(), bq, externalCylinderTop, 1);
-
-   auto BEMQuadraturesBottom = math::calcBEMquadraturesFromTriangles(
-      cylinder.bottomTriangles(), bq, externalCylinderBottom, -1);
-
-   std::vector<BEMQuadrature> quadratures;
-   quadratures.reserve(
-      BEMQuadraturesSide.size() +
-      BEMQuadraturesTop.size() +
-      BEMQuadraturesTop.size());
-      
-   quadratures.insert(quadratures.end(), BEMQuadraturesSide.begin(), BEMQuadraturesSide.end());
-   quadratures.insert(quadratures.end(), BEMQuadraturesTop.begin(), BEMQuadraturesTop.end());
-   quadratures.insert(quadratures.end(), BEMQuadraturesBottom.begin(), BEMQuadraturesBottom.end());
-
+   auto quadratures = test::quadraturesFromCylinder();
    std::vector<Vector3> initialPoints(internalCylinder.size());
 
    for(size_t i = 0; i < internalCylinder.size(); i++)
@@ -1535,7 +1488,7 @@ void stridedMatricesTest()
    cublasCreate(&handle);
 
    auto start = std::chrono::steady_clock::now();
-   cublasSgemm_v2(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+   blas::multMatricesCUBLAS(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
                   bDev.data(), ldb, aDev.data(), lda, &beta, cDev.data(), ldc);
    cDev.copyToHost(c2.data());
    cublasDestroy(handle);
@@ -1544,7 +1497,7 @@ void stridedMatricesTest()
 
    std::vector<real> c3(width * height);
    start = std::chrono::steady_clock::now();
-   cblas_sgemm(CBLAS_ORDER::CblasColMajor,
+   blas::multMatrices(CBLAS_ORDER::CblasColMajor,
                CBLAS_TRANSPOSE::CblasNoTrans,
                CBLAS_TRANSPOSE::CblasNoTrans,
                m, n, k,
@@ -1612,12 +1565,19 @@ void stridedMatricesTest()
    cudaFree(cDev);*/
 }
 
+void cylinderSurfaceAreaTest()
+{
+   auto quadratures = test::quadraturesFromCylinder();
+
+   std::cout << abs(math::calcSurfaceArea(quadratures) - math::PI * 8);
+}
+
 int main()
 {
    //NMResearch2();
    //timeResearchForMorePoints();
 
-   comparisonToTelmaIntegrals();
+   //comparisonToTelmaIntegrals();
 
    //octreeFormingTime();
    //calculationTimeForMultipolesInLeaves();
@@ -1640,14 +1600,16 @@ int main()
    //FMMPrecisionTest();
    //FMMTimeTest();
 
-   NMResearch2();
+   //NMResearch2();
 
    //timeForFullFMMByQuadratures();
    //timeForFullFMMByPointCount();
    //timeForTallCube();
 
    //BApproximationOnCylinder();
-   //FMMAndBEM();
+   FMMAndBEM();
 
    //stridedMatricesTest();
+
+   //cylinderSurfaceAreaTest();
 }

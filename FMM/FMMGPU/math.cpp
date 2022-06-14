@@ -83,24 +83,67 @@ real math::min(const std::vector<Vector3>& vec, size_t axis)
    return res;
 }
 
+real getReal(const Complex& complex)
+{
+#ifdef REAL_IS_FLOAT
+   return cuCrealf(complex);
+#else
+   return cuCreal(complex);
+#endif
+}
+
+real getImag(const Complex& complex)
+{
+#ifdef REAL_IS_FLOAT
+   return cuCimagf(complex);
+#else
+   return cuCimag(complex);
+#endif
+}
+
+Complex makeComplex(real realPart, real imagPart)
+{
+#ifdef REAL_IS_FLOAT
+   return make_cuComplex(realPart, imagPart);
+#else
+   return make_cuDoubleComplex(realPart, imagPart);
+#endif
+}
+
 Complex operator*(const Complex& lhs, const Complex& rhs)
 {
+#ifdef REAL_IS_FLOAT
    return cuCmulf(lhs, rhs);
+#else
+   return cuCmul(lhs, rhs);
+#endif
 }
 
 __all__ Complex operator*(const Complex& lhs, const real rhs)
 {
+#ifdef REAL_IS_FLOAT
    return make_cuComplex(cuCrealf(lhs) * rhs, cuCimagf(lhs) * rhs);
+#else
+   return make_cuDoubleComplex(cuCreal(lhs) * rhs, cuCimag(lhs) * rhs);
+#endif
 }
 
 Complex operator+(const Complex& lhs, const Complex& rhs)
 {
+#ifdef REAL_IS_FLOAT
    return cuCaddf(lhs, rhs);
+#else
+   return cuCadd(lhs, rhs);
+#endif
 }
 
 __all__ Complex operator-(const Complex& lhs, const Complex& rhs)
 {
+#ifdef REAL_IS_FLOAT
    return cuCsubf(lhs, rhs);
+#else
+   return cuCsub(lhs, rhs);
+#endif
 }
 
 Complex& operator*=(Complex& lhs, const Complex& rhs)

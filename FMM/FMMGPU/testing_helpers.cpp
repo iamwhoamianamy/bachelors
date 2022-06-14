@@ -1,8 +1,10 @@
 #include <iostream>
+#include <fstream>
 
 #include "testing_helpers.hpp"
 #include "math.hpp"
 #include "exeptions.hpp"
+#include "integration.hpp"
 
 namespace test
 {
@@ -36,6 +38,60 @@ namespace test
          heightSegmentCount,
          depthSegmentCount };
    }
+   
+   std::vector<ReferenceCylinderData> readCylinderData(const std::string& filename)
+   {
+      std::vector<ReferenceCylinderData> result;
+
+      std::ifstream fin(filename);
+      std::string _;
+      std::getline(fin, _);
+      std::getline(fin, _);
+      size_t pointId;
+
+      while(fin >> pointId)
+      {
+         real px, py, pz;
+         real bx, by, bz, bl;
+
+         fin >> px >> py >> pz >> bx >> by >> bz >> bl;
+
+         result.emplace_back(pointId, Vector3(px, py, pz), Vector3(bx, by, bz), bl);
+      }
+
+      return result;
+   }
+
+   std::vector<BEMQuadrature> quadraturesFromCylinder()
+   {
+      Cylinder cylinder = createCylinder();
+      BasisQuadratures bq = readTriangleBasisQuadratures();
+
+      auto externalCylinderSides = readCylinderData("cylinder/¬нешний÷илиндр.0");
+      auto externalCylinderTop = readCylinderData("cylinder/¬нешний÷илиндр¬ерх.0");
+      auto externalCylinderBottom = readCylinderData("cylinder/¬нешний÷илиндрЌиз.0");
+
+      auto BEMQuadraturesSide = math::calcBEMquadraturesFromTriangles(
+         cylinder.sideTriangles(), bq, externalCylinderSides, 0);
+
+      auto BEMQuadraturesTop = math::calcBEMquadraturesFromTriangles(
+         cylinder.topTriangles(), bq, externalCylinderTop, 1);
+
+      auto BEMQuadraturesBottom = math::calcBEMquadraturesFromTriangles(
+         cylinder.bottomTriangles(), bq, externalCylinderBottom, -1);
+
+      std::vector<BEMQuadrature> quadratures;
+      quadratures.reserve(
+         BEMQuadraturesSide.size() +
+         BEMQuadraturesTop.size() +
+         BEMQuadraturesTop.size());
+
+      quadratures.insert(quadratures.end(), BEMQuadraturesSide.begin(), BEMQuadraturesSide.end());
+      quadratures.insert(quadratures.end(), BEMQuadraturesTop.begin(), BEMQuadraturesTop.end());
+      quadratures.insert(quadratures.end(), BEMQuadraturesBottom.begin(), BEMQuadraturesBottom.end());
+
+      return quadratures;
+   }
 
    double getTime(void (*f)())
    {
@@ -56,7 +112,6 @@ namespace test
    {
       BasisQuadratures bq;
       std::string bqDir = "E:/ћнЄ/Ѕиба/bachelors/FMM/FMMGPU/basis_quadratures/";
-      //std::string bqDir = "basis_quadratures/";
 
       try
       {

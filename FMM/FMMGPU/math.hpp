@@ -267,6 +267,9 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
    return os;
 }
 
+__all__ real getReal(const Complex& complex);
+__all__ real getImag(const Complex& complex);
+__all__ Complex makeComplex(real realPart, real imagPart);
 __all__ Complex operator*(const Complex& lhs, const Complex& rhs);
 __all__ Complex operator*(const Complex& lhs, real rhs);
 __all__ Complex operator+(const Complex& lhs, const Complex& rhs);

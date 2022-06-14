@@ -10,7 +10,7 @@ public:
    Triangle();
    Triangle(const Vector3& a, const Vector3& b, const Vector3& c);
    std::vector<Vector3> points;
-   real square() const;
+   real area() const;
    Vector3 center() const;
    Box boundingBox() const;
 

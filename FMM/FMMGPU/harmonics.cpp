@@ -124,8 +124,8 @@ real Harmonics::calcLegendrePolynomial(int l, real z)
 
 void Harmonics::addComplex(real x, real y)
 {
-   Complex ephi1m = make_cuComplex(sqrt(2.0), 0);
-   Complex mult = make_cuComplex(x, y);
+   Complex ephi1m = makeComplex(sqrt(2.0), 0);
+   Complex mult = makeComplex(x, y);
 
    for(int m = 1; m < _order; m++)
    {
@@ -133,8 +133,8 @@ void Harmonics::addComplex(real x, real y)
 
       for(int l = m; l <= _order; l++)
       {
-         _sphericalHarmonics.getHarmonic(l, m) *= cuCrealf(ephi1m);
-         _sphericalHarmonics.getHarmonic(l, -m) *= cuCimagf(ephi1m);
+         _sphericalHarmonics.getHarmonic(l, m) *= getReal(ephi1m);
+         _sphericalHarmonics.getHarmonic(l, -m) *= getImag(ephi1m);
       }
    }
 }
@@ -158,8 +158,8 @@ ComplexMatrix Harmonics::calcRealToComplexMatrix2D(size_t order)
          size_t newRealIndex = HarmonicSeries<Complex>::lmToIndex(l, realM);
          size_t newImagIndex = HarmonicSeries<Complex>::lmToIndex(l, imagM);
 
-         res[newRealIndex][currentIndex] += make_cuComplex(realPart, 0);
-         res[newImagIndex][currentIndex] += make_cuComplex(0, imagPart);
+         res[newRealIndex][currentIndex] += makeComplex(realPart, 0);
+         res[newImagIndex][currentIndex] += makeComplex(0, imagPart);
       }
    }
 
@@ -173,15 +173,15 @@ ComplexMatrix Harmonics::calcComplexToRealMatrix2D(size_t order)
 
    for(int l = 0; l <= order; l++)
    {
-      res[l * l + l][l * l + l] = make_cuComplex(1, 0);
+      res[l * l + l][l * l + l] = makeComplex(1, 0);
 
       for(int m = 1; m <= l; m++)
       {
-         res[l * l + l + m][l * l + l + m] = make_cuComplex(math::R_SQRT_2, 0);
-         res[l * l + l - m][l * l + l + m] = make_cuComplex(math::R_SQRT_2, 0);
+         res[l * l + l + m][l * l + l + m] = makeComplex(math::R_SQRT_2, 0);
+         res[l * l + l - m][l * l + l + m] = makeComplex(math::R_SQRT_2, 0);
 
-         res[l * l + l + m][l * l + l - m] = make_cuComplex(0, -math::R_SQRT_2);
-         res[l * l + l - m][l * l + l - m] = make_cuComplex(0, math::R_SQRT_2);
+         res[l * l + l + m][l * l + l - m] = makeComplex(0, -math::R_SQRT_2);
+         res[l * l + l - m][l * l + l - m] = makeComplex(0, math::R_SQRT_2);
       }
    }
 
@@ -208,9 +208,9 @@ std::vector<Complex> Harmonics::calcRealToComplexTransitionMatrix1D(size_t order
          size_t newImagIndex = HarmonicSeries<Complex>::lmToIndex(l, imagM);
 
          res[newRealIndex * harmonicLen + currentIndex] +=
-            make_cuComplex(realPart, 0);
+            makeComplex(realPart, 0);
          res[newImagIndex * harmonicLen + currentIndex] +=
-            make_cuComplex(0, imagPart);
+            makeComplex(0, imagPart);
       }
    }
 
@@ -224,19 +224,19 @@ std::vector<Complex> Harmonics::calcComplexToRealTransitionMatrix1D(size_t order
 
    for(int l = 0; l <= order; l++)
    {
-      res[(l * l + l) * harmonicLen + (l * l + l)] = make_cuComplex(1, 0);
+      res[(l * l + l) * harmonicLen + (l * l + l)] = makeComplex(1, 0);
 
       for(int m = 1; m <= l; m++)
       {
          res[(l * l + l + m) * harmonicLen + (l * l + l + m)] =
-            make_cuComplex(math::R_SQRT_2, 0);
+            makeComplex(math::R_SQRT_2, 0);
          res[(l * l + l - m) * harmonicLen + (l * l + l + m)] =
-            make_cuComplex(math::R_SQRT_2, 0);
+            makeComplex(math::R_SQRT_2, 0);
 
          res[(l * l + l + m) * harmonicLen + (l * l + l - m)] =
-            make_cuComplex(0, -math::R_SQRT_2);
+            makeComplex(0, -math::R_SQRT_2);
          res[(l * l + l - m) * harmonicLen + (l * l + l - m)] =
-            make_cuComplex(0, math::R_SQRT_2);
+            makeComplex(0, math::R_SQRT_2);
       }
    }
 
@@ -286,13 +286,15 @@ ComplexHarmonicSeries Harmonics::realToComplex(
    real c = math::R_SQRT_2;
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = make_cuComplex(harmonics.getHarmonic(l, 0), 0);
+      res.getHarmonic(l, 0) = makeComplex(harmonics.getHarmonic(l, 0), 0);
       for(int m = 1; m <= l; m++)
       {
-         res.setHarmonic(l, m, make_cuComplex(harmonics.getHarmonic(l, m) * c,
-                                       harmonics.getHarmonic(l, -m) * c));
-         res.setHarmonic(l, -m, make_cuComplex(harmonics.getHarmonic(l, m) * c,
-                                      -harmonics.getHarmonic(l, -m) * c));
+         res.setHarmonic(l, m, makeComplex(
+            harmonics.getHarmonic(l, m) * c,
+            harmonics.getHarmonic(l, -m) * c));
+         res.setHarmonic(l, -m, makeComplex(
+            harmonics.getHarmonic(l, m) * c,
+            -harmonics.getHarmonic(l, -m) * c));
       }
    }
 
@@ -306,11 +308,11 @@ RealHarmonicSeries Harmonics::complexToReal(const ComplexHarmonicSeries& harmoni
    real c = 1.0 / sqrt(2);
    for(int l = 0; l <= harmonics.order(); l++)
    {
-      res.getHarmonic(l, 0) = cuCrealf(harmonics.getHarmonic(l, 0));
+      res.getHarmonic(l, 0) = getReal(harmonics.getHarmonic(l, 0));
       for(int m = 1; m <= l; m++)
       {
-         res.getHarmonic(l, m) = c * cuCrealf(harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m));
-         res.getHarmonic(l, -m) = c * cuCimagf(harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m));
+         res.getHarmonic(l, m) = c * getReal(harmonics.getHarmonic(l, m) + harmonics.getHarmonic(l, -m));
+         res.getHarmonic(l, -m) = c * getImag(harmonics.getHarmonic(l, m) - harmonics.getHarmonic(l, -m));
       }
    }
 

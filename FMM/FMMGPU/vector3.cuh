@@ -3,6 +3,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "real.hpp"
+#include "typedefs.hpp"
 
 class Vector3
 {

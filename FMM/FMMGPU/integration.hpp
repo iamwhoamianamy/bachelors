@@ -86,6 +86,8 @@ namespace math
       const std::vector<Quadrature*>& quadratures,
       int harmonicOrder,
       const Vector3& center = Vector3());
+
+   real calcSurfaceArea(const std::vector<BEMQuadrature>& quadratures);
    
 #pragma endregion
 }

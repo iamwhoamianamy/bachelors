@@ -9,7 +9,7 @@ struct BEMQuadrature : public Quadrature
    BEMQuadrature() = default;
    BEMQuadrature(
       const Vector3& coordinates,
-      real square,
+      real area,
       real weight,
       const Vector3& B,
       const Vector3& normal);

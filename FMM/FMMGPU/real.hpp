@@ -14,5 +14,3 @@
    typedef double real;
 
 #endif // REAL_IS_DOUBLE
-
-#define __all__ __device__ __host__

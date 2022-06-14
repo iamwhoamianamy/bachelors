@@ -3,13 +3,19 @@
 
 #include "torus.hpp"
 #include "basis_quadratures.hpp"
+#include "bem_quadrature.hpp"
 #include "box.hpp"
 #include "cylinder.hpp"
+#include "reference_cylinder_data.hpp"
 
 namespace test
 {
    Torus createTorus();
    Cylinder createCylinder();
+   std::vector<BEMQuadrature> quadraturesFromCylinder();
+   std::vector<ReferenceCylinderData> readCylinderData(
+      const std::string& filename);
+
    double getTime(void (*f)());
    double getTime(const std::chrono::steady_clock::time_point& start,
                   const std::chrono::steady_clock::time_point& stop);

@@ -2,6 +2,7 @@
 #include "kernels.cuh"
 #include "cblas.h"
 #include "multipole_translator.hpp"
+#include "blass_callers.hpp"
 
 #include <omp.h>
 
@@ -126,7 +127,7 @@ void kernels::translateAllCPUMatrixBLAS(
    const real alpha = 1;
    const real beta = 0;
 
-   cblas_sgemm(CBLAS_ORDER::CblasColMajor,
+   blas::multMatrices(CBLAS_ORDER::CblasColMajor,
                CBLAS_TRANSPOSE::CblasNoTrans,
                CBLAS_TRANSPOSE::CblasNoTrans,
                m, n, k,

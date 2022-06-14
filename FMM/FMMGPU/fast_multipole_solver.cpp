@@ -7,6 +7,7 @@
 #include "multipole_translator.hpp"
 #include "testing_helpers.hpp"
 #include "translation_algorithms.hpp"
+#include "blass_callers.hpp"
 
 FastMultipoleSolver::FastMultipoleSolver(
    std::vector<Quadrature>& quadratures,
@@ -387,10 +388,10 @@ void FastMultipoleSolver::accountContributionsToChildren(
    {
       for(size_t c = 0; c < 3; c++)
       {
-         cblas_saxpy(
+         blas::addVectorToVector(
             harmonicLength, 1,
             contributions[c].data() + harmonicLength * nodeId, 1,
-            (float*)(nodesByOrientation[nodeId]->localExpansion().data().data()) + c, 3);
+            (real*)(nodesByOrientation[nodeId]->localExpansion().data().data()) + c, 3);
       }
    }
 }
@@ -408,9 +409,9 @@ RealMatrix FastMultipoleSolver::getExpansionsInOneOrientationAsVectors(
 
       for(size_t c = 0; c < 3; c++)
       {
-         cblas_scopy(
+         blas::copyVector(
             harmonicLength,
-            (float*)expansion.data().data() + c, 3,
+            (real*)expansion.data().data() + c, 3,
             res[c].data() + nodeId * harmonicLength, 1);
       }
    }
@@ -508,8 +509,8 @@ RealMatrix FastMultipoleSolver::calcRegularMatricesForL2LAsVectors(
       auto regularHarmonicsMatrix = formMatrixFromRegularHarmonicsForL2LAsVectors(
          Harmonics::realToComplex(regularHarmonics));
 
-      Complex alpha = make_cuComplex(1, 0);
-      Complex beta = make_cuComplex(0, 0);
+      Complex alpha = makeComplex(1, 0);
+      Complex beta = makeComplex(0, 0);
 
       std::vector<Complex> temp1(matrixElemCount);
 
@@ -543,9 +544,9 @@ RealMatrix FastMultipoleSolver::calcRegularMatricesForL2LAsVectors(
          (float*)temp2.data(),
          harmonicLength);
 
-      cblas_scopy(
+      blas::copyVector(
          matrixElemCount,
-         (float*)(temp2.data()), 2,
+         (real*)(temp2.data()), 2,
          result[i].data(), 1);
    }
 

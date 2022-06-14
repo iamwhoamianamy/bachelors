@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="basis_quadratures.hpp" />
     <ClInclude Include="bem_quadrature.hpp" />
+    <ClInclude Include="blass_callers.hpp" />
     <ClInclude Include="box.hpp" />
     <ClInclude Include="calculation_point_octree.hpp" />
     <ClInclude Include="cuda_helper.hpp" />
@@ -128,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="basis_quadratures.cpp" />
     <ClCompile Include="bem_quadrature.cpp" />
+    <ClCompile Include="blass_callers.cpp" />
     <ClCompile Include="box.cpp" />
     <ClCompile Include="calculation_point_octree.cpp" />
     <ClCompile Include="cuda_helper.cpp" />

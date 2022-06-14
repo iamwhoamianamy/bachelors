@@ -11,7 +11,7 @@ Triangle::Triangle(const Vector3& a, const Vector3& b, const Vector3& c)
 {
 }
 
-real Triangle::square() const
+real Triangle::area() const
 {
    Vector3 ab(b().x - a().x, b().y - a().y, b().z - a().z);
    Vector3 ac(c().x - a().x, c().y - a().y, c().z - a().z);

@@ -230,8 +230,8 @@ namespace math
             math::cylindricToCartesian(triangle.b()),
             math::cylindricToCartesian(triangle.c()));
 
-         //real square = triangle.square();
-         real square = triangleCartesian.square();
+         //real area = triangle.area();
+         real square = triangleCartesian.area();
          Vector3 B;
          Vector3 closestB;
          real minDist = 1000000;
@@ -352,6 +352,18 @@ namespace math
       }
 
       return res;
+   }
+
+   real calcSurfaceArea(const std::vector<BEMQuadrature>& quadratures)
+   {
+      real result = 0;
+
+      for(auto& quadrature : quadratures)
+      {
+         result += quadrature.weight;
+      }
+
+      return result;
    }
 
 #pragma endregion
