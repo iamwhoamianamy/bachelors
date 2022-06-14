@@ -8,7 +8,7 @@ namespace math
    {
       return  {
          point.y * std::cos(point.x),
-         point.y* std::sin(point.x),
+         point.y * std::sin(point.x),
          point.z };
    }
 
