@@ -151,10 +151,21 @@ void MultipoleSolver::calcMultipoleExpansionsWithoutTranslation()
 
       if(!currentNode->isUsefullLeaf())
       {
-         currentNode->multipoleExpansion() = math::calcIntegralContribution(
-            currentNode->getAllQuadratures(),
-            harmonicOrder,
-            currentNode->box().center());
+         switch(_problem)
+         {
+            case Problem::BioSavartLaplace:
+            {
+               currentNode->multipoleExpansion() = math::calcIntegralContribution(
+                  currentNode->getAllQuadratures(), harmonicOrder, currentNode->box().center());
+               break;
+            }
+            case Problem::BEM:
+            {
+               currentNode->multipoleExpansion() = math::calcBEMIntegralContribution(
+                  currentNode->getAllQuadratures(), harmonicOrder, currentNode->box().center());
+               break;
+            }
+         }
 
          for(auto child : currentNode->children())
          {

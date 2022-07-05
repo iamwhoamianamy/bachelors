@@ -6,7 +6,7 @@ timeInt = []
 timeMatrices = []
 timeFullFMM = []
 
-with open("full_N_M_time2.txt") as f:
+with open("full_N_M_time.txt") as f:
    for line in f:
       values = line.split(" ")
       NM.append(float(values[0]))
@@ -20,7 +20,7 @@ plt.plot(NM, timeInt, "-o")
 plt.plot(NM, timeMatrices, "-o")
 plt.plot(NM, timeFullFMM, "-o")
 plt.grid(True)
-plt.xlabel("Количество точек на количество квадратур")
+plt.xlabel("Количество точек на количество точек квадратур")
 plt.ylabel("Время построения, с")
 plt.legend(["Интегрирование квадратурами", 
             "БММ с одним деревом",
